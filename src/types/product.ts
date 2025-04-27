@@ -1,10 +1,11 @@
+
 export interface Product {
   id: string;
   name: string;
   description: string;
   price: number;
   discountPrice?: number;
-  category: string;
+  category: 'boots' | 'jackets' | 'pants' | 'accessories';
   images: string[];
   inStock: boolean;
   featured: boolean;

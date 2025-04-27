@@ -70,7 +70,7 @@ interface ProductFormData {
   description: string;
   price: number;
   discountPrice?: number;
-  category: 'boots' | 'jackets' | 'accessories';
+  category: 'boots' | 'jackets' | 'pants' | 'accessories';
   images: string[];
   inStock: boolean;
   featured: boolean;
@@ -169,7 +169,11 @@ const AdminPage = () => {
   };
   
   const handleEdit = (product: Product) => {
-    setFormData(product);
+    // Type casting the product to ensure category is compatible
+    setFormData({
+      ...product,
+      category: product.category as 'boots' | 'jackets' | 'pants' | 'accessories'
+    });
     setIsEditing(true);
     setActiveTab("add-product");
   };
@@ -348,6 +352,7 @@ const AdminPage = () => {
                         <SelectContent>
                           <SelectItem value="boots">{t('boots')}</SelectItem>
                           <SelectItem value="jackets">{t('jackets')}</SelectItem>
+                          <SelectItem value="pants">{t('pants')}</SelectItem>
                           <SelectItem value="accessories">{t('accessories')}</SelectItem>
                         </SelectContent>
                       </Select>
