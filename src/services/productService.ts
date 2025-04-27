@@ -1,5 +1,5 @@
 
-import { Product, ProductFilters } from '@/types/product';
+import { Product, ProductFilters, SAMPLE_PRODUCTS } from '@/types/product';
 
 // Save products to localStorage
 export const saveProducts = (products: Product[]): void => {
@@ -13,8 +13,7 @@ export const getProducts = (): Product[] => {
     return JSON.parse(storedProducts);
   }
 
-  // If no products in localStorage, import and use sample products
-  const { SAMPLE_PRODUCTS } = require('@/types/product');
+  // If no products in localStorage, use imported sample products
   saveProducts(SAMPLE_PRODUCTS);
   return SAMPLE_PRODUCTS;
 };
