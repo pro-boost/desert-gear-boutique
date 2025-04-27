@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -14,7 +13,8 @@ import {
   Sun, 
   Moon, 
   Globe, 
-  Heart 
+  Heart,
+  Target
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -36,44 +36,53 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
-      <div className="container mx-auto py-3 px-4 md:px-6">
-        <div className="flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
+      <div className="container mx-auto py-3 px-4">
+        <div className="flex items-center justify-between gap-8">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 rtl:space-x-reverse">
-            <span className="text-2xl font-heading font-bold text-primary">{t('siteTitle')}</span>
+          <Link to="/" className="flex items-center gap-2 min-w-[160px]">
+            <Target className="h-8 w-8 text-primary" />
+            <span className="text-2xl font-heading font-bold text-primary tracking-tight">
+              {t('siteTitle')}
+            </span>
           </Link>
 
+          {/* Search Bar - Optional */}
+          <div className="flex-1 max-w-xl hidden lg:block">
+            <input
+              type="search"
+              placeholder={t('search')}
+              className="w-full px-4 py-2 rounded-full bg-muted/50 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6 rtl:space-x-reverse">
-            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+          <nav className="hidden md:flex items-center gap-6 ml-auto">
+            <Link to="/" className="nav-link">
               {t('home')}
             </Link>
-            <Link to="/products" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/products" className="nav-link">
               {t('products')}
             </Link>
-            <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/contact" className="nav-link">
               {t('contactUs')}
             </Link>
           </nav>
 
-          {/* Right Side: User, Cart, Language & Theme */}
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            {/* Theme Toggle */}
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-2">
             <Button
               variant="ghost" 
               size="icon"
               onClick={toggleTheme}
-              aria-label={theme === 'dark' ? t('light') : t('dark')}
               className="text-foreground hover:text-primary"
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </Button>
 
-            {/* Language Selector */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Change Language">
+                <Button variant="ghost" size="icon">
                   <Globe size={20} />
                 </Button>
               </DropdownMenuTrigger>
@@ -87,10 +96,9 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="User Menu">
+                <Button variant="ghost" size="icon">
                   <User size={20} />
                 </Button>
               </DropdownMenuTrigger>
@@ -127,32 +135,28 @@ const Navbar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Favorites */}
-            <Link to="/favorites" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Favorites">
+            <Link to="/favorites">
+              <Button variant="ghost" size="icon" className="relative">
                 <Heart size={20} />
               </Button>
             </Link>
 
-            {/* Cart */}
-            <Link to="/cart" className="relative">
-              <Button variant="ghost" size="icon" aria-label="Shopping Cart">
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative">
                 <ShoppingBag size={20} />
                 {itemCount > 0 && (
-                  <div className="absolute -top-1 -right-1 bg-tactical-light text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
                     {itemCount}
-                  </div>
+                  </span>
                 )}
               </Button>
             </Link>
 
-            {/* Mobile Menu Button */}
             <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={toggleMenu}
-              aria-label="Toggle Menu"
             >
               {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
             </Button>
@@ -161,25 +165,25 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden pt-4 pb-3 border-t border-border mt-3">
-            <nav className="flex flex-col space-y-3">
+          <div className="md:hidden py-4 border-t border-border mt-3 space-y-4">
+            <nav className="flex flex-col gap-4">
               <Link 
                 to="/" 
-                className="px-2 py-1 text-foreground hover:text-primary transition-colors"
+                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('home')}
               </Link>
               <Link 
                 to="/products" 
-                className="px-2 py-1 text-foreground hover:text-primary transition-colors"
+                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('products')}
               </Link>
               <Link 
                 to="/contact" 
-                className="px-2 py-1 text-foreground hover:text-primary transition-colors"
+                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {t('contactUs')}

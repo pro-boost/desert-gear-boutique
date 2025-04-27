@@ -8,7 +8,7 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingBag, Heart } from 'lucide-react';
+import { ShoppingBag, Heart, Target } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
@@ -43,67 +43,75 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
 
   return (
-    <Card className="overflow-hidden card-hover h-full flex flex-col">
+    <Card className="group overflow-hidden card-hover h-full flex flex-col border-2">
       <Link to={`/products/${product.id}`} className="h-full flex flex-col">
-        <div className="relative h-60 overflow-hidden">
-          {/* Image */}
+        <div className="relative h-[280px] overflow-hidden bg-muted">
           <img
-            src={product.images[0] || '/placeholder.svg'}
+            src={product.images[0] || 'https://images.unsplash.com/photo-1452378174528-3090a4bba7b2'}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
           
-          {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-2">
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
             {!product.inStock && (
-              <Badge variant="destructive">
+              <Badge variant="destructive" className="animate-pulse">
                 {t('outOfStock')}
               </Badge>
             )}
-            {hasDiscount && (
-              <Badge variant="secondary" className="bg-tactical-light text-white">
-                -{Math.round((1 - product.discountPrice! / product.price) * 100)}%
+            {product.discountPrice && product.discountPrice < product.price && (
+              <Badge variant="secondary" className="bg-primary text-primary-foreground">
+                -{Math.round((1 - product.discountPrice / product.price) * 100)}%
               </Badge>
             )}
             {product.featured && (
-              <Badge>{t('featured')}</Badge>
+              <Badge className="bg-secondary text-secondary-foreground">
+                <Target className="w-3 h-3 mr-1" />
+                {t('featured')}
+              </Badge>
             )}
           </div>
           
-          {/* Favorite Button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 bg-background/50 backdrop-blur-sm hover:bg-background/70"
+            className="absolute top-3 right-3 bg-background/50 backdrop-blur-sm hover:bg-background/70 transition-transform duration-300 hover:scale-110"
             onClick={handleFavoriteToggle}
           >
             <Heart 
               size={18} 
-              className={favorited ? 'fill-tactical text-tactical' : ''} 
+              className={`transition-colors ${favorited ? 'fill-destructive text-destructive' : ''}`}
             />
           </Button>
         </div>
         
-        <CardContent className="pt-4 flex-grow">
-          <h3 className="font-semibold text-lg mb-1 line-clamp-1">{product.name}</h3>
-          <p className="text-muted-foreground text-sm mb-2 line-clamp-2">{product.description}</p>
+        <CardContent className="flex-grow p-4">
+          <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1">
+            {product.name}
+          </h3>
+          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+            {product.description}
+          </p>
           
-          <div className="flex items-center mt-auto">
-            {hasDiscount ? (
-              <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                <span className="font-bold">{product.discountPrice?.toFixed(2)} Dh</span>
-                <span className="text-muted-foreground line-through text-sm">{product.price.toFixed(2)} Dh</span>
-              </div>
+          <div className="flex items-baseline gap-2">
+            {product.discountPrice && product.discountPrice < product.price ? (
+              <>
+                <span className="font-bold text-lg">{product.discountPrice.toFixed(2)} Dh</span>
+                <span className="text-muted-foreground line-through text-sm">
+                  {product.price.toFixed(2)} Dh
+                </span>
+              </>
             ) : (
-              <span className="font-bold">{product.price.toFixed(2)} Dh</span>
+              <span className="font-bold text-lg">{product.price.toFixed(2)} Dh</span>
             )}
           </div>
         </CardContent>
         
-        <CardFooter className="pb-4 pt-0">
+        <CardFooter className="p-4 pt-0">
           <Button 
             variant={product.inStock ? "default" : "outline"}
-            className={product.inStock ? "w-full bg-primary" : "w-full"} 
+            className={`w-full group-hover:bg-primary/90 transition-all duration-300 ${
+              product.inStock ? "bg-primary" : ""
+            }`}
             disabled={!product.inStock}
             onClick={handleAddToCart}
           >
