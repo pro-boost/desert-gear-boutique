@@ -62,6 +62,7 @@ import {
   Save, 
   X
 } from 'lucide-react';
+import ImageDropzone from '@/components/ImageDropzone';
 
 // Product form interface
 interface ProductFormData {
@@ -195,6 +196,20 @@ const AdminPage = () => {
     setFormData(initialFormData);
     setIsEditing(false);
     setActiveTab("products");
+  };
+
+  const handleImageUpload = (imageData: string) => {
+    setFormData(prev => ({
+      ...prev,
+      images: [imageData]
+    }));
+  };
+
+  const handleImageRemove = () => {
+    setFormData(prev => ({
+      ...prev,
+      images: ['/placeholder.svg']
+    }));
   };
 
   return (
@@ -418,24 +433,16 @@ const AdminPage = () => {
                       </div>
                     </div>
                     
-                    {/* Image URL */}
+                    {/* Image Upload */}
                     <div className="space-y-1">
-                      <label htmlFor="images" className="text-sm font-medium">
-                        Image URL
+                      <label className="text-sm font-medium">
+                        Product Image
                       </label>
-                      <Input
-                        id="images"
-                        name="images"
-                        value={formData.images[0]}
-                        onChange={(e) => setFormData(prev => ({
-                          ...prev,
-                          images: [e.target.value]
-                        }))}
-                        placeholder="/images/product.jpg"
+                      <ImageDropzone
+                        onImageUpload={handleImageUpload}
+                        currentImage={formData.images[0]}
+                        onImageRemove={handleImageRemove}
                       />
-                      <p className="text-xs text-muted-foreground">
-                        For now, enter an image URL. For example: /placeholder.svg
-                      </p>
                     </div>
                     
                     {/* Status Checkboxes */}
