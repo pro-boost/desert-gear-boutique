@@ -32,9 +32,9 @@ const FavoritesPage = () => {
           ) : (
             <div className="text-center py-16 max-w-md mx-auto">
               <Heart size={64} className="mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-2xl font-medium mb-2">No favorites yet</h2>
+              <h2 className="text-2xl font-medium mb-2">{t('noFavorites')}</h2>
               <p className="text-muted-foreground mb-6">
-                You haven't added any products to your favorites yet.
+                {t('noFavoritesMessage')}
               </p>
               <Button asChild>
                 <Link to="/products">{t('shopNow')}</Link>

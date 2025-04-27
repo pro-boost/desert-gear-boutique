@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 type Language = 'fr' | 'ar';
@@ -247,6 +246,58 @@ const translations: Translations = {
   createAccount: {
     fr: 'Créer un compte',
     ar: 'إنشاء حساب',
+  },
+  noFavorites: {
+    fr: 'Aucun favori',
+    ar: 'لا توجد مفضلات',
+  },
+  noFavoritesMessage: {
+    fr: "Vous n'avez pas encore ajouté de produits à vos favoris",
+    ar: 'لم تقم بإضافة أي منتجات إلى المفضلة بعد',
+  },
+  pants: {
+    fr: 'Pantalons',
+    ar: 'سراويل',
+  },
+  allProducts: {
+    fr: 'Tous les produits',
+    ar: 'جميع المنتجات',
+  },
+  allRights: {
+    fr: 'Tous droits réservés',
+    ar: 'جميع الحقوق محفوظة',
+  },
+  shipping: {
+    fr: 'Livraison',
+    ar: 'الشحن',
+  },
+  returns: {
+    fr: 'Retours',
+    ar: 'الإرجاع',
+  },
+  sendMessage: {
+    fr: 'Envoyer le message',
+    ar: 'إرسال الرسالة',
+  },
+  messageSent: {
+    fr: 'Message envoyé avec succès !',
+    ar: 'تم إرسال الرسالة بنجاح!',
+  },
+  name: {
+    fr: 'Nom',
+    ar: 'الاسم',
+  },
+  subject: {
+    fr: 'Sujet',
+    ar: 'الموضوع',
+  },
+  message: {
+    fr: 'Message',
+    ar: 'الرسالة',
+  },
+  equipmentDescription: {
+    fr: 'Équipement militaire et tactique de haute qualité',
+    ar: 'معدات عسكرية وتكتيكية عالية الجودة',
   },
 };
 
