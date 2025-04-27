@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -74,7 +73,7 @@ interface ProductFormData {
   category: 'boots' | 'jackets' | 'accessories';
   images: string[];
   inStock: boolean;
-  featured?: boolean;
+  featured: boolean;
 }
 
 // Initial form data
