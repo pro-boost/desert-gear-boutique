@@ -21,7 +21,7 @@ const Shipping = () => {
               <Truck className="w-12 h-12 text-primary mb-4" />
               <h3 className="text-xl font-semibold mb-2">Livraison Standard</h3>
               <p className="text-muted-foreground">3-5 jours ouvrables</p>
-              <p className="text-muted-foreground">Gratuit pour les commandes > 500 DH</p>
+              <p className="text-muted-foreground">Gratuit pour les commandes {'>'}500 DH</p>
             </div>
             
             <div className="p-6 rounded-lg bg-card">
