@@ -11,6 +11,7 @@ import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AuthLayout from "@/pages/auth/AuthLayout";
+import BackToTopButton from "@/components/BackToTopButton";
 
 // Pages
 import Index from "./pages/Index";
@@ -71,6 +72,7 @@ const App = () => (
                     />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
+                  <BackToTopButton />
                 </BrowserRouter>
               </TooltipProvider>
             </FavoritesProvider>

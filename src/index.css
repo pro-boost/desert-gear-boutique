@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700;800&display=swap');
 
 @tailwind base;
@@ -117,6 +116,23 @@
   .delay-400 {
     animation-delay: 400ms;
   }
+  
+  /* Back to top button animation */
+  .back-to-top-enter {
+    @apply opacity-0 translate-y-10;
+  }
+  
+  .back-to-top-enter-active {
+    @apply opacity-100 translate-y-0 transition-all duration-300 ease-out;
+  }
+  
+  .back-to-top-exit {
+    @apply opacity-100 translate-y-0;
+  }
+  
+  .back-to-top-exit-active {
+    @apply opacity-0 translate-y-10 transition-all duration-300 ease-in;
+  }
 }
 
 @keyframes float {
@@ -180,4 +196,21 @@
 
 .animate-fade-in {
   animation: fade-in 0.8s ease-out forwards;
+}
+
+/* Back to top button pulse effect */
+.back-to-top-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--primary) / 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(var(--primary) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--primary) / 0);
+  }
 }
