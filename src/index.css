@@ -9,10 +9,10 @@
     --background: 144 38% 97%;
     --foreground: 144 38% 15%;
 
-    --card: 144 38% 97%;
+    --card: 0 0% 100%;
     --card-foreground: 144 38% 15%;
 
-    --popover: 144 38% 97%;
+    --popover: 0 0% 100%;
     --popover-foreground: 144 38% 15%;
 
     --primary: 144 38% 25%;
@@ -21,10 +21,10 @@
     --secondary: 144 25% 85%;
     --secondary-foreground: 144 38% 25%;
 
-    --muted: 144 38% 90%;
+    --muted: 144 10% 95%;
     --muted-foreground: 144 20% 35%;
 
-    --accent: 144 25% 85%;
+    --accent: 144 60% 90%;
     --accent-foreground: 144 38% 25%;
 
     --destructive: 0 84.2% 60.2%;
@@ -35,6 +35,9 @@
     --ring: 144 38% 25%;
 
     --radius: 0.5rem;
+    
+    --soft-bg: 144 38% 97%;
+    --soft-accent: 160 84% 96%;
   }
 
   .dark {
@@ -100,6 +103,33 @@
   
   .hero-animated-bg {
     @apply bg-gradient-to-br from-background to-secondary/20;
+  }
+
+  /* New accent components for white mode */
+  .accent-card {
+    @apply bg-white border border-border shadow-sm hover:shadow-md transition-all duration-300 rounded-lg overflow-hidden;
+  }
+  
+  .accent-border {
+    @apply border border-accent/50 rounded-lg p-4;
+  }
+  
+  .accent-pattern {
+    background-color: hsl(var(--background));
+    background-image: radial-gradient(hsl(var(--accent)/20) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .accent-bg-soft {
+    @apply bg-[hsl(var(--soft-accent))];
+  }
+  
+  .accent-border-subtle {
+    @apply border border-secondary/50;
+  }
+  
+  .accent-glass {
+    @apply backdrop-blur-sm bg-white/70 border border-white/20 shadow-sm;
   }
 }
 

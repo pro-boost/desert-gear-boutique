@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { filterProducts } from '@/services/productService';
 import { ProductFilters, Product } from '@/types/product';
@@ -22,6 +22,7 @@ import { Search } from 'lucide-react';
 const ProductsPage = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   
   // Get initial filter values from URL parameters
   const initialCategory = searchParams.get('category') || 'all';
@@ -38,6 +39,14 @@ const ProductsPage = () => {
   // State for products
   const [products, setProducts] = useState<Product[]>([]);
   const [searchValue, setSearchValue] = useState(initialSearch);
+  
+  // Update filters when URL parameters change (for footer links)
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam) {
+      setFilters(prev => ({ ...prev, category: categoryParam as any }));
+    }
+  }, [location.search, searchParams]);
   
   // Load products when filters change
   useEffect(() => {
@@ -125,7 +134,7 @@ const ProductsPage = () => {
                     <SelectValue placeholder={t('category')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="all">{t('allProducts')}</SelectItem>
                     <SelectItem value="boots">{t('boots')}</SelectItem>
                     <SelectItem value="jackets">{t('jackets')}</SelectItem>
                     <SelectItem value="accessories">{t('accessories')}</SelectItem>
@@ -147,7 +156,7 @@ const ProductsPage = () => {
               
               {/* Clear Filters */}
               <Button variant="outline" onClick={clearFilters}>
-                Clear
+                {t('cancel')}
               </Button>
             </div>
           </div>
@@ -163,7 +172,7 @@ const ProductsPage = () => {
             <div className="text-center py-12">
               <p className="text-muted-foreground">No products found matching your criteria.</p>
               <Button variant="outline" onClick={clearFilters} className="mt-4">
-                Clear Filters
+                {t('cancel')}
               </Button>
             </div>
           )}

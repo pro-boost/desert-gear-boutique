@@ -14,7 +14,7 @@ type Translations = {
 const translations: Translations = {
   siteTitle: {
     fr: "Strike Gear",
-    ar: "strike gear",
+    ar: "سترايك جير",
   },
   home: {
     fr: "Accueil",
@@ -25,7 +25,7 @@ const translations: Translations = {
     ar: "المنتجات",
   },
   boots: {
-    fr: "Brodequin",
+    fr: "Brodequins",
     ar: "أحذية",
   },
   jackets: {
@@ -113,8 +113,8 @@ const translations: Translations = {
     ar: "الأكثر مبيعاً",
   },
   welcomeMessage: {
-    fr: "Bienvenue chez Nidal Boots",
-    ar: "مرحباً بكم في أحذية نضال",
+    fr: "Bienvenue chez Strike Gear",
+    ar: "مرحباً بكم في سترايك جير",
   },
   shopNow: {
     fr: "Acheter maintenant",

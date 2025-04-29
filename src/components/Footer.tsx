@@ -17,7 +17,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">{t('siteTitle')}</h3>
             <p className="text-muted-foreground mb-4">
-              Équipement militaire et tactique de haute qualité.
+              {t('equipmentDescription')}
             </p>
             <div className="flex space-x-4 rtl:space-x-reverse">
               <a href="https://instagram.com" className="text-foreground hover:text-primary" aria-label="Instagram">
@@ -72,12 +72,12 @@ const Footer = () => {
               </li>
               <li>
                 <Link to="/shipping" className="text-muted-foreground hover:text-primary transition-colors">
-                  Livraison
+                  {t('shipping')}
                 </Link>
               </li>
               <li>
                 <Link to="/returns" className="text-muted-foreground hover:text-primary transition-colors">
-                  Retours
+                  {t('returns')}
                 </Link>
               </li>
             </ul>
