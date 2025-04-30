@@ -30,6 +30,12 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(theme);
     localStorage.setItem('theme', theme);
+    
+    // Add a transition class to make theme changes smoother
+    document.documentElement.classList.add('theme-transition');
+    setTimeout(() => {
+      document.documentElement.classList.remove('theme-transition');
+    }, 500);
   }, [theme]);
 
   const toggleTheme = () => {

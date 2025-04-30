@@ -6,68 +6,68 @@
 
 @layer base {
   :root {
-    --background: 144 38% 97%;
-    --foreground: 144 38% 15%;
+    --background: 30 38% 97%;
+    --foreground: 30 38% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 144 38% 15%;
+    --card-foreground: 30 38% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 144 38% 15%;
+    --popover-foreground: 30 38% 15%;
 
-    --primary: 144 38% 25%;
-    --primary-foreground: 144 38% 97%;
+    --primary: 30 85% 45%;
+    --primary-foreground: 30 38% 97%;
 
-    --secondary: 144 25% 85%;
-    --secondary-foreground: 144 38% 25%;
+    --secondary: 30 25% 85%;
+    --secondary-foreground: 30 38% 25%;
 
-    --muted: 144 10% 95%;
-    --muted-foreground: 144 20% 35%;
+    --muted: 30 10% 95%;
+    --muted-foreground: 30 20% 35%;
 
-    --accent: 144 60% 90%;
-    --accent-foreground: 144 38% 25%;
+    --accent: 30 60% 90%;
+    --accent-foreground: 30 38% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 144 38% 85%;
-    --input: 144 38% 85%;
-    --ring: 144 38% 25%;
+    --border: 30 38% 85%;
+    --input: 30 38% 85%;
+    --ring: 30 85% 45%;
 
     --radius: 0.5rem;
     
-    --soft-bg: 144 38% 97%;
-    --soft-accent: 160 84% 96%;
+    --soft-bg: 30 38% 97%;
+    --soft-accent: 30 84% 96%;
   }
 
   .dark {
     --background: 0 0% 7%;
-    --foreground: 144 38% 95%;
+    --foreground: 30 38% 95%;
 
     --card: 0 0% 9%;
-    --card-foreground: 144 38% 95%;
+    --card-foreground: 30 38% 95%;
 
     --popover: 0 0% 9%;
-    --popover-foreground: 144 38% 95%;
+    --popover-foreground: 30 38% 95%;
 
-    --primary: 144 38% 58%;
+    --primary: 30 85% 55%;
     --primary-foreground: 0 0% 7%;
 
-    --secondary: 144 25% 35%;
-    --secondary-foreground: 144 38% 95%;
+    --secondary: 30 25% 35%;
+    --secondary-foreground: 30 38% 95%;
 
     --muted: 0 0% 15%;
-    --muted-foreground: 144 20% 65%;
+    --muted-foreground: 30 20% 65%;
 
-    --accent: 144 25% 35%;
-    --accent-foreground: 144 38% 95%;
+    --accent: 30 25% 35%;
+    --accent-foreground: 30 38% 95%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 144 38% 95%;
+    --destructive-foreground: 30 38% 95%;
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 144 38% 58%;
+    --ring: 30 85% 55%;
   }
 }
 
@@ -130,6 +130,40 @@
   
   .accent-glass {
     @apply backdrop-blur-sm bg-white/70 border border-white/20 shadow-sm;
+  }
+  
+  /* Enhanced card animations */
+  .card-animated {
+    @apply transition-all duration-500 hover:shadow-xl border border-transparent hover:border-primary/20 hover:-translate-y-2 hover:scale-[1.03] relative overflow-hidden;
+  }
+  
+  .card-animated::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 -translate-x-full;
+    transition: transform 0.8s ease;
+  }
+  
+  .card-animated:hover::before {
+    @apply translate-x-full;
+  }
+  
+  .card-glow {
+    @apply relative overflow-hidden;
+    box-shadow: 0 0 15px -5px rgba(255, 153, 51, 0.2);
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card-glow:hover {
+    box-shadow: 0 0 30px -5px rgba(255, 153, 51, 0.4);
+  }
+  
+  /* Orange gradient backgrounds */
+  .bg-orange-gradient {
+    @apply bg-gradient-to-br from-orange-100 to-orange-50;
+  }
+  
+  .bg-orange-gradient-dark {
+    @apply bg-gradient-to-br from-orange-900 to-orange-800;
   }
 }
 
@@ -231,6 +265,92 @@
 /* Back to top button pulse effect */
 .back-to-top-pulse {
   animation: pulse 2s infinite;
+}
+
+/* Adding new animations for cards */
+@keyframes card-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 138, 76, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 138, 76, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 138, 76, 0);
+  }
+}
+
+@keyframes card-appear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-card-appear {
+  animation: card-appear 0.6s ease-out forwards;
+}
+
+.animate-card-pulse {
+  animation: card-pulse 2s infinite;
+}
+
+/* Enhanced float animations */
+@keyframes float-enhanced {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-25px) translateX(10px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -1000px 0;
+  }
+  to {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-float-enhanced {
+  animation: float-enhanced 12s ease-in-out infinite;
+}
+
+.card-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-shimmer::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg);
+  animation: shimmer 3s infinite linear;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-shimmer:hover::after {
+  opacity: 1;
 }
 
 @keyframes pulse {

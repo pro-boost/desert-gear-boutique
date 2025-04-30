@@ -57,3 +57,24 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.7);
 }
+
+/* Add smooth transition for theme changes */
+.theme-transition * {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Improve responsiveness */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Animation for staggered card appearance */
+.stagger-card:nth-child(1) { animation-delay: 0.1s; }
+.stagger-card:nth-child(2) { animation-delay: 0.2s; }
+.stagger-card:nth-child(3) { animation-delay: 0.3s; }
+.stagger-card:nth-child(4) { animation-delay: 0.4s; }
+.stagger-card:nth-child(5) { animation-delay: 0.5s; }
+.stagger-card:nth-child(6) { animation-delay: 0.6s; }
