@@ -85,6 +85,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
               isHovered ? 'opacity-100 translate-y-0 scale-110' : 'opacity-70 -translate-y-1'
             }`}
             onClick={handleFavoriteToggle}
+            type="button"
           >
             <Heart 
               size={18} 
@@ -92,7 +93,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             />
           </Button>
           
-          {/* Highlight effect on hover */}
           <div className={`absolute inset-0 bg-gradient-to-t from-black/40 to-transparent transition-opacity duration-300 ${
             isHovered ? 'opacity-50' : 'opacity-0'
           }`}></div>
@@ -134,6 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             }`}
             disabled={!product.inStock}
             onClick={handleAddToCart}
+            type="button"
           >
             <ShoppingBag className={`mr-2 h-4 w-4 transition-transform duration-300 ${isHovered ? 'scale-110' : ''}`} />
             {product.inStock ? t('addToCart') : t('outOfStock')}

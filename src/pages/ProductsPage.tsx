@@ -26,7 +26,8 @@ const ProductsPage = () => {
   
   // Get initial filter values from URL parameters
   const initialCategory = searchParams.get('category') || 'all';
-  const initialInStock = searchParams.get('inStock') === 'true';
+  // Set inStock to true by default
+  const initialInStock = searchParams.get('inStock') === 'false' ? false : true; // Default to true
   const initialSearch = searchParams.get('search') || '';
   
   // State for filters
@@ -58,7 +59,9 @@ const ProductsPage = () => {
     if (filters.category && filters.category !== 'all') {
       newParams.set('category', filters.category);
     }
-    if (filters.inStock) {
+    if (filters.inStock === false) {
+      newParams.set('inStock', 'false');
+    } else {
       newParams.set('inStock', 'true');
     }
     if (filters.search) {
@@ -87,7 +90,7 @@ const ProductsPage = () => {
   };
   
   const clearFilters = () => {
-    setFilters({ category: 'all', inStock: false, search: '' });
+    setFilters({ category: 'all', inStock: true, search: '' }); // Default inStock to true
     setSearchValue('');
   };
 
