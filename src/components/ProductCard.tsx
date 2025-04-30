@@ -51,13 +51,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link to={`/products/${product.id}`} className="h-full flex flex-col">
+      <div className="h-full flex flex-col">
         <div className="relative h-[280px] overflow-hidden bg-muted">
-          <img
-            src={product.images[0] || 'https://images.unsplash.com/photo-1452378174528-3090a4bba7b2'}
-            alt={product.name}
-            className={`w-full h-full object-cover transition-all duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
-          />
+          <Link to={`/products/${product.id}`}>
+            <img
+              src={product.images[0] || 'https://images.unsplash.com/photo-1452378174528-3090a4bba7b2'}
+              alt={product.name}
+              className={`w-full h-full object-cover transition-all duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+            />
+          </Link>
           
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {!product.inStock && (
@@ -99,12 +101,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
         </div>
         
         <CardContent className="flex-grow p-4">
-          <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1 transition-colors group-hover:text-orange-600">
-            {product.name}
-          </h3>
-          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-            {product.description}
-          </p>
+          <Link to={`/products/${product.id}`} className="block">
+            <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1 transition-colors group-hover:text-orange-600">
+              {product.name}
+            </h3>
+            <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+              {product.description}
+            </p>
+          </Link>
           
           <div className="flex items-baseline gap-2">
             {product.discountPrice && product.discountPrice < product.price ? (
@@ -140,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             {product.inStock ? t('addToCart') : t('outOfStock')}
           </Button>
         </CardFooter>
-      </Link>
+      </div>
     </Card>
   );
 };
