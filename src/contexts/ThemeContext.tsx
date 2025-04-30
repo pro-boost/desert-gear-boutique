@@ -29,6 +29,9 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // Update data-theme attribute and localStorage when theme changes
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(theme);
+    document.documentElement.style.setProperty('--primary', theme === 'light' ? '24 95% 52%' : '24 95% 55%'); // More vibrant orange
+    document.documentElement.style.setProperty('--primary-foreground', '0 0% 100%');
+    
     localStorage.setItem('theme', theme);
     
     // Add a transition class to make theme changes smoother

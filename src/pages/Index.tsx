@@ -1,5 +1,4 @@
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
@@ -13,6 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 const Index = () => {
   const { t } = useLanguage();
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const scrollingDown = useRef(true);
   
   const featuredProducts = getFeaturedProducts().slice(0, 4);
   const newArrivals = getNewArrivals(4);
@@ -43,28 +44,35 @@ const Index = () => {
     };
   }, []);
   
-  // Set up scroll snap
+  // Set up scroll snap - only when scrolling down
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight / 2;
+      const currentScrollY = window.scrollY;
+      scrollingDown.current = currentScrollY > lastScrollY;
+      setLastScrollY(currentScrollY);
       
-      let closestSection = null;
-      let minDistance = Number.MAX_VALUE;
-      
-      sectionsRef.current.forEach((section) => {
-        if (!section) return;
+      // Only apply scroll snapping when scrolling down
+      if (scrollingDown.current) {
+        const scrollPosition = currentScrollY + window.innerHeight / 2;
         
-        const sectionTop = section.offsetTop;
-        const distance = Math.abs(scrollPosition - sectionTop);
+        let closestSection = null;
+        let minDistance = Number.MAX_VALUE;
         
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestSection = section;
+        sectionsRef.current.forEach((section) => {
+          if (!section) return;
+          
+          const sectionTop = section.offsetTop;
+          const distance = Math.abs(scrollPosition - sectionTop);
+          
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestSection = section;
+          }
+        });
+        
+        if (closestSection && minDistance < 300) {
+          closestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      });
-      
-      if (closestSection && minDistance < 300) {
-        closestSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     };
     
@@ -74,7 +82,7 @@ const Index = () => {
     return () => {
       window.removeEventListener('scroll', debouncedHandleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
   
   // Simple debounce function
   const debounce = (func: Function, delay: number) => {
@@ -84,6 +92,7 @@ const Index = () => {
       timeout = setTimeout(() => func(...args), delay);
     };
   };
+  
   
   return (
     <div className="min-h-screen flex flex-col scroll-smooth">

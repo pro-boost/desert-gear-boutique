@@ -72,9 +72,9 @@ export default {
           dark: "#C6BC99",
         },
         tactical: {
-          light: "#FF8A4C",
-          DEFAULT: "#FF6B1A",
-          dark: "#E85500",
+          light: "#FF9C4C", // Brighter orange
+          DEFAULT: "#FF7C1A", // More vibrant base
+          dark: "#FF5500", // More vibrant dark
         },
         orange: {
           50: "#FFF8F2",
@@ -85,8 +85,8 @@ export default {
           500: "#FF9843",
           600: "#FF8A4C",
           700: "#FF6B1A",
-          800: "#E85500",
-          900: "#B34200",
+          800: "#FF5500", // More vibrant
+          900: "#D14400", // More vibrant
         },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",

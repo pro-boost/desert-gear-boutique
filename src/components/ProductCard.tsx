@@ -66,12 +66,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
               </Badge>
             )}
             {product.discountPrice && product.discountPrice < product.price && (
-              <Badge variant="secondary" className="bg-primary text-primary-foreground">
+              <Badge variant="secondary" className="bg-tactical-light text-primary-foreground">
                 -{Math.round((1 - product.discountPrice / product.price) * 100)}%
               </Badge>
             )}
             {product.featured && (
-              <Badge className="bg-secondary text-secondary-foreground">
+              <Badge className="bg-orange-500 text-white">
                 <Target className="w-3 h-3 mr-1" />
                 {t('featured')}
               </Badge>
@@ -88,7 +88,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
           >
             <Heart 
               size={18} 
-              className={`transition-colors ${favorited ? 'fill-destructive text-destructive' : ''}`}
+              className={`transition-colors ${favorited ? 'fill-orange-500 text-orange-500' : ''}`}
             />
           </Button>
           
@@ -99,7 +99,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
         </div>
         
         <CardContent className="flex-grow p-4">
-          <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1 transition-colors group-hover:text-primary">
+          <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1 transition-colors group-hover:text-orange-600">
             {product.name}
           </h3>
           <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
@@ -109,7 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
           <div className="flex items-baseline gap-2">
             {product.discountPrice && product.discountPrice < product.price ? (
               <>
-                <span className="font-bold text-lg transition-colors group-hover:text-primary">
+                <span className="font-bold text-lg transition-colors group-hover:text-orange-600">
                   {product.discountPrice.toFixed(2)} Dh
                 </span>
                 <span className="text-muted-foreground line-through text-sm">
@@ -117,7 +117,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
                 </span>
               </>
             ) : (
-              <span className="font-bold text-lg transition-colors group-hover:text-primary">
+              <span className="font-bold text-lg transition-colors group-hover:text-orange-600">
                 {product.price.toFixed(2)} Dh
               </span>
             )}
@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
           <Button 
             variant={product.inStock ? "default" : "outline"}
             className={`w-full transition-all duration-500 ${
-              isHovered && product.inStock ? "bg-primary shadow-lg shadow-primary/20" : "bg-primary"
+              isHovered && product.inStock ? "bg-orange-500 shadow-lg shadow-orange-500/20" : "bg-primary"
             } ${
               product.inStock ? "" : ""
             }`}
