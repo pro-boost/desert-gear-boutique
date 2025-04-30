@@ -1,8 +1,7 @@
-
-import React, { useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Upload, X } from 'lucide-react';
-import { Button } from './ui/button';
+import React, { useCallback } from "react";
+import { useDropzone } from "react-dropzone";
+import { Upload, X } from "lucide-react";
+import { Button } from "./ui/button";
 
 interface ImageDropzoneProps {
   onImageUpload: (image: string) => void;
@@ -10,24 +9,31 @@ interface ImageDropzoneProps {
   onImageRemove?: () => void;
 }
 
-const ImageDropzone = ({ onImageUpload, currentImage, onImageRemove }: ImageDropzoneProps) => {
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onImageUpload(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  }, [onImageUpload]);
+const ImageDropzone = ({
+  onImageUpload,
+  currentImage,
+  onImageRemove,
+}: ImageDropzoneProps) => {
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          onImageUpload(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
+    },
+    [onImageUpload]
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.webp']
+      "image/*": [".jpeg", ".jpg", ".png", ".webp"],
     },
-    maxFiles: 1
+    maxFiles: 1,
   });
 
   return (
@@ -35,9 +41,9 @@ const ImageDropzone = ({ onImageUpload, currentImage, onImageRemove }: ImageDrop
       <div
         {...getRootProps()}
         className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-          isDragActive 
-            ? 'border-primary bg-primary/5' 
-            : 'border-muted-foreground/25 hover:border-primary'
+          isDragActive
+            ? "border-primary bg-primary/5"
+            : "border-muted-foreground/25 hover:border-primary"
         }`}
       >
         <input {...getInputProps()} />
@@ -66,8 +72,8 @@ const ImageDropzone = ({ onImageUpload, currentImage, onImageRemove }: ImageDrop
           <div className="space-y-2">
             <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              {isDragActive 
-                ? "Drop the image here" 
+              {isDragActive
+                ? "Drop the image here"
                 : "Drag & drop your product image here or click to select"}
             </p>
           </div>
