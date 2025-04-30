@@ -1,9 +1,14 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { toast } from "@/components/ui/sonner";
 import { Product } from "@/types/product";
-import { useAuth } from './AuthContext';
-import { useLanguage } from './LanguageContext';
+import { useAuth } from "./AuthContext";
+import { useLanguage } from "./LanguageContext";
 
 interface FavoritesContextType {
   favorites: Product[];
@@ -12,9 +17,13 @@ interface FavoritesContextType {
   isFavorite: (productId: string) => boolean;
 }
 
-const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
+const FavoritesContext = createContext<FavoritesContextType | undefined>(
+  undefined
+);
 
-export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
   const [favorites, setFavorites] = useState<Product[]>([]);
   const { user } = useAuth();
   const { t } = useLanguage();
@@ -27,7 +36,7 @@ export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children 
         setFavorites(JSON.parse(savedFavorites));
       }
     } else {
-      const savedFavorites = localStorage.getItem('favorites-guest');
+      const savedFavorites = localStorage.getItem("favorites-guest");
       if (savedFavorites) {
         setFavorites(JSON.parse(savedFavorites));
       }
@@ -39,13 +48,13 @@ export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children 
     if (user) {
       localStorage.setItem(`favorites-${user.id}`, JSON.stringify(favorites));
     } else {
-      localStorage.setItem('favorites-guest', JSON.stringify(favorites));
+      localStorage.setItem("favorites-guest", JSON.stringify(favorites));
     }
   }, [favorites, user]);
 
   const addToFavorites = (product: Product) => {
-    setFavorites(prevFavorites => {
-      if (!prevFavorites.some(item => item.id === product.id)) {
+    setFavorites((prevFavorites) => {
+      if (!prevFavorites.some((item) => item.id === product.id)) {
         toast.success(`${product.name} ajouté aux favoris`);
         return [...prevFavorites, product];
       }
@@ -54,22 +63,24 @@ export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children 
   };
 
   const removeFromFavorites = (productId: string) => {
-    setFavorites(prevFavorites => 
-      prevFavorites.filter(item => item.id !== productId)
+    setFavorites((prevFavorites) =>
+      prevFavorites.filter((item) => item.id !== productId)
     );
   };
 
   const isFavorite = (productId: string) => {
-    return favorites.some(item => item.id === productId);
+    return favorites.some((item) => item.id === productId);
   };
 
   return (
-    <FavoritesContext.Provider value={{
-      favorites,
-      addToFavorites,
-      removeFromFavorites,
-      isFavorite,
-    }}>
+    <FavoritesContext.Provider
+      value={{
+        favorites,
+        addToFavorites,
+        removeFromFavorites,
+        isFavorite,
+      }}
+    >
       {children}
     </FavoritesContext.Provider>
   );
@@ -78,7 +89,7 @@ export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({ children 
 export const useFavorites = () => {
   const context = useContext(FavoritesContext);
   if (context === undefined) {
-    throw new Error('useFavorites must be used within a FavoritesProvider');
+    throw new Error("useFavorites must be used within a FavoritesProvider");
   }
   return context;
 };
