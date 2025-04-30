@@ -138,7 +138,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             }`}
             disabled={!product.inStock}
             onClick={handleAddToCart}
-            type="button"
           >
             <ShoppingBag className={`mr-2 h-4 w-4 transition-transform duration-300 ${isHovered ? 'scale-110' : ''}`} />
             {product.inStock ? t('addToCart') : t('outOfStock')}
