@@ -1,5 +1,10 @@
-
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from "react";
 
 type Language = "fr" | "ar";
 
@@ -67,6 +72,14 @@ const translations: Translations = {
   outOfStock: {
     fr: "En rupture de stock",
     ar: "نفذ من المخزون",
+  },
+  stock: {
+    fr: "Stock",
+    ar: "المخزون",
+  },
+  allStock: {
+    fr: "Tout le stock",
+    ar: "كل المخزون",
   },
   inStock: {
     fr: "En stock",
@@ -317,21 +330,21 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [language, setLanguage] = useState<Language>("fr");
-  
+
   // Detect browser language on mount
   useEffect(() => {
     const detectBrowserLanguage = () => {
       const browserLang = navigator.language.toLowerCase();
-      
+
       // Check if the browser language is Arabic or French
-      if (browserLang.startsWith('ar')) {
-        setLanguage('ar');
-      } else if (browserLang.startsWith('fr')) {
-        setLanguage('fr');
+      if (browserLang.startsWith("ar")) {
+        setLanguage("ar");
+      } else if (browserLang.startsWith("fr")) {
+        setLanguage("fr");
       }
       // Default is already set to 'fr'
     };
-    
+
     detectBrowserLanguage();
   }, []);
 
