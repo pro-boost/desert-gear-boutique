@@ -11,7 +11,7 @@ import {
   getCategories,
   addCategory,
 } from '@/services/productService';
-import { Product, PRODUCT_CATEGORIES } from '@/types/product';
+import { Product } from '@/types/product';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -116,8 +116,14 @@ const AdminPage = () => {
   
   useEffect(() => {
     // Redirect if not admin
-    if (!user?.isAdmin) {
+    if (user === null) {
       navigate('/login');
+      toast.error("You need to log in to access this page.");
+      return;
+    }
+    
+    if (user && !user.isAdmin) {
+      navigate('/');
       toast.error("You need admin privileges to access this page.");
       return;
     }

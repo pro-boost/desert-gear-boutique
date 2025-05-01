@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { toast } from "@/components/ui/sonner";
 
@@ -29,7 +30,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Check if user is already logged in from localStorage
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to parse user from localStorage:", error);
+        localStorage.removeItem('user');
+      }
     }
     setIsLoading(false);
   }, []);
@@ -37,89 +43,100 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Check if admin login
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      const adminUser: User = {
-        id: 'admin-id',
-        username: ADMIN_USERNAME,
-        isAdmin: true
-      };
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      setUser(adminUser);
-      localStorage.setItem('user', JSON.stringify(adminUser));
-      setIsLoading(false);
-      toast.success("Connecté en tant qu'administrateur");
-      return true;
-    }
-    
-    // Check for regular users (in a real app, this would be an API call)
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const foundUser = users.find(
-      (u: any) => u.username === username && u.password === password
-    );
-    
-    if (foundUser) {
-      const loggedInUser: User = {
-        id: foundUser.id,
-        username: foundUser.username,
-        isAdmin: false
-      };
+      // Check if admin login
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        const adminUser: User = {
+          id: 'admin-id',
+          username: ADMIN_USERNAME,
+          isAdmin: true
+        };
+        
+        setUser(adminUser);
+        localStorage.setItem('user', JSON.stringify(adminUser));
+        toast.success("Connecté en tant qu'administrateur");
+        return true;
+      }
       
-      setUser(loggedInUser);
-      localStorage.setItem('user', JSON.stringify(loggedInUser));
+      // Check for regular users (in a real app, this would be an API call)
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const foundUser = users.find(
+        (u: any) => u.username === username && u.password === password
+      );
+      
+      if (foundUser) {
+        const loggedInUser: User = {
+          id: foundUser.id,
+          username: foundUser.username,
+          isAdmin: false
+        };
+        
+        setUser(loggedInUser);
+        localStorage.setItem('user', JSON.stringify(loggedInUser));
+        toast.success("Connecté avec succès");
+        return true;
+      }
+      
+      toast.error("Nom d'utilisateur ou mot de passe incorrect");
+      return false;
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error("Une erreur s'est produite lors de la connexion");
+      return false;
+    } finally {
       setIsLoading(false);
-      toast.success("Connecté avec succès");
-      return true;
     }
-    
-    setIsLoading(false);
-    toast.error("Nom d'utilisateur ou mot de passe incorrect");
-    return false;
   };
 
   const signup = async (username: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Check if username already exists
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userExists = users.some((u: any) => u.username === username);
-    
-    if (userExists) {
-      setIsLoading(false);
-      toast.error("Nom d'utilisateur déjà pris");
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Check if username already exists
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      const userExists = users.some((u: any) => u.username === username);
+      
+      if (userExists) {
+        toast.error("Nom d'utilisateur déjà pris");
+        return false;
+      }
+      
+      // Create new user
+      const newUser = {
+        id: `user-${Date.now()}`,
+        username,
+        password,
+        isAdmin: false
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      // Auto login after signup
+      const loggedInUser: User = {
+        id: newUser.id,
+        username: newUser.username,
+        isAdmin: false
+      };
+      
+      setUser(loggedInUser);
+      localStorage.setItem('user', JSON.stringify(loggedInUser));
+      
+      toast.success("Compte créé avec succès");
+      return true;
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast.error("Une erreur s'est produite lors de la création du compte");
       return false;
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Create new user
-    const newUser = {
-      id: `user-${Date.now()}`,
-      username,
-      password,
-      isAdmin: false
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    // Auto login after signup
-    const loggedInUser: User = {
-      id: newUser.id,
-      username: newUser.username,
-      isAdmin: false
-    };
-    
-    setUser(loggedInUser);
-    localStorage.setItem('user', JSON.stringify(loggedInUser));
-    
-    setIsLoading(false);
-    toast.success("Compte créé avec succès");
-    return true;
   };
 
   const logout = () => {

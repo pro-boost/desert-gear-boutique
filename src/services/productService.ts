@@ -15,7 +15,14 @@ export const saveCategories = (categories: string[]): void => {
 export const getCategories = (): string[] => {
   const storedCategories = localStorage.getItem('categories');
   if (storedCategories) {
-    return JSON.parse(storedCategories);
+    try {
+      return JSON.parse(storedCategories);
+    } catch (error) {
+      console.error("Failed to parse categories from localStorage:", error);
+      // If parsing fails, use default categories
+      saveCategories(PRODUCT_CATEGORIES);
+      return [...PRODUCT_CATEGORIES];
+    }
   }
 
   // If no categories in localStorage, use imported default categories
@@ -41,7 +48,14 @@ export const addCategory = (category: string): boolean => {
 export const getProducts = (): Product[] => {
   const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
-    return JSON.parse(storedProducts);
+    try {
+      return JSON.parse(storedProducts);
+    } catch (error) {
+      console.error("Failed to parse products from localStorage:", error);
+      // If parsing fails, use sample products
+      saveProducts(SAMPLE_PRODUCTS);
+      return SAMPLE_PRODUCTS;
+    }
   }
 
   // If no products in localStorage, use imported sample products

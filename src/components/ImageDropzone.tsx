@@ -68,6 +68,7 @@ const ImageDropzone = ({
                 size="icon"
                 className="absolute -top-2 -right-2"
                 onClick={handleRemoveButtonClick}
+                type="button"
               >
                 <X className="h-4 w-4" />
               </Button>
