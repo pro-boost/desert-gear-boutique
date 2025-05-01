@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { filterProducts } from '@/services/productService';
+import { filterProducts, getCategories } from '@/services/productService';
 import { ProductFilters, Product } from '@/types/product';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -37,15 +37,21 @@ const ProductsPage = () => {
     search: initialSearch,
   });
   
-  // State for products
+  // State for products and categories
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState(initialSearch);
+  
+  // Load categories
+  useEffect(() => {
+    setCategories(getCategories());
+  }, []);
   
   // Update filters when URL parameters change (for footer links)
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam) {
-      setFilters(prev => ({ ...prev, category: categoryParam as any }));
+      setFilters(prev => ({ ...prev, category: categoryParam }));
     }
   }, [location.search, searchParams]);
   
@@ -72,7 +78,7 @@ const ProductsPage = () => {
   
   // Handle filter changes
   const handleCategoryChange = (value: string) => {
-    setFilters(prev => ({ ...prev, category: value as any }));
+    setFilters(prev => ({ ...prev, category: value }));
   };
   
   const handleStockChange = (checked: boolean) => {
@@ -138,9 +144,11 @@ const ProductsPage = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">{t('allProducts')}</SelectItem>
-                    <SelectItem value="boots">{t('boots')}</SelectItem>
-                    <SelectItem value="jackets">{t('jackets')}</SelectItem>
-                    <SelectItem value="accessories">{t('accessories')}</SelectItem>
+                    {categories.map(category => (
+                      <SelectItem key={category} value={category}>
+                        {t(category)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

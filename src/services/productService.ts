@@ -1,9 +1,40 @@
 
-import { Product, ProductFilters, SAMPLE_PRODUCTS } from '@/types/product';
+import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
 
 // Save products to localStorage
 export const saveProducts = (products: Product[]): void => {
   localStorage.setItem('products', JSON.stringify(products));
+};
+
+// Save categories to localStorage
+export const saveCategories = (categories: string[]): void => {
+  localStorage.setItem('categories', JSON.stringify(categories));
+};
+
+// Get categories from localStorage or use default ones
+export const getCategories = (): string[] => {
+  const storedCategories = localStorage.getItem('categories');
+  if (storedCategories) {
+    return JSON.parse(storedCategories);
+  }
+
+  // If no categories in localStorage, use imported default categories
+  saveCategories(PRODUCT_CATEGORIES);
+  return [...PRODUCT_CATEGORIES];
+};
+
+// Add a new category
+export const addCategory = (category: string): boolean => {
+  const categories = getCategories();
+  
+  // Check if category already exists (case insensitive)
+  if (categories.some(c => c.toLowerCase() === category.toLowerCase())) {
+    return false;
+  }
+  
+  categories.push(category);
+  saveCategories(categories);
+  return true;
 };
 
 // Get products from localStorage or use default samples

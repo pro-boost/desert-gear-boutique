@@ -1,3 +1,4 @@
+
 import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, X } from "lucide-react";
@@ -36,6 +37,13 @@ const ImageDropzone = ({
     maxFiles: 1,
   });
 
+  const handleRemoveButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering parent click events
+    if (onImageRemove) {
+      onImageRemove();
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div
@@ -59,10 +67,7 @@ const ImageDropzone = ({
                 variant="destructive"
                 size="icon"
                 className="absolute -top-2 -right-2"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onImageRemove();
-                }}
+                onClick={handleRemoveButtonClick}
               >
                 <X className="h-4 w-4" />
               </Button>

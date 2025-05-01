@@ -5,7 +5,7 @@ export interface Product {
   description: string;
   price: number;
   discountPrice?: number;
-  category: 'boots' | 'jackets' | 'pants' | 'accessories';
+  category: string;
   images: string[];
   inStock: boolean;
   featured: boolean;
@@ -17,6 +17,14 @@ export interface ProductFilters {
   inStock?: boolean;
   search?: string;
 }
+
+// Add available categories for the application
+export const PRODUCT_CATEGORIES = [
+  'boots',
+  'jackets', 
+  'pants', 
+  'accessories'
+];
 
 export const SAMPLE_PRODUCTS: Product[] = [
   {

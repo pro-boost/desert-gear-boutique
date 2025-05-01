@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -6,9 +7,11 @@ import {
   getProducts, 
   addProduct, 
   updateProduct, 
-  deleteProduct 
+  deleteProduct,
+  getCategories,
+  addCategory,
 } from '@/services/productService';
-import { Product } from '@/types/product';
+import { Product, PRODUCT_CATEGORIES } from '@/types/product';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -32,6 +35,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
   Card,
@@ -55,6 +59,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { 
   PlusCircle, 
   Trash, 
@@ -71,7 +83,7 @@ interface ProductFormData {
   description: string;
   price: number;
   discountPrice?: number;
-  category: 'boots' | 'jackets' | 'pants' | 'accessories';
+  category: string;
   images: string[];
   inStock: boolean;
   featured: boolean;
@@ -98,6 +110,9 @@ const AdminPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("products");
+  const [categories, setCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState('');
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   
   useEffect(() => {
     // Redirect if not admin
@@ -107,8 +122,9 @@ const AdminPage = () => {
       return;
     }
     
-    // Load products
+    // Load products and categories
     setProducts(getProducts());
+    setCategories(getCategories());
   }, [user, navigate]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -134,6 +150,20 @@ const AdminPage = () => {
       ...prev,
       [name]: value
     }));
+  };
+  
+  const handleSubmitCategory = () => {
+    if (newCategory.trim() !== '') {
+      const success = addCategory(newCategory.trim().toLowerCase());
+      if (success) {
+        toast.success(`Category "${newCategory}" added successfully`);
+        setCategories(getCategories());
+        setNewCategory('');
+        setCategoryDialogOpen(false);
+      } else {
+        toast.error(`Category "${newCategory}" already exists`);
+      }
+    }
   };
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -170,10 +200,8 @@ const AdminPage = () => {
   };
   
   const handleEdit = (product: Product) => {
-    // Type casting the product to ensure category is compatible
     setFormData({
       ...product,
-      category: product.category as 'boots' | 'jackets' | 'pants' | 'accessories'
     });
     setIsEditing(true);
     setActiveTab("add-product");
@@ -234,10 +262,18 @@ const AdminPage = () => {
             <TabsContent value="products" className="space-y-4">
               <Card>
                 <CardHeader>
-                  <CardTitle>{t('products')}</CardTitle>
-                  <CardDescription>
-                    Manage your product inventory, prices, and availability.
-                  </CardDescription>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>{t('products')}</CardTitle>
+                      <CardDescription>
+                        Manage your product inventory, prices, and availability.
+                      </CardDescription>
+                    </div>
+                    <Button onClick={() => setCategoryDialogOpen(true)}>
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Add Category
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="rounded-md border">
@@ -365,10 +401,11 @@ const AdminPage = () => {
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="boots">{t('boots')}</SelectItem>
-                          <SelectItem value="jackets">{t('jackets')}</SelectItem>
-                          <SelectItem value="pants">{t('pants')}</SelectItem>
-                          <SelectItem value="accessories">{t('accessories')}</SelectItem>
+                          {categories.map(category => (
+                            <SelectItem key={category} value={category}>
+                              {t(category)}
+                            </SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
@@ -525,6 +562,41 @@ const AdminPage = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+      {/* Add Category Dialog */}
+      <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Category</DialogTitle>
+            <DialogDescription>
+              Enter a name for the new product category.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="newCategory" className="text-sm font-medium">
+                Category Name
+              </label>
+              <Input
+                id="newCategory"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="Enter category name"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCategoryDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitCategory} disabled={!newCategory.trim()}>
+              Add Category
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
