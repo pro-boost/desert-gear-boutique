@@ -130,10 +130,10 @@ const Navbar = () => {
                 ) : (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link to="/login">{t("login")}</Link>
+                      <Link to="/auth/login">{t("login")}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/signup">{t("signup")}</Link>
+                      <Link to="/auth/signup">{t("signup")}</Link>
                     </DropdownMenuItem>
                   </>
                 )}
