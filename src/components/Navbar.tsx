@@ -123,7 +123,12 @@ const Navbar = () => {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        logout();
+                        window.location.href = "/";
+                      }}
+                    >
                       {t("logout")}
                     </DropdownMenuItem>
                   </>

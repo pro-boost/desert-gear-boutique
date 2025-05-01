@@ -313,6 +313,83 @@ const translations: Translations = {
     fr: "Équipement militaire et tactique de haute qualité",
     ar: "معدات عسكرية وتكتيكية عالية الجودة",
   },
+  passwordRequirements: {
+    fr: "Le mot de passe doit contenir au moins 6 caractères",
+    ar: "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+  },
+  signupSubtitle: {
+    fr: "Créez votre compte pour accéder à toutes les fonctionnalités",
+    ar: "أنشئ حسابك للوصول إلى جميع الميزات",
+  },
+  loginSubtitle: {
+    fr: "Connectez-vous pour accéder à votre compte",
+    ar: "سجل دخولك للوصول إلى حسابك",
+  },
+  confirmPassword: {
+    fr: "Confirmer le mot de passe",
+    ar: "تأكيد كلمة المرور",
+  },
+  passwordsDontMatch: {
+    fr: "Les mots de passe ne correspondent pas",
+    ar: "كلمات المرور غير متطابقة",
+  },
+  passwordTooShort: {
+    fr: "Le mot de passe doit contenir au moins 6 caractères",
+    ar: "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+  },
+  usernameTaken: {
+    fr: "Ce nom d'utilisateur est déjà pris",
+    ar: "اسم المستخدم مستخدم بالفعل",
+  },
+  signupSuccess: {
+    fr: "Compte créé avec succès",
+    ar: "تم إنشاء الحساب بنجاح",
+  },
+  signupError: {
+    fr: "Une erreur s'est produite lors de la création du compte",
+    ar: "حدث خطأ أثناء إنشاء الحساب",
+  },
+  loginSuccess: {
+    fr: "Connexion réussie",
+    ar: "تم تسجيل الدخول بنجاح",
+  },
+  loginError: {
+    fr: "Une erreur s'est produite lors de la connexion",
+    ar: "حدث خطأ أثناء تسجيل الدخول",
+  },
+  invalidCredentials: {
+    fr: "Nom d'utilisateur ou mot de passe incorrect",
+    ar: "اسم المستخدم أو كلمة المرور غير صحيحة",
+  },
+  loggingIn: {
+    fr: "Connexion en cours...",
+    ar: "جاري تسجيل الدخول...",
+  },
+  creatingAccount: {
+    fr: "Création du compte...",
+    ar: "جاري إنشاء الحساب...",
+  },
+  rememberMe: {
+    fr: "Se souvenir de moi",
+    ar: "تذكرني",
+  },
+  forgotPassword: {
+    fr: "Mot de passe oublié ?",
+    ar: "نسيت كلمة المرور؟",
+  },
+  noAccount: {
+    fr: "Vous n'avez pas de compte ?",
+    ar: "ليس لديك حساب؟",
+  },
+  hasAccount: {
+    fr: "Vous avez déjà un compte ?",
+    ar: "لديك حساب بالفعل؟",
+  },
+  createAccount: {
+    fr: "Créer un compte",
+    ar: "إنشاء حساب",
+  },
+  // ... rest of the translations ...
 };
 
 interface LanguageContextType {
