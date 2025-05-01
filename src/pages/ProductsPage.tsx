@@ -123,7 +123,7 @@ const ProductsPage = () => {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <main className="flex-grow py-8">
+      <main className="flex-grow py-8 min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-heading font-bold mb-8">
             {t("ourProducts")}

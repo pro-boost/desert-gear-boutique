@@ -1,20 +1,19 @@
-
-import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   adminOnly?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  adminOnly = false 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  adminOnly = false,
 }) => {
   const { user, isLoading } = useAuth();
   const location = useLocation();
-  
+
   // Show loading state if auth is still being checked
   if (isLoading) {
     return (
@@ -23,17 +22,23 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
       </div>
     );
   }
-  
+
   // If no user is logged in, redirect to login
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return (
+      <Navigate
+        to="/auth/login"
+        state={{ returnTo: location.pathname }}
+        replace
+      />
+    );
   }
-  
+
   // If admin only and user is not admin, redirect to home
   if (adminOnly && !user.isAdmin) {
     return <Navigate to="/" replace />;
   }
-  
+
   // User is authenticated, render children
   return <>{children}</>;
 };

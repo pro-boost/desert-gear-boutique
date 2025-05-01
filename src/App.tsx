@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
@@ -54,22 +53,20 @@ const App = () => (
                     <Route path="/about" element={<AboutUs />} />
                     <Route path="/shipping" element={<Shipping />} />
                     <Route path="/returns" element={<Returns />} />
-                    <Route 
-                      path="/favorites" 
-                      element={
-                        <ProtectedRoute>
-                          <FavoritesPage />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    <Route 
-                      path="/admin" 
+
+                    {/* Public Favorites Page - no login required */}
+                    <Route path="/favorites" element={<FavoritesPage />} />
+
+                    {/* Admin Route - Protected, only for admins */}
+                    <Route
+                      path="/admin"
                       element={
                         <ProtectedRoute adminOnly>
                           <AdminPage />
                         </ProtectedRoute>
-                      } 
+                      }
                     />
+
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                   <BackToTopButton />

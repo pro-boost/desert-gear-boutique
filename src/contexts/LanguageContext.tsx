@@ -86,8 +86,8 @@ const translations: Translations = {
     ar: "متوفر",
   },
   search: {
-    fr: "Rechercher",
-    ar: "بحث",
+    fr: "Rechercher un produit",
+    ar: "البحث عن منتج",
   },
   email: {
     fr: "Email",

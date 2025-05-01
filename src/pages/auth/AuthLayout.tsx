@@ -11,7 +11,7 @@ const AuthLayout = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
-      <main className="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
+      <main className="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8 min-h-[calc(100vh-4rem)]">
         <div className="w-full max-w-md">
           <Outlet />
         </div>

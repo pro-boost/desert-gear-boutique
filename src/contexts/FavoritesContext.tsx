@@ -24,48 +24,80 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(
 export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [favorites, setFavorites] = useState<Product[]>([]);
   const { user } = useAuth();
+  const [favorites, setFavorites] = useState<Product[]>([]);
+  const storageKey = user ? `favorites-${user.id}` : "favorites-guest";
   const { t } = useLanguage();
 
-  // Load favorites from local storage when component mounts or user changes
-  useEffect(() => {
-    if (user) {
-      const savedFavorites = localStorage.getItem(`favorites-${user.id}`);
-      if (savedFavorites) {
-        setFavorites(JSON.parse(savedFavorites));
-      }
-    } else {
-      const savedFavorites = localStorage.getItem("favorites-guest");
-      if (savedFavorites) {
-        setFavorites(JSON.parse(savedFavorites));
+  const saveFavorites = (favorites: Product[]) => {
+    try {
+      // Limit the data being stored by only keeping essential fields
+      const limitedFavorites = favorites.map(
+        ({ id, name, price, images, discountPrice }) => ({
+          id,
+          name,
+          price,
+          images,
+          discountPrice,
+        })
+      );
+
+      const favoritesData = JSON.stringify(limitedFavorites);
+      localStorage.setItem(storageKey, favoritesData);
+    } catch (error) {
+      console.error("Error saving favorites:", error);
+      // If storage is full, try to clear old data
+      try {
+        localStorage.clear();
+        const limitedFavorites = favorites.map(
+          ({ id, name, price, images, discountPrice }) => ({
+            id,
+            name,
+            price,
+            images,
+            discountPrice,
+          })
+        );
+        localStorage.setItem(storageKey, JSON.stringify(limitedFavorites));
+      } catch (retryError) {
+        console.error(
+          "Failed to save favorites after clearing storage:",
+          retryError
+        );
       }
     }
+  };
+
+  const loadFavorites = (): Product[] => {
+    try {
+      const favoritesData = localStorage.getItem(storageKey);
+      if (!favoritesData) return [];
+      return JSON.parse(favoritesData);
+    } catch (error) {
+      console.error("Error loading favorites:", error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    setFavorites(loadFavorites());
   }, [user]);
 
-  // Save favorites to local storage whenever it changes
-  useEffect(() => {
-    if (user) {
-      localStorage.setItem(`favorites-${user.id}`, JSON.stringify(favorites));
-    } else {
-      localStorage.setItem("favorites-guest", JSON.stringify(favorites));
-    }
-  }, [favorites, user]);
-
   const addToFavorites = (product: Product) => {
-    setFavorites((prevFavorites) => {
-      if (!prevFavorites.some((item) => item.id === product.id)) {
-        toast.success(`${product.name} ajouté aux favoris`);
-        return [...prevFavorites, product];
-      }
-      return prevFavorites;
+    setFavorites((prev) => {
+      const newFavorites = [...prev, product];
+      saveFavorites(newFavorites);
+      toast.success(`${product.name} ajouté aux favoris`);
+      return newFavorites;
     });
   };
 
   const removeFromFavorites = (productId: string) => {
-    setFavorites((prevFavorites) =>
-      prevFavorites.filter((item) => item.id !== productId)
-    );
+    setFavorites((prev) => {
+      const newFavorites = prev.filter((item) => item.id !== productId);
+      saveFavorites(newFavorites);
+      return newFavorites;
+    });
   };
 
   const isFavorite = (productId: string) => {
