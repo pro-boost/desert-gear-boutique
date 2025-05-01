@@ -1,4 +1,3 @@
-
 import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
 
 // Save products to localStorage
@@ -106,6 +105,7 @@ export const deleteProduct = (id: string): void => {
 // Filter products based on criteria
 export const filterProducts = (filters: ProductFilters): Product[] => {
   const products = getProducts();
+  console.log('Filtering products with filters:', filters);
   
   return products.filter(product => {
     // Filter by category if specified
@@ -127,6 +127,7 @@ export const filterProducts = (filters: ProductFilters): Product[] => {
       const searchTerm = filters.search.toLowerCase();
       const nameMatch = product.name.toLowerCase().includes(searchTerm);
       const descMatch = product.description.toLowerCase().includes(searchTerm);
+      console.log('Searching product:', product.name, 'with term:', searchTerm, 'matches:', nameMatch || descMatch);
       if (!nameMatch && !descMatch) {
         return false;
       }

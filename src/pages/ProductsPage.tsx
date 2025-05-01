@@ -30,7 +30,7 @@ const ProductsPage = () => {
   const initialSearch = searchParams.get("search") || "";
 
   const [filters, setFilters] = useState<ProductFilters>({
-    category: initialCategory as any,
+    category: initialCategory,
     inStock: initialInStock,
     search: initialSearch,
   });
@@ -88,11 +88,28 @@ const ProductsPage = () => {
 
   // Handle search input
   const handleSearch = () => {
-    setFilters((prev) => ({ ...prev, search: searchValue }));
+    console.log("Search triggered with value:", searchValue);
+    setFilters((prev) => {
+      const newFilters = { ...prev, search: searchValue.trim() };
+      console.log("New filters:", newFilters);
+      return newFilters;
+    });
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    console.log("Search value changed:", value);
+    setSearchValue(value);
+    // Update filters immediately as user types
+    setFilters((prev) => ({
+      ...prev,
+      search: value.trim(),
+    }));
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
+      e.preventDefault(); // Prevent form submission
       handleSearch();
     }
   };
@@ -122,7 +139,7 @@ const ProductsPage = () => {
                     type="text"
                     placeholder={t("search")}
                     value={searchValue}
-                    onChange={(e) => setSearchValue(e.target.value)}
+                    onChange={handleSearchChange}
                     onKeyDown={handleKeyDown}
                     className="pr-10"
                   />
