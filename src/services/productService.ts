@@ -1,3 +1,4 @@
+
 import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
 
 // Save products to localStorage
@@ -76,6 +77,7 @@ export const addProduct = (product: Omit<Product, 'id' | 'createdAt'>): Product 
     ...product,
     id: `${product.category}-${Date.now()}`,
     createdAt: Date.now(),
+    sizes: product.sizes || [], // Ensure sizes are never undefined
   };
   
   products.push(newProduct);
@@ -87,12 +89,18 @@ export const addProduct = (product: Omit<Product, 'id' | 'createdAt'>): Product 
 export const updateProduct = (updatedProduct: Product): Product => {
   const products = getProducts();
   
+  // Ensure sizes is an array
+  const productWithSizes = {
+    ...updatedProduct,
+    sizes: updatedProduct.sizes || [],
+  };
+  
   const updatedProducts = products.map(product => 
-    product.id === updatedProduct.id ? updatedProduct : product
+    product.id === productWithSizes.id ? productWithSizes : product
   );
   
   saveProducts(updatedProducts);
-  return updatedProduct;
+  return productWithSizes;
 };
 
 // Delete a product by ID

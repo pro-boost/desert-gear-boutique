@@ -10,6 +10,7 @@ export interface Product {
   inStock: boolean;
   featured: boolean;
   createdAt: number;
+  sizes: string[]; // Available sizes for the product
 }
 
 export interface ProductFilters {
@@ -26,6 +27,14 @@ export const PRODUCT_CATEGORIES = [
   'accessories'
 ];
 
+// European sizes
+export const PRODUCT_SIZES = {
+  boots: ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46'],
+  jackets: ['XS', 'S', 'M', 'L', 'XL', 'XXL'],
+  pants: ['36', '38', '40', '42', '44', '46', '48', '50'],
+  accessories: ['ONE SIZE']
+};
+
 export const SAMPLE_PRODUCTS: Product[] = [
   {
     id: 'boot-1',
@@ -37,7 +46,8 @@ export const SAMPLE_PRODUCTS: Product[] = [
     images: ['https://images.unsplash.com/photo-1452378174528-3090a4bba7b2'],
     inStock: true,
     featured: true,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    sizes: ['40', '41', '42', '43', '44']
   },
   {
     id: 'jacket-1',
@@ -48,7 +58,8 @@ export const SAMPLE_PRODUCTS: Product[] = [
     images: ['https://images.unsplash.com/photo-1493962853295-0fd70327578a'],
     inStock: true,
     featured: true,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    sizes: ['M', 'L', 'XL']
   },
   {
     id: 'backpack-1',
@@ -60,7 +71,8 @@ export const SAMPLE_PRODUCTS: Product[] = [
     images: ['https://images.unsplash.com/photo-1465379944081-7f47de8d74ac'],
     inStock: true,
     featured: false,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    sizes: ['ONE SIZE']
   },
   {
     id: 'pants-1',
@@ -71,6 +83,7 @@ export const SAMPLE_PRODUCTS: Product[] = [
     images: ['https://images.unsplash.com/photo-1466721591366-2d5fba72006d'],
     inStock: false,
     featured: false,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    sizes: ['40', '42', '44']
   }
 ];

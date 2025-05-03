@@ -11,7 +11,7 @@ import {
   getCategories,
   addCategory,
 } from '@/services/productService';
-import { Product } from '@/types/product';
+import { Product, PRODUCT_SIZES } from '@/types/product';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,8 @@ import {
   Trash, 
   Edit, 
   Save, 
-  X
+  X,
+  Check
 } from 'lucide-react';
 import ImageDropzone from '@/components/ImageDropzone';
 
@@ -87,6 +88,7 @@ interface ProductFormData {
   images: string[];
   inStock: boolean;
   featured: boolean;
+  sizes: string[];
 }
 
 // Initial form data
@@ -98,6 +100,7 @@ const initialFormData: ProductFormData = {
   images: ['/placeholder.svg'],
   inStock: true,
   featured: false,
+  sizes: [],
 };
 
 const AdminPage = () => {
@@ -113,6 +116,8 @@ const AdminPage = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [newCategory, setNewCategory] = useState('');
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: boolean }>({});
   
   useEffect(() => {
     // Redirect if not admin
@@ -132,6 +137,28 @@ const AdminPage = () => {
     setProducts(getProducts());
     setCategories(getCategories());
   }, [user, navigate]);
+
+  useEffect(() => {
+    // Update available sizes when category changes
+    const categorySizes = PRODUCT_SIZES[formData.category as keyof typeof PRODUCT_SIZES] || [];
+    setAvailableSizes(categorySizes);
+    
+    // Reset selected sizes when category changes
+    if (!isEditing) {
+      const newSelectedSizes: { [key: string]: boolean } = {};
+      categorySizes.forEach(size => {
+        newSelectedSizes[size] = false;
+      });
+      setSelectedSizes(newSelectedSizes);
+    } else {
+      // When editing, mark the product's sizes as selected
+      const newSelectedSizes: { [key: string]: boolean } = {};
+      categorySizes.forEach(size => {
+        newSelectedSizes[size] = formData.sizes.includes(size);
+      });
+      setSelectedSizes(newSelectedSizes);
+    }
+  }, [formData.category, isEditing, formData.sizes]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -157,6 +184,25 @@ const AdminPage = () => {
       [name]: value
     }));
   };
+
+  const handleSizeChange = (size: string, checked: boolean) => {
+    setSelectedSizes(prev => ({
+      ...prev,
+      [size]: checked
+    }));
+    
+    // Update formData.sizes based on selectedSizes
+    setFormData(prev => {
+      const newSizes = checked 
+        ? [...prev.sizes, size].filter((v, i, a) => a.indexOf(v) === i) // Add size if checked
+        : prev.sizes.filter(s => s !== size); // Remove size if unchecked
+      
+      return {
+        ...prev,
+        sizes: newSizes
+      };
+    });
+  };
   
   const handleSubmitCategory = () => {
     if (newCategory.trim() !== '') {
@@ -176,25 +222,35 @@ const AdminPage = () => {
     e.preventDefault();
     
     try {
-      if (isEditing && formData.id) {
+      // Get selected sizes from the state
+      const selectedSizesList = Object.entries(selectedSizes)
+        .filter(([_, isSelected]) => isSelected)
+        .map(([size]) => size);
+      
+      const productData = {
+        ...formData,
+        sizes: selectedSizesList
+      };
+      
+      if (isEditing && productData.id) {
         // Update existing product
         const updatedProduct = updateProduct({
-          ...(formData as Product),
-          createdAt: products.find(p => p.id === formData.id)?.createdAt || Date.now(),
+          ...(productData as Product),
+          createdAt: products.find(p => p.id === productData.id)?.createdAt || Date.now(),
         });
         
         setProducts(prev => 
           prev.map(p => p.id === updatedProduct.id ? updatedProduct : p)
         );
         
-        toast.success(`${formData.name} updated successfully`);
+        toast.success(`${productData.name} updated successfully`);
       } else {
         // Add new product
-        const newProduct = addProduct(formData);
+        const newProduct = addProduct(productData);
         
         setProducts(prev => [...prev, newProduct]);
         
-        toast.success(`${formData.name} added successfully`);
+        toast.success(`${productData.name} added successfully`);
       }
       
       // Reset form
@@ -206,9 +262,20 @@ const AdminPage = () => {
   };
   
   const handleEdit = (product: Product) => {
+    // Initialize size selection based on product sizes
+    const newSelectedSizes: { [key: string]: boolean } = {};
+    const categorySizes = PRODUCT_SIZES[product.category as keyof typeof PRODUCT_SIZES] || [];
+    
+    categorySizes.forEach(size => {
+      newSelectedSizes[size] = product.sizes.includes(size);
+    });
+    
+    setSelectedSizes(newSelectedSizes);
+    
     setFormData({
       ...product,
     });
+    
     setIsEditing(true);
     setActiveTab("add-product");
   };
@@ -474,6 +541,40 @@ const AdminPage = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
+                    
+                    {/* Sizes */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Available Sizes
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
+                        {availableSizes.map((size) => (
+                          <div 
+                            key={size}
+                            className="flex items-center space-x-2 border rounded-md p-2"
+                          >
+                            <Checkbox
+                              id={`size-${size}`}
+                              checked={selectedSizes[size] || false}
+                              onCheckedChange={(checked) => 
+                                handleSizeChange(size, !!checked)
+                              }
+                            />
+                            <label 
+                              htmlFor={`size-${size}`}
+                              className="text-sm cursor-pointer flex-1"
+                            >
+                              {size}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
+                      {availableSizes.length === 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          No sizes available for this category
+                        </p>
+                      )}
                     </div>
                     
                     {/* Image Upload */}

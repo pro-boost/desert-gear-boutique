@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,6 +15,13 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, ArrowLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +33,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   useEffect(() => {
     if (id) {
@@ -32,6 +41,7 @@ const ProductDetail = () => {
 
       if (foundProduct) {
         setProduct(foundProduct);
+        setSelectedSize(foundProduct.sizes.length > 0 ? foundProduct.sizes[0] : "");
 
         // Get related products from the same category
         const related = getProductsByCategory(foundProduct.category)
@@ -56,8 +66,8 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (product && product.inStock) {
-      addItem(product);
+    if (product && product.inStock && selectedSize) {
+      addItem({...product, selectedSize});
     }
   };
 
@@ -186,6 +196,27 @@ const ProductDetail = () => {
                 )}
               </div>
 
+              {/* Size Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-1">{t("size")}</label>
+                <Select
+                  value={selectedSize}
+                  onValueChange={setSelectedSize}
+                  disabled={!product.inStock || product.sizes.length === 0}
+                >
+                  <SelectTrigger className="w-full max-w-[200px]">
+                    <SelectValue placeholder={product.sizes.length ? t("selectSize") : t("noSizesAvailable")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {product.sizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Availability */}
               <div className="mb-6">
                 <Badge variant={product.inStock ? "outline" : "destructive"}>
@@ -203,11 +234,13 @@ const ProductDetail = () => {
               <div className="flex space-x-4">
                 <Button
                   className="flex-1"
-                  disabled={!product.inStock}
+                  disabled={!product.inStock || !selectedSize}
                   onClick={handleAddToCart}
                 >
                   <ShoppingBag className="mr-2 h-4 w-4" />
-                  {product.inStock ? t("addToCart") : t("outOfStock")}
+                  {product.inStock ? 
+                    (!selectedSize ? t("selectSizeFirst") : t("addToCart")) 
+                    : t("outOfStock")}
                 </Button>
 
                 <Button
