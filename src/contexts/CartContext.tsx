@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useContext,
@@ -8,7 +9,12 @@ import React, {
 import { Product } from "@/types/product";
 import { toast } from "react-hot-toast";
 
-type CartItem = Product & { quantity: number, selectedSize?: string };
+// Export the CartItem type so it can be imported in other files
+export type CartItem = {
+  product: Product;
+  quantity: number;
+  selectedSize?: string;
+};
 
 interface CartContextType {
   cartItems: CartItem[];
@@ -17,6 +23,10 @@ interface CartContextType {
   updateQuantity: (productId: string, quantity: number, selectedSize?: string) => void;
   clearCart: () => void;
   getCartTotal: () => number;
+  // Add missing properties
+  itemCount: number;
+  items: CartItem[];
+  totalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,39 +42,38 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     return storedItems ? JSON.parse(storedItems) : [];
   });
 
+  // Calculate total price
+  const totalPrice = cartItems.reduce(
+    (total, item) => total + (item.product.discountPrice || item.product.price) * item.quantity, 
+    0
+  );
+
+  // Calculate item count
+  const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
   const addItem = (product: Product, selectedSize?: string) => {
     setCartItems((prevItems) => {
-      // Create a new cart item with the product and selected size
-      const newItem = {
-        ...product,
-        quantity: 1,
-        selectedSize: selectedSize || (product.sizes.length > 0 ? product.sizes[0] : undefined)
-      };
-      
       // Check if the product with the same size already exists in the cart
       const existingItemIndex = prevItems.findIndex(
-        (item) => item.id === product.id && item.selectedSize === selectedSize
+        (item) => item.product.id === product.id && item.selectedSize === selectedSize
       );
 
       if (existingItemIndex >= 0) {
         // Product with same size exists, increment its quantity
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += 1;
-        
-        // Save to localStorage
-        localStorage.setItem('cartItems', JSON.stringify(updatedItems));
         return updatedItems;
       } else {
         // Add new product to cart
-        const updatedItems = [...prevItems, newItem];
-        
-        // Save to localStorage
-        localStorage.setItem('cartItems', JSON.stringify(updatedItems));
-        return updatedItems;
+        return [...prevItems, {
+          product,
+          quantity: 1,
+          selectedSize: selectedSize || (product.sizes.length > 0 ? product.sizes[0] : undefined)
+        }];
       }
     });
 
@@ -75,9 +84,8 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const removeItem = (productId: string, selectedSize?: string) => {
     setCartItems((prevItems) => {
       const updatedItems = prevItems.filter(
-        (item) => !(item.id === productId && item.selectedSize === selectedSize)
+        (item) => !(item.product.id === productId && item.selectedSize === selectedSize)
       );
-      localStorage.setItem('cartItems', JSON.stringify(updatedItems));
       return updatedItems;
     });
     toast.success("Item removed from cart");
@@ -91,12 +99,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     setCartItems((prevItems) => {
       const updatedItems = prevItems.map((item) => {
-        if (item.id === productId && item.selectedSize === selectedSize) {
+        if (item.product.id === productId && item.selectedSize === selectedSize) {
           return { ...item, quantity: quantity };
         }
         return item;
       });
-      localStorage.setItem('cartItems', JSON.stringify(updatedItems));
       return updatedItems;
     });
   };
@@ -108,7 +115,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const getCartTotal = (): number => {
-    return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cartItems.reduce((total, item) => total + (item.product.discountPrice || item.product.price) * item.quantity, 0);
   };
 
   return (
@@ -120,6 +127,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         updateQuantity,
         clearCart,
         getCartTotal,
+        // Add these properties to make them available through the context
+        itemCount,
+        items: cartItems,
+        totalPrice,
       }}
     >
       {children}

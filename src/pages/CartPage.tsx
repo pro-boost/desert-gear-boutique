@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCart, CartItem } from "@/contexts/CartContext";
+import { useCart, CartItem } from "@/contexts/CartContext"; // Now properly importing exported CartItem
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -29,15 +29,16 @@ import { toast } from "@/components/ui/sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { saveShippingAddress, createOrder } from "@/services/shippingService";
 
+// Update CartItemRow to work with the updated CartItem type
 const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
 
   const handleQuantityChange = (newQuantity: number) => {
-    updateQuantity(item.product.id, newQuantity);
+    updateQuantity(item.product.id, newQuantity, item.selectedSize);
   };
 
   const handleRemove = () => {
-    removeItem(item.product.id);
+    removeItem(item.product.id, item.selectedSize);
   };
 
   const price = item.product.discountPrice || item.product.price;
@@ -65,6 +66,11 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
         >
           {item.product.name}
         </Link>
+        {item.selectedSize && (
+          <div className="text-sm text-muted-foreground">
+            Size: {item.selectedSize}
+          </div>
+        )}
       </div>
 
       {/* Price */}
@@ -184,7 +190,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
 const CartPage = () => {
   const { t } = useLanguage();
   const { user } = useAuth();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart(); // Now accessing the properties properly
   const navigate = useNavigate();
 
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
@@ -280,7 +286,7 @@ const CartPage = () => {
                     {/* Cart Items */}
                     <div className="space-y-1">
                       {items.map((item) => (
-                        <CartItemRow key={item.product.id} item={item} />
+                        <CartItemRow key={`${item.product.id}-${item.selectedSize}`} item={item} />
                       ))}
                     </div>
 
