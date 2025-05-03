@@ -49,7 +49,12 @@ export const getProducts = (): Product[] => {
   const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
     try {
-      return JSON.parse(storedProducts);
+      const products = JSON.parse(storedProducts);
+      // Ensure all products have a sizes array
+      return products.map((product: Product) => ({
+        ...product,
+        sizes: product.sizes || []
+      }));
     } catch (error) {
       console.error("Failed to parse products from localStorage:", error);
       // If parsing fails, use sample products
@@ -66,7 +71,15 @@ export const getProducts = (): Product[] => {
 // Get a product by ID
 export const getProductById = (id: string): Product | undefined => {
   const products = getProducts();
-  return products.find(product => product.id === id);
+  const product = products.find(product => product.id === id);
+  if (product) {
+    // Ensure sizes is always an array
+    return {
+      ...product,
+      sizes: product.sizes || []
+    };
+  }
+  return undefined;
 };
 
 // Add a new product

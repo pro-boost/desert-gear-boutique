@@ -8,12 +8,14 @@ interface ImageDropzoneProps {
   onImageUpload: (image: string) => void;
   currentImage?: string;
   onImageRemove?: () => void;
+  multiple?: boolean;
 }
 
 const ImageDropzone = ({
   onImageUpload,
   currentImage,
   onImageRemove,
+  multiple = false,
 }: ImageDropzoneProps) => {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
@@ -34,7 +36,8 @@ const ImageDropzone = ({
     accept: {
       "image/*": [".jpeg", ".jpg", ".png", ".webp"],
     },
-    maxFiles: 1,
+    maxFiles: multiple ? 5 : 1,
+    multiple,
   });
 
   const handleRemoveButtonClick = (e: React.MouseEvent) => {

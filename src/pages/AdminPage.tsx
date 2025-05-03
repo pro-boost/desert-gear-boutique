@@ -143,22 +143,18 @@ const AdminPage = () => {
     const categorySizes = PRODUCT_SIZES[formData.category as keyof typeof PRODUCT_SIZES] || [];
     setAvailableSizes(categorySizes);
     
-    // Reset selected sizes when category changes
-    if (!isEditing) {
-      const newSelectedSizes: { [key: string]: boolean } = {};
-      categorySizes.forEach(size => {
-        newSelectedSizes[size] = false;
-      });
-      setSelectedSizes(newSelectedSizes);
-    } else {
-      // When editing, mark the product's sizes as selected
-      const newSelectedSizes: { [key: string]: boolean } = {};
-      categorySizes.forEach(size => {
-        newSelectedSizes[size] = formData.sizes.includes(size);
-      });
-      setSelectedSizes(newSelectedSizes);
-    }
-  }, [formData.category, isEditing, formData.sizes]);
+    // When editing or changing category, update the selected sizes
+    const newSelectedSizes: { [key: string]: boolean } = {};
+    categorySizes.forEach(size => {
+      newSelectedSizes[size] = formData.sizes.includes(size);
+    });
+    setSelectedSizes(newSelectedSizes);
+    
+    console.log("Category changed to:", formData.category);
+    console.log("Available sizes:", categorySizes);
+    console.log("Selected sizes:", newSelectedSizes);
+    console.log("Form data sizes:", formData.sizes);
+  }, [formData.category, formData.sizes]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -179,10 +175,19 @@ const AdminPage = () => {
   };
   
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    if (name === 'category') {
+      // When category changes, reset sizes
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        sizes: [] // Reset sizes when category changes
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSizeChange = (size: string, checked: boolean) => {
@@ -197,6 +202,7 @@ const AdminPage = () => {
         ? [...prev.sizes, size].filter((v, i, a) => a.indexOf(v) === i) // Add size if checked
         : prev.sizes.filter(s => s !== size); // Remove size if unchecked
       
+      console.log("Updating sizes:", newSizes);
       return {
         ...prev,
         sizes: newSizes
@@ -226,6 +232,8 @@ const AdminPage = () => {
       const selectedSizesList = Object.entries(selectedSizes)
         .filter(([_, isSelected]) => isSelected)
         .map(([size]) => size);
+      
+      console.log("Selected sizes for submission:", selectedSizesList);
       
       const productData = {
         ...formData,
@@ -262,18 +270,23 @@ const AdminPage = () => {
   };
   
   const handleEdit = (product: Product) => {
+    console.log("Editing product:", product);
+    console.log("Product sizes:", product.sizes);
+    
     // Initialize size selection based on product sizes
     const newSelectedSizes: { [key: string]: boolean } = {};
     const categorySizes = PRODUCT_SIZES[product.category as keyof typeof PRODUCT_SIZES] || [];
     
     categorySizes.forEach(size => {
-      newSelectedSizes[size] = product.sizes.includes(size);
+      newSelectedSizes[size] = (product.sizes || []).includes(size);
     });
     
+    console.log("Setting selected sizes:", newSelectedSizes);
     setSelectedSizes(newSelectedSizes);
     
     setFormData({
       ...product,
+      sizes: product.sizes || [],
     });
     
     setIsEditing(true);
@@ -296,6 +309,7 @@ const AdminPage = () => {
   const resetForm = () => {
     setFormData(initialFormData);
     setIsEditing(false);
+    setSelectedSizes({});
     setActiveTab("products");
   };
 
@@ -426,6 +440,7 @@ const AdminPage = () => {
                     setActiveTab("add-product");
                     setIsEditing(false);
                     setFormData(initialFormData);
+                    setSelectedSizes({}); // Reset selected sizes
                   }}>
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {t('addProduct')}
