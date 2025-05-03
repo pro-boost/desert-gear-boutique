@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -14,6 +15,13 @@ import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, ArrowLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +33,7 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   useEffect(() => {
     if (id) {
@@ -32,6 +41,12 @@ const ProductDetail = () => {
 
       if (foundProduct) {
         setProduct(foundProduct);
+        // Only set the selected size if the product has sizes
+        if (foundProduct.sizes && foundProduct.sizes.length > 0) {
+          setSelectedSize(foundProduct.sizes[0]);
+        } else {
+          setSelectedSize("");
+        }
 
         // Get related products from the same category
         const related = getProductsByCategory(foundProduct.category)
@@ -56,8 +71,10 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (product && product.inStock) {
-      addItem(product);
+    if (product && product.inStock && selectedSize) {
+      // Instead of modifying the product object directly,
+      // pass the selectedSize as a separate parameter
+      addItem(product, selectedSize);
     }
   };
 
@@ -66,7 +83,7 @@ const ProductDetail = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
-          <div className="animate-pulse">Loading...</div>
+          <div className="animate-pulse">{t("loading")}</div>
         </main>
         <Footer />
       </div>
@@ -79,11 +96,11 @@ const ProductDetail = () => {
         <Navbar />
         <main className="flex-grow py-8">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+            <h1 className="text-2xl font-bold mb-4">{t("productNotFound")}</h1>
             <Button asChild>
               <Link to="/products">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Products
+                {t("backToProducts")}
               </Link>
             </Button>
           </div>
@@ -93,6 +110,8 @@ const ProductDetail = () => {
     );
   }
 
+  // Ensure product.sizes is always an array, even if undefined
+  const productSizes = product.sizes || [];
   const hasDiscount =
     product.discountPrice && product.discountPrice < product.price;
   const favorited = isFavorite(product.id);
@@ -186,6 +205,27 @@ const ProductDetail = () => {
                 )}
               </div>
 
+              {/* Size Selection */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium mb-1">{t("size")}</label>
+                <Select
+                  value={selectedSize}
+                  onValueChange={setSelectedSize}
+                  disabled={!product.inStock || productSizes.length === 0}
+                >
+                  <SelectTrigger className="w-full max-w-[200px]">
+                    <SelectValue placeholder={productSizes.length ? t("selectSize") : t("noSizesAvailable")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {productSizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Availability */}
               <div className="mb-6">
                 <Badge variant={product.inStock ? "outline" : "destructive"}>
@@ -203,11 +243,13 @@ const ProductDetail = () => {
               <div className="flex space-x-4">
                 <Button
                   className="flex-1"
-                  disabled={!product.inStock}
+                  disabled={!product.inStock || !selectedSize}
                   onClick={handleAddToCart}
                 >
                   <ShoppingBag className="mr-2 h-4 w-4" />
-                  {product.inStock ? t("addToCart") : t("outOfStock")}
+                  {product.inStock ? 
+                    (!selectedSize ? t("selectSizeFirst") : t("addToCart")) 
+                    : t("outOfStock")}
                 </Button>
 
                 <Button
@@ -227,7 +269,7 @@ const ProductDetail = () => {
           {relatedProducts.length > 0 && (
             <div>
               <h2 className="text-2xl font-heading font-bold mb-6">
-                Related Products
+                {t("relatedProducts")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((product) => (

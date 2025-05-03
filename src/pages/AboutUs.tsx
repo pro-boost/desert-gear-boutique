@@ -19,7 +19,7 @@ const AboutUs = () => {
             <div className="mb-12">
               <img
                 src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
-                alt="About Nidal Boots"
+                alt={t('aboutUs')}
                 className="w-full h-[400px] object-cover rounded-lg mb-8"
               />
               
@@ -29,16 +29,16 @@ const AboutUs = () => {
 
               <div className="grid md:grid-cols-2 gap-8 mt-12">
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-heading font-semibold">Mission</h3>
+                  <h3 className="text-2xl font-heading font-semibold">{t('mission')}</h3>
                   <p className="text-muted-foreground">
-                    Nous nous engageons à fournir des équipements militaires et tactiques de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.
+                    {t('missionDescription')}
                   </p>
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-2xl font-heading font-semibold">Vision</h3>
+                  <h3 className="text-2xl font-heading font-semibold">{t('vision')}</h3>
                   <p className="text-muted-foreground">
-                    Devenir le leader de référence dans le domaine des équipements militaires et tactiques au Maroc et en Afrique.
+                    {t('visionDescription')}
                   </p>
                 </div>
               </div>

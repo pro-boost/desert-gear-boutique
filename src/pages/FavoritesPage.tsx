@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -39,7 +40,7 @@ const FavoritesPage = () => {
                   {t("emptyFavorites")}
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  {t("emptyFavoritesMessage")}
+                  {t("noFavoritesMessage")}
                 </p>
                 <Button asChild>
                   <Link to="/products">{t("shopNow")}</Link>

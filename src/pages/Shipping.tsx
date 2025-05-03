@@ -19,38 +19,38 @@ const Shipping = () => {
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 mb-12">
             <div className="p-6 rounded-lg bg-card">
               <Truck className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Livraison Standard</h3>
-              <p className="text-muted-foreground">3-5 jours ouvrables</p>
-              <p className="text-muted-foreground">Gratuit pour les commandes {'>'}500 DH</p>
+              <h3 className="text-xl font-semibold mb-2">{t('standardDelivery')}</h3>
+              <p className="text-muted-foreground">3-5 {t('businessDays')}</p>
+              <p className="text-muted-foreground">{t('freeForOrders')} {'>'}500 DH</p>
             </div>
             
             <div className="p-6 rounded-lg bg-card">
               <PackageCheck className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Suivi de Commande</h3>
-              <p className="text-muted-foreground">Suivi en temps réel</p>
-              <p className="text-muted-foreground">Notifications par email</p>
+              <h3 className="text-xl font-semibold mb-2">{t('orderTracking')}</h3>
+              <p className="text-muted-foreground">{t('realTimeTracking')}</p>
+              <p className="text-muted-foreground">{t('emailNotifications')}</p>
             </div>
             
             <div className="p-6 rounded-lg bg-card">
               <Clock className="w-12 h-12 text-primary mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Express</h3>
-              <p className="text-muted-foreground">1-2 jours ouvrables</p>
-              <p className="text-muted-foreground">Supplément de 50 DH</p>
+              <h3 className="text-xl font-semibold mb-2">{t('expressDelivery')}</h3>
+              <p className="text-muted-foreground">1-2 {t('businessDays')}</p>
+              <p className="text-muted-foreground">{t('surcharge')} 50 DH</p>
             </div>
           </div>
           
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h2 className="text-2xl font-heading font-semibold mb-4">Zones de Livraison</h2>
+            <h2 className="text-2xl font-heading font-semibold mb-4">{t('deliveryZones')}</h2>
             <p className="text-muted-foreground mb-6">
-              Nous livrons dans toutes les villes du Maroc. Les délais peuvent varier selon votre localisation.
+              {t('deliveryZonesDescription')}
             </p>
             
-            <h2 className="text-2xl font-heading font-semibold mb-4">Important à Savoir</h2>
+            <h2 className="text-2xl font-heading font-semibold mb-4">{t('importantToKnow')}</h2>
             <ul className="list-disc pl-6 space-y-2 text-muted-foreground">
-              <li>Les commandes sont traitées du lundi au vendredi</li>
-              <li>Un email de confirmation vous sera envoyé après l'expédition</li>
-              <li>Possibilité de livraison à une adresse différente</li>
-              <li>Service client disponible pour toute question</li>
+              <li>{t('ordersProcessed')}</li>
+              <li>{t('confirmationEmail')}</li>
+              <li>{t('differentAddress')}</li>
+              <li>{t('customerSupport')}</li>
             </ul>
           </div>
         </div>

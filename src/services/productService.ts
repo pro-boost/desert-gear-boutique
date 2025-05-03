@@ -1,3 +1,4 @@
+
 import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
 
 // Save products to localStorage
@@ -48,7 +49,12 @@ export const getProducts = (): Product[] => {
   const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
     try {
-      return JSON.parse(storedProducts);
+      const products = JSON.parse(storedProducts);
+      // Ensure all products have a sizes array
+      return products.map((product: Product) => ({
+        ...product,
+        sizes: product.sizes || []
+      }));
     } catch (error) {
       console.error("Failed to parse products from localStorage:", error);
       // If parsing fails, use sample products
@@ -65,7 +71,15 @@ export const getProducts = (): Product[] => {
 // Get a product by ID
 export const getProductById = (id: string): Product | undefined => {
   const products = getProducts();
-  return products.find(product => product.id === id);
+  const product = products.find(product => product.id === id);
+  if (product) {
+    // Ensure sizes is always an array
+    return {
+      ...product,
+      sizes: product.sizes || []
+    };
+  }
+  return undefined;
 };
 
 // Add a new product
@@ -76,6 +90,7 @@ export const addProduct = (product: Omit<Product, 'id' | 'createdAt'>): Product 
     ...product,
     id: `${product.category}-${Date.now()}`,
     createdAt: Date.now(),
+    sizes: product.sizes || [], // Ensure sizes are never undefined
   };
   
   products.push(newProduct);
@@ -87,12 +102,18 @@ export const addProduct = (product: Omit<Product, 'id' | 'createdAt'>): Product 
 export const updateProduct = (updatedProduct: Product): Product => {
   const products = getProducts();
   
+  // Ensure sizes is an array
+  const productWithSizes = {
+    ...updatedProduct,
+    sizes: updatedProduct.sizes || [],
+  };
+  
   const updatedProducts = products.map(product => 
-    product.id === updatedProduct.id ? updatedProduct : product
+    product.id === productWithSizes.id ? productWithSizes : product
   );
   
   saveProducts(updatedProducts);
-  return updatedProduct;
+  return productWithSizes;
 };
 
 // Delete a product by ID
