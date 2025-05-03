@@ -110,6 +110,8 @@ const ProductDetail = () => {
     );
   }
 
+  // Ensure product.sizes is always an array, even if undefined
+  const productSizes = product.sizes || [];
   const hasDiscount =
     product.discountPrice && product.discountPrice < product.price;
   const favorited = isFavorite(product.id);
@@ -209,13 +211,13 @@ const ProductDetail = () => {
                 <Select
                   value={selectedSize}
                   onValueChange={setSelectedSize}
-                  disabled={!product.inStock || product.sizes.length === 0}
+                  disabled={!product.inStock || productSizes.length === 0}
                 >
                   <SelectTrigger className="w-full max-w-[200px]">
-                    <SelectValue placeholder={product.sizes.length ? t("selectSize") : t("noSizesAvailable")} />
+                    <SelectValue placeholder={productSizes.length ? t("selectSize") : t("noSizesAvailable")} />
                   </SelectTrigger>
                   <SelectContent>
-                    {product.sizes.map((size) => (
+                    {productSizes.map((size) => (
                       <SelectItem key={size} value={size}>
                         {size}
                       </SelectItem>
