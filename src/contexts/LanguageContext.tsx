@@ -385,6 +385,204 @@ const translations: Translations = {
   selectSizeFirst: {
     fr: "Choisir une taille d'abord",
     ar: "اختر المقاس أولاً",
+  },
+  // Adding missing translations that are visible in English in various pages
+  loading: {
+    fr: "Chargement...",
+    ar: "جاري التحميل...",
+  },
+  productNotFound: {
+    fr: "Produit non trouvé",
+    ar: "المنتج غير موجود",
+  },
+  backToProducts: {
+    fr: "Retour aux produits",
+    ar: "العودة إلى المنتجات",
+  },
+  relatedProducts: {
+    fr: "Produits connexes",
+    ar: "منتجات ذات صلة",
+  },
+  noProductsFound: {
+    fr: "Aucun produit trouvé correspondant à vos critères",
+    ar: "لم يتم العثور على منتجات تطابق معاييرك",
+  },
+  mission: {
+    fr: "Mission",
+    ar: "المهمة",
+  },
+  vision: {
+    fr: "Vision",
+    ar: "الرؤية",
+  },
+  missionDescription: {
+    fr: "Nous nous engageons à fournir des équipements militaires et tactiques de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.",
+    ar: "نلتزم بتقديم معدات عسكرية وتكتيكية من أعلى جودة، مع التركيز على المتانة والأداء.",
+  },
+  visionDescription: {
+    fr: "Devenir le leader de référence dans le domaine des équipements militaires et tactiques au Maroc et en Afrique.",
+    ar: "أن نصبح الرائد المرجعي في مجال المعدات العسكرية والتكتيكية في المغرب وأفريقيا.",
+  },
+  standardDelivery: {
+    fr: "Livraison Standard",
+    ar: "التوصيل العادي",
+  },
+  expressDelivery: {
+    fr: "Express",
+    ar: "السريع",
+  },
+  orderTracking: {
+    fr: "Suivi de Commande",
+    ar: "تتبع الطلب",
+  },
+  realTimeTracking: {
+    fr: "Suivi en temps réel",
+    ar: "تتبع في الوقت الحقيقي",
+  },
+  emailNotifications: {
+    fr: "Notifications par email",
+    ar: "إشعارات عبر البريد الإلكتروني",
+  },
+  businessDays: {
+    fr: "jours ouvrables",
+    ar: "أيام العمل",
+  },
+  freeForOrders: {
+    fr: "Gratuit pour les commandes",
+    ar: "مجاني للطلبات",
+  },
+  surcharge: {
+    fr: "Supplément de",
+    ar: "رسوم إضافية قدرها",
+  },
+  deliveryZones: {
+    fr: "Zones de Livraison",
+    ar: "مناطق التوصيل",
+  },
+  deliveryZonesDescription: {
+    fr: "Nous livrons dans toutes les villes du Maroc. Les délais peuvent varier selon votre localisation.",
+    ar: "نقوم بالتوصيل إلى جميع مدن المغرب. قد تختلف مدة التوصيل حسب موقعك.",
+  },
+  importantToKnow: {
+    fr: "Important à Savoir",
+    ar: "مهم أن تعرف",
+  },
+  returnPolicy: {
+    fr: "Politique de Retour",
+    ar: "سياسة الإرجاع",
+  },
+  returnPolicyDescription: {
+    fr: "Nous acceptons les retours dans les 30 jours suivant la réception de votre commande. Les articles doivent être dans leur état d'origine, non utilisés et dans leur emballage d'origine.",
+    ar: "نقبل المرتجعات في غضون 30 يومًا من استلام طلبك. يجب أن تكون المنتجات في حالتها الأصلية، غير مستخدمة وفي عبوتها الأصلية.",
+  },
+  howToReturn: {
+    fr: "Comment Retourner un Article",
+    ar: "كيفية إرجاع منتج",
+  },
+  refunds: {
+    fr: "Remboursements",
+    ar: "المبالغ المستردة",
+  },
+  refundDescription: {
+    fr: "Le remboursement sera effectué sous 5-10 jours ouvrables après réception et vérification du retour. Le montant sera crédité sur le mode de paiement utilisé lors de l'achat.",
+    ar: "سيتم رد المبلغ خلال 5-10 أيام عمل بعد استلام المرتجع والتحقق منه. سيتم إضافة المبلغ إلى وسيلة الدفع المستخدمة عند الشراء.",
+  },
+  contactCustomerService: {
+    fr: "Contactez notre service client pour initier le retour",
+    ar: "اتصل بخدمة العملاء لبدء عملية الإرجاع",
+  },
+  packageCarefully: {
+    fr: "Emballez soigneusement l'article avec tous les accessoires",
+    ar: "قم بتغليف المنتج بعناية مع جميع الملحقات",
+  },
+  useReturnLabel: {
+    fr: "Utilisez l'étiquette de retour fournie",
+    ar: "استخدم ملصق الإرجاع المقدم",
+  },
+  dropOffPackage: {
+    fr: "Déposez le colis au point de collecte indiqué",
+    ar: "قم بإيداع الطرد في نقطة التجميع المحددة",
+  },
+  daysGuarantee: {
+    fr: "30 Jours",
+    ar: "30 يوم",
+  },
+  forReturning: {
+    fr: "Pour retourner vos articles",
+    ar: "لإرجاع منتجاتك",
+  },
+  warranty: {
+    fr: "Garantie",
+    ar: "الضمان",
+  },
+  yearWarranty: {
+    fr: "Produits garantis 1 an",
+    ar: "منتجات مضمونة لمدة سنة",
+  },
+  support: {
+    fr: "Support",
+    ar: "الدعم",
+  },
+  dedicatedSupport: {
+    fr: "Assistance dédiée",
+    ar: "دعم مخصص",
+  },
+  yourName: {
+    fr: "Votre nom",
+    ar: "اسمك",
+  },
+  yourEmail: {
+    fr: "Votre email",
+    ar: "بريدك الإلكتروني",
+  },
+  messageSubject: {
+    fr: "Sujet du message",
+    ar: "موضوع الرسالة",
+  },
+  typeYourMessage: {
+    fr: "Tapez votre message ici...",
+    ar: "اكتب رسالتك هنا...",
+  },
+  emptyFavorites: {
+    fr: "Aucun favori",
+    ar: "لا توجد مفضلات",
+  },
+  bestEquipment: {
+    fr: "Le meilleur équipement militaire et tactique pour les professionnels et les passionnés.",
+    ar: "أفضل المعدات العسكرية والتكتيكية للمحترفين والهواة.",
+  },
+  aboutUsDescription: {
+    fr: "Nidal Boots est votre destination de confiance pour l'équipement militaire et tactique de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.",
+    ar: "نضال بوتس هي وجهتك الموثوقة للمعدات العسكرية والتكتيكية عالية الجودة. منذ تأسيسنا، التزمنا بتقديم أفضل المنتجات للمحترفين والهواة.",
+  },
+  productSelection: {
+    fr: "Notre sélection comprend des bottes militaires robustes, des vestes tactiques et des accessoires essentiels, tous soigneusement choisis pour leur qualité et leur durabilité.",
+    ar: "تشمل مجموعتنا أحذية عسكرية متينة وسترات تكتيكية وإكسسوارات أساسية، تم اختيارها جميعًا بعناية لجودتها ومتانتها.",
+  },
+  ordersProcessed: {
+    fr: "Les commandes sont traitées du lundi au vendredi",
+    ar: "تتم معالجة الطلبات من الاثنين إلى الجمعة",
+  },
+  confirmationEmail: {
+    fr: "Un email de confirmation vous sera envoyé après l'expédition",
+    ar: "سيتم إرسال بريد إلكتروني للتأكيد بعد الشحن",
+  },
+  differentAddress: {
+    fr: "Possibilité de livraison à une adresse différente",
+    ar: "إمكانية التوصيل إلى عنوان مختلف",
+  },
+  customerSupport: {
+    fr: "Service client disponible pour toute question",
+    ar: "خدمة العملاء متاحة لأي استفسار",
+  },
+  // Add translations for components with hardcoded text
+  sendMessageCta: {
+    fr: "Envoyez-nous un message",
+    ar: "أرسل لنا رسالة",
+  },
+  messageSentSuccess: {
+    fr: "Message envoyé avec succès!",
+    ar: "تم إرسال الرسالة بنجاح!",
   }
 };
 

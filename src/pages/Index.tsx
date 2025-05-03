@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -119,7 +120,7 @@ const Index = () => {
                   {t('welcomeMessage')}
                 </h1>
                 <p className="text-lg mb-8 text-muted-foreground max-w-md">
-                  Le meilleur équipement militaire et tactique pour les professionnels et les passionnés.
+                  {t('bestEquipment')}
                 </p>
                 <div className="flex flex-wrap gap-4">
                   <Button asChild size="lg" className="bg-primary hover:bg-primary/90 hover:scale-105 transition-all">
@@ -134,7 +135,7 @@ const Index = () => {
                 <div className="aspect-w-16 aspect-h-9 relative rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]">
                   <img 
                     src="/placeholder.svg" 
-                    alt="Military Boots" 
+                    alt={t("equipmentDescription")} 
                     className="object-cover w-full h-full"
                   />
                 </div>
@@ -192,10 +193,10 @@ const Index = () => {
               <div className="scroll-animate">
                 <h2 className="text-3xl font-heading font-bold mb-6">{t('aboutUs')}</h2>
                 <p className="text-muted-foreground mb-4">
-                  Nidal Boots est votre destination de confiance pour l'équipement militaire et tactique de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.
+                  {t('aboutUsDescription')}
                 </p>
                 <p className="text-muted-foreground mb-6">
-                  Notre sélection comprend des bottes militaires robustes, des vestes tactiques et des accessoires essentiels, tous soigneusement choisis pour leur qualité et leur durabilité.
+                  {t('productSelection')}
                 </p>
                 <Button asChild className="hover:scale-105 transition-all">
                   <Link to="/contact">{t('contactUs')}</Link>

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
@@ -14,7 +15,7 @@ const ContactPage = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    toast.success("Message sent successfully!");
+    toast.success(t("messageSentSuccess"));
   };
 
   return (
@@ -31,26 +32,26 @@ const ContactPage = () => {
             {/* Contact Form */}
             <div className="bg-card rounded-lg border border-border overflow-hidden">
               <div className="p-4 border-b border-border bg-muted">
-                <h2 className="font-semibold">Send us a message</h2>
+                <h2 className="font-semibold">{t("sendMessageCta")}</h2>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label htmlFor="name" className="text-sm font-medium">
-                      Name
+                      {t("name")}
                     </label>
-                    <Input id="name" placeholder="Your name" required />
+                    <Input id="name" placeholder={t("yourName")} required />
                   </div>
 
                   <div className="space-y-2">
                     <label htmlFor="email" className="text-sm font-medium">
-                      Email
+                      {t("email")}
                     </label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your.email@example.com"
+                      placeholder={t("yourEmail")}
                       required
                     />
                   </div>
@@ -58,25 +59,25 @@ const ContactPage = () => {
 
                 <div className="space-y-2">
                   <label htmlFor="subject" className="text-sm font-medium">
-                    Subject
+                    {t("subject")}
                   </label>
-                  <Input id="subject" placeholder="Message subject" required />
+                  <Input id="subject" placeholder={t("messageSubject")} required />
                 </div>
 
                 <div className="space-y-2">
                   <label htmlFor="message" className="text-sm font-medium">
-                    Message
+                    {t("message")}
                   </label>
                   <Textarea
                     id="message"
-                    placeholder="Type your message here..."
+                    placeholder={t("typeYourMessage")}
                     rows={5}
                     required
                   />
                 </div>
 
                 <Button type="submit" className="w-full">
-                  Send Message
+                  {t("sendMessage")}
                 </Button>
               </form>
             </div>

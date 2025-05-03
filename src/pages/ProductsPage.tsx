@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -220,7 +221,7 @@ const ProductsPage = () => {
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">
-                No products found matching your criteria.
+                {t("noProductsFound")}
               </p>
               <Button variant="outline" onClick={clearFilters} className="mt-4">
                 {t("cancel")}

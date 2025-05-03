@@ -83,7 +83,7 @@ const ProductDetail = () => {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-grow flex items-center justify-center">
-          <div className="animate-pulse">Loading...</div>
+          <div className="animate-pulse">{t("loading")}</div>
         </main>
         <Footer />
       </div>
@@ -96,11 +96,11 @@ const ProductDetail = () => {
         <Navbar />
         <main className="flex-grow py-8">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+            <h1 className="text-2xl font-bold mb-4">{t("productNotFound")}</h1>
             <Button asChild>
               <Link to="/products">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Products
+                {t("backToProducts")}
               </Link>
             </Button>
           </div>
@@ -269,7 +269,7 @@ const ProductDetail = () => {
           {relatedProducts.length > 0 && (
             <div>
               <h2 className="text-2xl font-heading font-bold mb-6">
-                Related Products
+                {t("relatedProducts")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {relatedProducts.map((product) => (
