@@ -1,3 +1,4 @@
+
 import React, {
   createContext,
   useContext,
@@ -369,27 +370,22 @@ const translations: Translations = {
     fr: "Création du compte...",
     ar: "جاري إنشاء الحساب...",
   },
-  rememberMe: {
-    fr: "Se souvenir de moi",
-    ar: "تذكرني",
+  size: {
+    fr: "Taille",
+    ar: "المقاس",
   },
-  forgotPassword: {
-    fr: "Mot de passe oublié ?",
-    ar: "نسيت كلمة المرور؟",
+  selectSize: {
+    fr: "Sélectionner une taille",
+    ar: "اختر المقاس",
   },
-  noAccount: {
-    fr: "Vous n'avez pas de compte ?",
-    ar: "ليس لديك حساب؟",
+  noSizesAvailable: {
+    fr: "Aucune taille disponible",
+    ar: "لا توجد مقاسات متاحة",
   },
-  hasAccount: {
-    fr: "Vous avez déjà un compte ?",
-    ar: "لديك حساب بالفعل؟",
-  },
-  createAccount: {
-    fr: "Créer un compte",
-    ar: "إنشاء حساب",
-  },
-  // ... rest of the translations ...
+  selectSizeFirst: {
+    fr: "Choisir une taille d'abord",
+    ar: "اختر المقاس أولاً",
+  }
 };
 
 interface LanguageContextType {

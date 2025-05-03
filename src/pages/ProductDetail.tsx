@@ -41,7 +41,12 @@ const ProductDetail = () => {
 
       if (foundProduct) {
         setProduct(foundProduct);
-        setSelectedSize(foundProduct.sizes.length > 0 ? foundProduct.sizes[0] : "");
+        // Only set the selected size if the product has sizes
+        if (foundProduct.sizes && foundProduct.sizes.length > 0) {
+          setSelectedSize(foundProduct.sizes[0]);
+        } else {
+          setSelectedSize("");
+        }
 
         // Get related products from the same category
         const related = getProductsByCategory(foundProduct.category)
@@ -67,7 +72,9 @@ const ProductDetail = () => {
 
   const handleAddToCart = () => {
     if (product && product.inStock && selectedSize) {
-      addItem({...product, selectedSize});
+      // Instead of modifying the product object directly,
+      // pass the selectedSize as a separate parameter
+      addItem(product, selectedSize);
     }
   };
 
