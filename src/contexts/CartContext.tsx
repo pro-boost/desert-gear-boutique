@@ -7,8 +7,7 @@ import React, {
   ReactNode,
 } from "react";
 import { Product } from "@/types/product";
-import { toast } from "@/hooks/use-toast";
-import { useLanguage } from "./LanguageContext";
+import { toast } from "react-hot-toast";
 
 // Export the CartItem type so it can be imported in other files
 export type CartItem = {
@@ -35,7 +34,6 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const { t } = useLanguage();
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     if (typeof window === 'undefined') {
       return [];
@@ -68,22 +66,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         // Product with same size exists, increment its quantity
         const updatedItems = [...prevItems];
         updatedItems[existingItemIndex].quantity += 1;
-        
-        toast({
-          title: t("cartUpdated"),
-          description: `${product.name} ${t("quantityIncreased")}`,
-          variant: "default",
-        });
-        
         return updatedItems;
       } else {
         // Add new product to cart
-        toast({
-          title: t("productAdded"),
-          description: `${product.name} ${t("addedToCart")}`,
-          variant: "default",
-        });
-        
         return [...prevItems, {
           product,
           quantity: 1,
@@ -91,28 +76,19 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         }];
       }
     });
+
+    // Show success toast
+    toast.success("Item added to cart");
   };
 
   const removeItem = (productId: string, selectedSize?: string) => {
     setCartItems((prevItems) => {
-      const itemToRemove = prevItems.find(
-        (item) => item.product.id === productId && item.selectedSize === selectedSize
-      );
-      
       const updatedItems = prevItems.filter(
         (item) => !(item.product.id === productId && item.selectedSize === selectedSize)
       );
-      
-      if (itemToRemove) {
-        toast({
-          title: t("itemRemoved"),
-          description: `${itemToRemove.product.name} ${t("removedFromCart")}`,
-          variant: "default",
-        });
-      }
-      
       return updatedItems;
     });
+    toast.success("Item removed from cart");
   };
 
   const updateQuantity = (productId: string, quantity: number, selectedSize?: string) => {
@@ -124,11 +100,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     setCartItems((prevItems) => {
       const updatedItems = prevItems.map((item) => {
         if (item.product.id === productId && item.selectedSize === selectedSize) {
-          toast({
-            title: t("quantityUpdated"),
-            description: `${item.product.name}: ${quantity} ${t("items")}`,
-            variant: "default",
-          });
           return { ...item, quantity: quantity };
         }
         return item;
@@ -140,11 +111,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem("cartItems");
-    toast({
-      title: t("cartCleared"),
-      description: t("cartClearedMessage"),
-      variant: "default",
-    });
+    toast.success("Cart cleared");
   };
 
   const getCartTotal = (): number => {

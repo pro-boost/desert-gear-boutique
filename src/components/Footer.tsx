@@ -5,8 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Instagram, Facebook, Mail, Phone } from 'lucide-react';
 
 const Footer = () => {
-  const { t, dir } = useLanguage();
-  const isRTL = dir === 'rtl';
+  const { t, isRTL } = useLanguage();
   
   return (
     <footer className="bg-orange-100 dark:bg-orange-900/20 py-10 px-4">

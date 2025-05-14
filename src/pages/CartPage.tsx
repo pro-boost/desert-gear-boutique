@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCart, CartItem } from "@/contexts/CartContext"; 
+import { useCart, CartItem } from "@/contexts/CartContext"; // Now properly importing exported CartItem
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,16 +24,14 @@ import {
   ShoppingBasket,
   Check,
   AlertCircle,
-  MessageCircle, // Using MessageCircle as a fallback
 } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { saveShippingAddress, createOrder } from "@/services/shippingService";
 
 // Update CartItemRow to work with the updated CartItem type
 const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
-  const { t } = useLanguage();
 
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.product.id, newQuantity, item.selectedSize);
@@ -71,7 +68,7 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
         </Link>
         {item.selectedSize && (
           <div className="text-sm text-muted-foreground">
-            {t("size")}: {item.selectedSize}
+            Size: {item.selectedSize}
           </div>
         )}
       </div>
@@ -125,7 +122,6 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +140,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="fullName">{t("fullNameId")}</Label>
+        <Label htmlFor="fullName">Full Name (as it appears on your ID)</Label>
         <Input
           id="fullName"
           value={fullName}
@@ -154,7 +150,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="nationalId">{t("nationalId")}</Label>
+        <Label htmlFor="nationalId">National ID Number</Label>
         <Input
           id="nationalId"
           value={nationalId}
@@ -164,7 +160,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">{t("completeAddress")}</Label>
+        <Label htmlFor="address">Complete Shipping Address</Label>
         <Input
           id="address"
           value={address}
@@ -174,7 +170,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">{t("phone")}</Label>
+        <Label htmlFor="phoneNumber">Phone Number</Label>
         <Input
           id="phoneNumber"
           type="tel"
@@ -185,7 +181,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("processing") : t("continueOnWhatsApp")} <MessageCircle className="ml-2" size={18} />
+        {isSubmitting ? "Processing..." : "Place Order"}
       </Button>
     </form>
   );
@@ -197,15 +193,23 @@ const CartPage = () => {
   const { items, totalPrice, clearCart } = useCart(); // Now accessing the properties properly
   const navigate = useNavigate();
 
+  const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+
+  const handleProceedToCheckout = () => {
+    if (!user) {
+      // If not logged in, redirect to login page
+      toast.error("You need to be logged in to checkout");
+      navigate("/auth/login", { state: { returnTo: "/cart" } });
+      return;
+    }
+
+    setIsCheckoutStep(true);
+  };
 
   const handleSubmitOrder = async (shippingData: any) => {
     if (items.length === 0) {
-      toast({
-        title: t("emptyCart"),
-        description: t("addItemsBeforeCheckout"),
-        variant: "destructive",
-      });
+      toast.error("Your cart is empty");
       return;
     }
 
@@ -214,11 +218,6 @@ const CartPage = () => {
     try {
       // Save shipping address
       const shippingAddress = await saveShippingAddress(shippingData);
-
-      // Check that shippingAddress is not null before accessing its id
-      if (!shippingAddress) {
-        throw new Error("Failed to create shipping address");
-      }
 
       // Create order with product items
       const orderItems = items.map((item) => ({
@@ -232,28 +231,17 @@ const CartPage = () => {
       // Clear cart after successful order
       clearCart();
 
-      toast({
-        title: t("orderSuccess"),
-        description: t("orderConfirmation"),
-        variant: "default",
-      });
+      toast.success(
+        "Order placed successfully! We'll contact you shortly to confirm your order."
+      );
 
-      // Simulate continuing to WhatsApp
-      const phoneNumber = "1234567890"; // Replace with your actual WhatsApp business number
-      const message = encodeURIComponent(`New order from ${shippingData.full_name}\nTotal: ${totalPrice.toFixed(2)} Dh`);
-      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
-
-      // Redirect to home page after a short delay
+      // Redirect to order confirmation or home page
       setTimeout(() => {
         navigate("/");
       }, 2000);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast({
-        title: t("orderError"),
-        description: t("errorProcessingOrder"),
-        variant: "destructive",
-      });
+      toast.error("There was a problem placing your order. Please try again.");
       setIsProcessingOrder(false);
     }
   };
@@ -265,29 +253,33 @@ const CartPage = () => {
       <main className="flex-grow py-8 min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-heading font-bold mb-8">
-            {t("checkout")}
+            {isCheckoutStep ? "Checkout" : t("cart")}
           </h1>
 
           {items.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Cart Items */}
-              <div className="lg:col-span-2">
+              <div
+                className={`${
+                  isCheckoutStep ? "hidden lg:block" : ""
+                } lg:col-span-2`}
+              >
                 <div className="bg-card rounded-lg border border-border overflow-hidden">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
-                      {items.length} {items.length === 1 ? t("item") : t("items")}
+                      {items.length} {items.length === 1 ? "item" : "items"}
                     </h2>
                   </div>
 
                   <div className="p-4">
                     {/* Headers on larger screens */}
                     <div className="hidden sm:flex text-sm text-muted-foreground mb-2">
-                      <div className="flex-grow ml-24">{t("product")}</div>
-                      <div className="min-w-[80px] text-right mr-4">{t("price")}</div>
+                      <div className="flex-grow ml-24">Product</div>
+                      <div className="min-w-[80px] text-right mr-4">Price</div>
                       <div className="min-w-[96px] text-center mr-4">
-                        {t("quantity")}
+                        Quantity
                       </div>
-                      <div className="min-w-[80px] text-right mr-4">{t("total")}</div>
+                      <div className="min-w-[80px] text-right mr-4">Total</div>
                       <div className="w-9"></div>
                     </div>
 
@@ -301,7 +293,7 @@ const CartPage = () => {
                     {/* Actions */}
                     <div className="mt-6 flex justify-between">
                       <Button variant="outline" size="sm" onClick={clearCart}>
-                        {t("clearCart")}
+                        Clear Cart
                       </Button>
                       <Button asChild variant="outline" size="sm">
                         <Link to="/products">
@@ -314,24 +306,63 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* Client Information */}
+              {/* Order Summary or Checkout Form */}
               <div className="lg:col-span-1">
                 <div className="bg-card rounded-lg border border-border overflow-hidden sticky top-24">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
-                      {t("customerInfo")}
+                      {isCheckoutStep ? "Customer Information" : t("total")}
                     </h2>
                   </div>
 
                   <div className="p-4 space-y-4">
-                    <Alert>
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>{t("continueOnWhatsApp")}</AlertTitle>
-                      <AlertDescription>
-                        {t("whatsAppConfirmation")}
-                      </AlertDescription>
-                    </Alert>
-                    <CheckoutForm onSubmit={handleSubmitOrder} />
+                    {isCheckoutStep ? (
+                      <>
+                        <Alert>
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertTitle>Pay after delivery</AlertTitle>
+                          <AlertDescription>
+                            We'll contact you to confirm your order before
+                            shipping.
+                          </AlertDescription>
+                        </Alert>
+                        <CheckoutForm onSubmit={handleSubmitOrder} />
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground">
+                            Subtotal:
+                          </span>
+                          <span className="font-medium">
+                            {totalPrice.toFixed(2)} Dh
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between py-2 border-b border-border">
+                          <span className="text-muted-foreground">
+                            Shipping:
+                          </span>
+                          <span>Free</span>
+                        </div>
+
+                        <div className="flex justify-between py-2 text-lg font-semibold">
+                          <span>Total:</span>
+                          <span>{totalPrice.toFixed(2)} Dh</span>
+                        </div>
+
+                        <Button
+                          className="w-full"
+                          onClick={handleProceedToCheckout}
+                        >
+                          Proceed to Checkout
+                        </Button>
+
+                        <div className="text-center text-sm text-muted-foreground mt-4">
+                          <p>Pay after receiving your order</p>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -345,7 +376,7 @@ const CartPage = () => {
                 />
                 <h2 className="text-2xl font-medium mb-2">{t("emptyCart")}</h2>
                 <p className="text-muted-foreground mb-6">
-                  {t("emptyCartMessage")}
+                  You haven't added any products to your cart yet.
                 </p>
                 <Button asChild>
                   <Link to="/products">{t("shopNow")}</Link>

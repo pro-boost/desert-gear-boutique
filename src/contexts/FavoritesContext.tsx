@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -6,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/sonner";
 import { Product } from "@/types/product";
 import { useAuth } from "./AuthContext";
 import { useLanguage } from "./LanguageContext";
@@ -88,29 +87,15 @@ export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({
     setFavorites((prev) => {
       const newFavorites = [...prev, product];
       saveFavorites(newFavorites);
-      toast({
-        title: t("favoriteAdded"),
-        description: `${product.name} ${t("addedToFavorites")}`,
-        variant: "default",
-      });
+      toast.success(`${product.name} ajouté aux favoris`);
       return newFavorites;
     });
   };
 
   const removeFromFavorites = (productId: string) => {
     setFavorites((prev) => {
-      const productToRemove = prev.find(item => item.id === productId);
       const newFavorites = prev.filter((item) => item.id !== productId);
       saveFavorites(newFavorites);
-      
-      if (productToRemove) {
-        toast({
-          title: t("favoriteRemoved"),
-          description: `${productToRemove.name} ${t("removedFromFavorites")}`,
-          variant: "default",
-        });
-      }
-      
       return newFavorites;
     });
   };
