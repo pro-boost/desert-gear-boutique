@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -221,6 +220,11 @@ const CartPage = () => {
     try {
       // Save shipping address
       const shippingAddress = await saveShippingAddress(shippingData);
+
+      // Check that shippingAddress is not null before accessing its id
+      if (!shippingAddress) {
+        throw new Error("Failed to create shipping address");
+      }
 
       // Create order with product items
       const orderItems = items.map((item) => ({
