@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -24,7 +25,7 @@ import {
   ShoppingBasket,
   Check,
   AlertCircle,
-  Whatsapp,
+  WhatsApp,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -184,7 +185,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("processing") : t("continueOnWhatsApp")} <Whatsapp className="ml-2" size={18} />
+        {isSubmitting ? t("processing") : t("continueOnWhatsApp")} <WhatsApp className="ml-2" size={18} />
       </Button>
     </form>
   );
