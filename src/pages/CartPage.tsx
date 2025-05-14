@@ -24,6 +24,7 @@ import {
   ShoppingBasket,
   Check,
   AlertCircle,
+  Whatsapp,
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -183,7 +184,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? t("processing") : t("placeOrder")}
+        {isSubmitting ? t("processing") : t("continueOnWhatsApp")} <Whatsapp className="ml-2" size={18} />
       </Button>
     </form>
   );
@@ -195,23 +196,7 @@ const CartPage = () => {
   const { items, totalPrice, clearCart } = useCart(); // Now accessing the properties properly
   const navigate = useNavigate();
 
-  const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
-
-  const handleProceedToCheckout = () => {
-    if (!user) {
-      // If not logged in, redirect to login page
-      toast({
-        title: t("loginRequired"),
-        description: t("loginToCheckout"),
-        variant: "destructive",
-      });
-      navigate("/auth/login", { state: { returnTo: "/cart" } });
-      return;
-    }
-
-    setIsCheckoutStep(true);
-  };
 
   const handleSubmitOrder = async (shippingData: any) => {
     if (items.length === 0) {
@@ -252,7 +237,12 @@ const CartPage = () => {
         variant: "default",
       });
 
-      // Redirect to order confirmation or home page
+      // Simulate continuing to WhatsApp
+      const phoneNumber = "1234567890"; // Replace with your actual WhatsApp business number
+      const message = encodeURIComponent(`New order from ${shippingData.full_name}\nTotal: ${totalPrice.toFixed(2)} Dh`);
+      window.open(`https://wa.me/${phoneNumber}?text=${message}`, '_blank');
+
+      // Redirect to home page after a short delay
       setTimeout(() => {
         navigate("/");
       }, 2000);
@@ -274,17 +264,13 @@ const CartPage = () => {
       <main className="flex-grow py-8 min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-heading font-bold mb-8">
-            {isCheckoutStep ? t("checkout") : t("cart")}
+            {t("checkout")}
           </h1>
 
           {items.length > 0 ? (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Cart Items */}
-              <div
-                className={`${
-                  isCheckoutStep ? "hidden lg:block" : ""
-                } lg:col-span-2`}
-              >
+              <div className="lg:col-span-2">
                 <div className="bg-card rounded-lg border border-border overflow-hidden">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
@@ -327,62 +313,24 @@ const CartPage = () => {
                 </div>
               </div>
 
-              {/* Order Summary or Checkout Form */}
+              {/* Client Information */}
               <div className="lg:col-span-1">
                 <div className="bg-card rounded-lg border border-border overflow-hidden sticky top-24">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
-                      {isCheckoutStep ? t("customerInfo") : t("total")}
+                      {t("customerInfo")}
                     </h2>
                   </div>
 
                   <div className="p-4 space-y-4">
-                    {isCheckoutStep ? (
-                      <>
-                        <Alert>
-                          <AlertCircle className="h-4 w-4" />
-                          <AlertTitle>{t("payAfterDelivery")}</AlertTitle>
-                          <AlertDescription>
-                            {t("contactConfirmation")}
-                          </AlertDescription>
-                        </Alert>
-                        <CheckoutForm onSubmit={handleSubmitOrder} />
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex justify-between py-2 border-b border-border">
-                          <span className="text-muted-foreground">
-                            {t("subtotal")}:
-                          </span>
-                          <span className="font-medium">
-                            {totalPrice.toFixed(2)} Dh
-                          </span>
-                        </div>
-
-                        <div className="flex justify-between py-2 border-b border-border">
-                          <span className="text-muted-foreground">
-                            {t("shipping")}:
-                          </span>
-                          <span>{t("free")}</span>
-                        </div>
-
-                        <div className="flex justify-between py-2 text-lg font-semibold">
-                          <span>{t("total")}:</span>
-                          <span>{totalPrice.toFixed(2)} Dh</span>
-                        </div>
-
-                        <Button
-                          className="w-full"
-                          onClick={handleProceedToCheckout}
-                        >
-                          {t("proceedToCheckout")}
-                        </Button>
-
-                        <div className="text-center text-sm text-muted-foreground mt-4">
-                          <p>{t("payAfterReceiving")}</p>
-                        </div>
-                      </>
-                    )}
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>{t("continueOnWhatsApp")}</AlertTitle>
+                      <AlertDescription>
+                        {t("whatsAppConfirmation")}
+                      </AlertDescription>
+                    </Alert>
+                    <CheckoutForm onSubmit={handleSubmitOrder} />
                   </div>
                 </div>
               </div>

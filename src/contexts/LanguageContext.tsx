@@ -139,6 +139,10 @@ const translations: AllTranslations = {
     emptyFavorites: "Aucun favori",
     noFavoritesMessage: "Vous n'avez pas encore ajouté de produits à vos favoris.",
     customerInfo: "Informations client",
+    
+    // WhatsApp Integration
+    continueOnWhatsApp: "Continuer sur WhatsApp",
+    whatsAppConfirmation: "Après avoir soumis vos informations, vous serez redirigé vers WhatsApp pour finaliser votre commande.",
   },
   ar: {
     // Navigation
@@ -264,6 +268,10 @@ const translations: AllTranslations = {
     emptyFavorites: "لا توجد مفضلات",
     noFavoritesMessage: "لم تقم بإضافة أي منتجات إلى المفضلة بعد.",
     customerInfo: "معلومات العميل",
+    
+    // WhatsApp Integration
+    continueOnWhatsApp: "المتابعة على واتساب",
+    whatsAppConfirmation: "بعد إرسال معلوماتك، سيتم توجيهك إلى واتساب لإنهاء طلبك.",
   },
 };
 
