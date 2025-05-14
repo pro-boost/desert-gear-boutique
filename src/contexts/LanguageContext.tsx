@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -583,7 +582,89 @@ const translations: Translations = {
   messageSentSuccess: {
     fr: "Message envoyé avec succès!",
     ar: "تم إرسال الرسالة بنجاح!",
-  }
+  },
+  
+  // Cart and checkout translations
+  item: {
+    fr: "article",
+    ar: "عنصر",
+  },
+  items: {
+    fr: "articles",
+    ar: "عناصر",
+  },
+  product: {
+    fr: "Produit",
+    ar: "المنتج",
+  },
+  subtotal: {
+    fr: "Sous-total",
+    ar: "المجموع الفرعي",
+  },
+  free: {
+    fr: "Gratuit",
+    ar: "مجاني",
+  },
+  clearCart: {
+    fr: "Vider le panier",
+    ar: "إفراغ السلة",
+  },
+  proceedToCheckout: {
+    fr: "Passer à la caisse",
+    ar: "المتابعة للدفع",
+  },
+  payAfterReceiving: {
+    fr: "Paiement à la livraison",
+    ar: "الدفع عند الاستلام",
+  },
+  customerInfo: {
+    fr: "Informations client",
+    ar: "معلومات العميل",
+  },
+  payAfterDelivery: {
+    fr: "Paiement à la livraison",
+    ar: "الدفع عند التسليم",
+  },
+  contactConfirmation: {
+    fr: "Nous vous contacterons pour confirmer votre commande avant l'expédition.",
+    ar: "سنتصل بك لتأكيد طلبك قبل الشحن.",
+  },
+  fullNameId: {
+    fr: "Nom complet (tel qu'il apparaît sur votre carte d'identité)",
+    ar: "الاسم الكامل (كما يظهر على بطاقة الهوية)",
+  },
+  nationalId: {
+    fr: "Numéro de carte d'identité nationale",
+    ar: "رقم بطاقة الهوية الوطنية",
+  },
+  completeAddress: {
+    fr: "Adresse complète de livraison",
+    ar: "عنوان الشحن الكامل",
+  },
+  processing: {
+    fr: "Traitement en cours...",
+    ar: "جاري المعالجة...",
+  },
+  placeOrder: {
+    fr: "Passer la commande",
+    ar: "إتمام الطلب",
+  },
+  loginRequired: {
+    fr: "Vous devez être connecté pour passer à la caisse",
+    ar: "يجب أن تكون مسجل الدخول للمتابعة",
+  },
+  orderSuccess: {
+    fr: "Commande passée avec succès! Nous vous contacterons bientôt pour confirmer votre commande.",
+    ar: "تم تقديم الطلب بنجاح! سنتصل بك قريبًا لتأكيد طلبك.",
+  },
+  orderError: {
+    fr: "Un problème est survenu lors du passage de votre commande. Veuillez réessayer.",
+    ar: "حدثت مشكلة أثناء تقديم طلبك. يرجى المحاولة مرة أخرى.",
+  },
+  emptyCartMessage: {
+    fr: "Vous n'avez pas encore ajouté de produits à votre panier.",
+    ar: "لم تقم بإضافة أي منتجات إلى سلة التسوق الخاصة بك حتى الآن.",
+  },
 };
 
 interface LanguageContextType {

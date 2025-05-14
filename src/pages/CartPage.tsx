@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -32,6 +33,7 @@ import { saveShippingAddress, createOrder } from "@/services/shippingService";
 // Update CartItemRow to work with the updated CartItem type
 const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
+  const { t } = useLanguage();
 
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.product.id, newQuantity, item.selectedSize);
@@ -68,7 +70,7 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
         </Link>
         {item.selectedSize && (
           <div className="text-sm text-muted-foreground">
-            Size: {item.selectedSize}
+            {t("size")}: {item.selectedSize}
           </div>
         )}
       </div>
@@ -122,6 +124,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
   const [address, setAddress] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,7 +143,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name (as it appears on your ID)</Label>
+        <Label htmlFor="fullName">{t("fullNameId")}</Label>
         <Input
           id="fullName"
           value={fullName}
@@ -150,7 +153,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="nationalId">National ID Number</Label>
+        <Label htmlFor="nationalId">{t("nationalId")}</Label>
         <Input
           id="nationalId"
           value={nationalId}
@@ -160,7 +163,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Complete Shipping Address</Label>
+        <Label htmlFor="address">{t("completeAddress")}</Label>
         <Input
           id="address"
           value={address}
@@ -170,7 +173,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phoneNumber">Phone Number</Label>
+        <Label htmlFor="phoneNumber">{t("phone")}</Label>
         <Input
           id="phoneNumber"
           type="tel"
@@ -181,7 +184,7 @@ const CheckoutForm = ({ onSubmit }: { onSubmit: (formData: any) => void }) => {
       </div>
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Processing..." : "Place Order"}
+        {isSubmitting ? t("processing") : t("placeOrder")}
       </Button>
     </form>
   );
@@ -199,7 +202,7 @@ const CartPage = () => {
   const handleProceedToCheckout = () => {
     if (!user) {
       // If not logged in, redirect to login page
-      toast.error("You need to be logged in to checkout");
+      toast.error(t("loginRequired"));
       navigate("/auth/login", { state: { returnTo: "/cart" } });
       return;
     }
@@ -209,7 +212,7 @@ const CartPage = () => {
 
   const handleSubmitOrder = async (shippingData: any) => {
     if (items.length === 0) {
-      toast.error("Your cart is empty");
+      toast.error(t("emptyCart"));
       return;
     }
 
@@ -231,9 +234,7 @@ const CartPage = () => {
       // Clear cart after successful order
       clearCart();
 
-      toast.success(
-        "Order placed successfully! We'll contact you shortly to confirm your order."
-      );
+      toast.success(t("orderSuccess"));
 
       // Redirect to order confirmation or home page
       setTimeout(() => {
@@ -241,7 +242,7 @@ const CartPage = () => {
       }, 2000);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error("There was a problem placing your order. Please try again.");
+      toast.error(t("orderError"));
       setIsProcessingOrder(false);
     }
   };
@@ -253,7 +254,7 @@ const CartPage = () => {
       <main className="flex-grow py-8 min-h-[calc(100vh-4rem)]">
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-heading font-bold mb-8">
-            {isCheckoutStep ? "Checkout" : t("cart")}
+            {isCheckoutStep ? t("checkout") : t("cart")}
           </h1>
 
           {items.length > 0 ? (
@@ -267,19 +268,19 @@ const CartPage = () => {
                 <div className="bg-card rounded-lg border border-border overflow-hidden">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
-                      {items.length} {items.length === 1 ? "item" : "items"}
+                      {items.length} {items.length === 1 ? t("item") : t("items")}
                     </h2>
                   </div>
 
                   <div className="p-4">
                     {/* Headers on larger screens */}
                     <div className="hidden sm:flex text-sm text-muted-foreground mb-2">
-                      <div className="flex-grow ml-24">Product</div>
-                      <div className="min-w-[80px] text-right mr-4">Price</div>
+                      <div className="flex-grow ml-24">{t("product")}</div>
+                      <div className="min-w-[80px] text-right mr-4">{t("price")}</div>
                       <div className="min-w-[96px] text-center mr-4">
-                        Quantity
+                        {t("quantity")}
                       </div>
-                      <div className="min-w-[80px] text-right mr-4">Total</div>
+                      <div className="min-w-[80px] text-right mr-4">{t("total")}</div>
                       <div className="w-9"></div>
                     </div>
 
@@ -293,7 +294,7 @@ const CartPage = () => {
                     {/* Actions */}
                     <div className="mt-6 flex justify-between">
                       <Button variant="outline" size="sm" onClick={clearCart}>
-                        Clear Cart
+                        {t("clearCart")}
                       </Button>
                       <Button asChild variant="outline" size="sm">
                         <Link to="/products">
@@ -311,7 +312,7 @@ const CartPage = () => {
                 <div className="bg-card rounded-lg border border-border overflow-hidden sticky top-24">
                   <div className="p-4 border-b border-border bg-muted">
                     <h2 className="font-semibold">
-                      {isCheckoutStep ? "Customer Information" : t("total")}
+                      {isCheckoutStep ? t("customerInfo") : t("total")}
                     </h2>
                   </div>
 
@@ -320,10 +321,9 @@ const CartPage = () => {
                       <>
                         <Alert>
                           <AlertCircle className="h-4 w-4" />
-                          <AlertTitle>Pay after delivery</AlertTitle>
+                          <AlertTitle>{t("payAfterDelivery")}</AlertTitle>
                           <AlertDescription>
-                            We'll contact you to confirm your order before
-                            shipping.
+                            {t("contactConfirmation")}
                           </AlertDescription>
                         </Alert>
                         <CheckoutForm onSubmit={handleSubmitOrder} />
@@ -332,7 +332,7 @@ const CartPage = () => {
                       <>
                         <div className="flex justify-between py-2 border-b border-border">
                           <span className="text-muted-foreground">
-                            Subtotal:
+                            {t("subtotal")}:
                           </span>
                           <span className="font-medium">
                             {totalPrice.toFixed(2)} Dh
@@ -341,13 +341,13 @@ const CartPage = () => {
 
                         <div className="flex justify-between py-2 border-b border-border">
                           <span className="text-muted-foreground">
-                            Shipping:
+                            {t("shipping")}:
                           </span>
-                          <span>Free</span>
+                          <span>{t("free")}</span>
                         </div>
 
                         <div className="flex justify-between py-2 text-lg font-semibold">
-                          <span>Total:</span>
+                          <span>{t("total")}:</span>
                           <span>{totalPrice.toFixed(2)} Dh</span>
                         </div>
 
@@ -355,11 +355,11 @@ const CartPage = () => {
                           className="w-full"
                           onClick={handleProceedToCheckout}
                         >
-                          Proceed to Checkout
+                          {t("proceedToCheckout")}
                         </Button>
 
                         <div className="text-center text-sm text-muted-foreground mt-4">
-                          <p>Pay after receiving your order</p>
+                          <p>{t("payAfterReceiving")}</p>
                         </div>
                       </>
                     )}
@@ -376,7 +376,7 @@ const CartPage = () => {
                 />
                 <h2 className="text-2xl font-medium mb-2">{t("emptyCart")}</h2>
                 <p className="text-muted-foreground mb-6">
-                  You haven't added any products to your cart yet.
+                  {t("emptyCartMessage")}
                 </p>
                 <Button asChild>
                   <Link to="/products">{t("shopNow")}</Link>
