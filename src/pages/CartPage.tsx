@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCart, CartItem } from "@/contexts/CartContext"; // Now properly importing exported CartItem
+import { useCart, CartItem } from "@/contexts/CartContext"; 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,7 +25,7 @@ import {
   Check,
   AlertCircle,
 } from "lucide-react";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { saveShippingAddress, createOrder } from "@/services/shippingService";
 
@@ -201,7 +201,11 @@ const CartPage = () => {
   const handleProceedToCheckout = () => {
     if (!user) {
       // If not logged in, redirect to login page
-      toast.error(t("loginRequired"));
+      toast({
+        title: t("loginRequired"),
+        description: t("loginToCheckout"),
+        variant: "destructive",
+      });
       navigate("/auth/login", { state: { returnTo: "/cart" } });
       return;
     }
@@ -211,7 +215,11 @@ const CartPage = () => {
 
   const handleSubmitOrder = async (shippingData: any) => {
     if (items.length === 0) {
-      toast.error(t("emptyCart"));
+      toast({
+        title: t("emptyCart"),
+        description: t("addItemsBeforeCheckout"),
+        variant: "destructive",
+      });
       return;
     }
 
@@ -238,7 +246,11 @@ const CartPage = () => {
       // Clear cart after successful order
       clearCart();
 
-      toast.success(t("orderSuccess"));
+      toast({
+        title: t("orderSuccess"),
+        description: t("orderConfirmation"),
+        variant: "default",
+      });
 
       // Redirect to order confirmation or home page
       setTimeout(() => {
@@ -246,7 +258,11 @@ const CartPage = () => {
       }, 2000);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error(t("orderError"));
+      toast({
+        title: t("orderError"),
+        description: t("errorProcessingOrder"),
+        variant: "destructive",
+      });
       setIsProcessingOrder(false);
     }
   };
