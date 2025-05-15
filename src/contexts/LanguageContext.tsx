@@ -443,16 +443,16 @@ const translations: Translations = {
     ar: "تتبع في الوقت الحقيقي",
   },
   emailNotifications: {
-    fr: "Notifications par email",
-    ar: "إشعارات عبر البريد الإلكتروني",
+    fr: "Sur site de livraison",
+    ar: " في موقع التوصيل",
   },
   businessDays: {
     fr: "jours ouvrables",
     ar: "أيام العمل",
   },
   freeForOrders: {
-    fr: "Gratuit pour les commandes",
-    ar: "مجاني للطلبات",
+    fr: "Livraison gratuite",
+    ar: "توصيل مجاني",
   },
   surcharge: {
     fr: "Supplément de",
@@ -475,9 +475,10 @@ const translations: Translations = {
     ar: "سياسة الإرجاع",
   },
   returnPolicyDescription: {
-    fr: "Nous acceptons les retours dans les 30 jours suivant la réception de votre commande. Les articles doivent être dans leur état d'origine, non utilisés et dans leur emballage d'origine.",
-    ar: "نقبل المرتجعات في غضون 30 يومًا من استلام طلبك. يجب أن تكون المنتجات في حالتها الأصلية، غير مستخدمة وفي عبوتها الأصلية.",
+    fr: "Nous acceptons les retours dans un délai de 2 jours après la réception de votre commande ou directement avec le même livreur, si la pointure ne correspond pas.\nLes articles doivent être dans leur état d'origine, non utilisés et dans leur emballage d'origine.",
+    ar: "نقبل إرجاع المنتج خلال مدة لا تتجاوز يومين بعد استلام الطلب، أو يمكن إرجاعه مباشرة مع نفس عامل التوصيل إذا كانت المقاس غير مناسب.\nيجب أن يكون المنتج في حالته الأصلية، غير مستعمل، وفي عبوته الأصلية.",
   },
+
   howToReturn: {
     fr: "Comment Retourner un Article",
     ar: "كيفية إرجاع منتج",
@@ -507,8 +508,8 @@ const translations: Translations = {
     ar: "قم بإيداع الطرد في نقطة التجميع المحددة",
   },
   daysGuarantee: {
-    fr: "30 Jours",
-    ar: "30 يوم",
+    fr: "2 Jours",
+    ar: "2 يوما",
   },
   forReturning: {
     fr: "Pour retourner vos articles",
@@ -519,8 +520,8 @@ const translations: Translations = {
     ar: "الضمان",
   },
   yearWarranty: {
-    fr: "Produits garantis 1 an",
-    ar: "منتجات مضمونة لمدة سنة",
+    fr: "Produits garantis 3 mois",
+    ar: "منتجات مضمونة لمدة 3 شهور",
   },
   support: {
     fr: "Support",
@@ -567,8 +568,8 @@ const translations: Translations = {
     ar: "تتم معالجة الطلبات من الاثنين إلى الجمعة",
   },
   confirmationEmail: {
-    fr: "Un email de confirmation vous sera envoyé après l'expédition",
-    ar: "سيتم إرسال بريد إلكتروني للتأكيد بعد الشحن",
+    fr: "Un message de confirmation vous sera envoyé après l'expédition",
+    ar: "سيتم إرسال رسالة للتأكيد بعد الشحن",
   },
   differentAddress: {
     fr: "Possibilité de livraison à une adresse différente",

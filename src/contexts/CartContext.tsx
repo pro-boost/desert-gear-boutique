@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -20,7 +19,11 @@ interface CartContextType {
   cartItems: CartItem[];
   addItem: (product: Product, selectedSize?: string) => void;
   removeItem: (productId: string, selectedSize?: string) => void;
-  updateQuantity: (productId: string, quantity: number, selectedSize?: string) => void;
+  updateQuantity: (
+    productId: string,
+    quantity: number,
+    selectedSize?: string
+  ) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   // Add missing properties
@@ -35,7 +38,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return [];
     }
     const storedItems = localStorage.getItem("cartItems");
@@ -44,7 +47,9 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
   // Calculate total price
   const totalPrice = cartItems.reduce(
-    (total, item) => total + (item.product.discountPrice || item.product.price) * item.quantity, 
+    (total, item) =>
+      total +
+      (item.product.discountPrice || item.product.price) * item.quantity,
     0
   );
 
@@ -52,14 +57,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   const addItem = (product: Product, selectedSize?: string) => {
     setCartItems((prevItems) => {
       // Check if the product with the same size already exists in the cart
       const existingItemIndex = prevItems.findIndex(
-        (item) => item.product.id === product.id && item.selectedSize === selectedSize
+        (item) =>
+          item.product.id === product.id && item.selectedSize === selectedSize
       );
 
       if (existingItemIndex >= 0) {
@@ -69,11 +75,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         return updatedItems;
       } else {
         // Add new product to cart
-        return [...prevItems, {
-          product,
-          quantity: 1,
-          selectedSize: selectedSize || (product.sizes.length > 0 ? product.sizes[0] : undefined)
-        }];
+        return [
+          ...prevItems,
+          {
+            product,
+            quantity: 1,
+            selectedSize:
+              selectedSize ||
+              (product.sizes.length > 0 ? product.sizes[0] : undefined),
+          },
+        ];
       }
     });
 
@@ -84,14 +95,19 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const removeItem = (productId: string, selectedSize?: string) => {
     setCartItems((prevItems) => {
       const updatedItems = prevItems.filter(
-        (item) => !(item.product.id === productId && item.selectedSize === selectedSize)
+        (item) =>
+          !(item.product.id === productId && item.selectedSize === selectedSize)
       );
       return updatedItems;
     });
     toast.success("Item removed from cart");
   };
 
-  const updateQuantity = (productId: string, quantity: number, selectedSize?: string) => {
+  const updateQuantity = (
+    productId: string,
+    quantity: number,
+    selectedSize?: string
+  ) => {
     if (quantity <= 0) {
       removeItem(productId, selectedSize);
       return;
@@ -99,7 +115,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     setCartItems((prevItems) => {
       const updatedItems = prevItems.map((item) => {
-        if (item.product.id === productId && item.selectedSize === selectedSize) {
+        if (
+          item.product.id === productId &&
+          item.selectedSize === selectedSize
+        ) {
           return { ...item, quantity: quantity };
         }
         return item;
@@ -115,7 +134,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const getCartTotal = (): number => {
-    return cartItems.reduce((total, item) => total + (item.product.discountPrice || item.product.price) * item.quantity, 0);
+    return cartItems.reduce(
+      (total, item) =>
+        total +
+        (item.product.discountPrice || item.product.price) * item.quantity,
+      0
+    );
   };
 
   return (
