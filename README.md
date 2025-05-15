@@ -1,73 +1,127 @@
-# Welcome to your Lovable project
+# 🏜️ Desert Gear Boutique
 
-## Project info
+## 📘 Project Overview
 
-**URL**: https://lovable.dev/projects/ad2d3f5b-e7bf-4eb8-94f3-13268e34408c
+**Desert Gear Boutique** is a modern e-commerce platform tailored for outdoor enthusiasts. Built with cutting-edge technologies, it offers a seamless shopping experience with a focus on performance and scalability.
 
-## How can I edit this code?
+## 🚀 Features
 
-There are several ways of editing your application.
+- **Responsive Design**: Ensures optimal viewing across devices.
+- **Component-Based Architecture**: Facilitates easy customization and scalability.
+- **Dark/Light Mode Toggle**: Enhances user experience by adapting to user preferences.
+- **Fast Performance**: Leveraging Vite for rapid development and optimized builds.
 
-**Use Lovable**
+## 🧱 Project Structure
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ad2d3f5b-e7bf-4eb8-94f3-13268e34408c) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+desert-gear-boutique/
+├── public/                 # Static assets
+├── src/                    # Source code
+│   ├── components/         # Reusable UI components
+│   ├── pages/              # Page components
+│   ├── styles/             # Tailwind CSS configurations
+│   └── utils/              # Utility functions
+├── supabase/               # Supabase configuration and integration
+├── index.html              # Main HTML file
+├── package.json            # Project metadata and dependencies
+├── postcss.config.js       # PostCSS configuration
+├── tailwind.config.ts      # Tailwind CSS configuration
+├── tsconfig.json           # TypeScript configuration
+├── vite.config.ts          # Vite configuration
+└── README.md               # Project documentation
 ```
 
-**Edit a file directly in GitHub**
+## ⚙️ Tech Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Supabase](https://supabase.com/)
 
-**Use GitHub Codespaces**
+## 🛠 Installation & Setup
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Prerequisites
 
-## What technologies are used for this project?
+Ensure you have the following installed:
 
-This project is built with:
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- [Bun](https://bun.sh/) (if using Bun as the package manager)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Steps
 
-## How can I deploy this project?
+1. **Clone the Repository**
 
-Simply open [Lovable](https://lovable.dev/projects/ad2d3f5b-e7bf-4eb8-94f3-13268e34408c) and click on Share -> Publish.
+   ```bash
+   git clone https://github.com/pro-boost/desert-gear-boutique.git
+   cd desert-gear-boutique
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+2. **Install Dependencies**
 
-Yes, you can!
+   Using Bun:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+   ```bash
+   bun install
+   ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+   Or using npm:
+
+   ```bash
+   npm install
+   ```
+
+3. **Start the Development Server**
+
+   Using Bun:
+
+   ```bash
+   bun run dev
+   ```
+
+   Or using npm:
+
+   ```bash
+   npm run dev
+   ```
+
+4. **Build for Production**
+
+   Using Bun:
+
+   ```bash
+   bun run build
+   ```
+
+   Or using npm:
+
+   ```bash
+   npm run build
+   ```
+
+## 🌐 Deployment
+
+After building the project, the static files will be located in the `dist/` directory. You can deploy these files to any static hosting service like [Netlify](https://www.netlify.com/), [Vercel](https://vercel.com/), or [GitHub Pages](https://pages.github.com/).
+
+## 📁 Key Directories Explained
+
+| Directory       | Purpose                                         |
+|-----------------|-------------------------------------------------|
+| `public/`       | Contains static assets like images and icons    |
+| `src/components/` | Reusable React components                     |
+| `src/pages/`    | Page-level components                           |
+| `src/styles/`   | Tailwind CSS configurations and custom styles   |
+| `src/utils/`    | Utility functions and helpers                   |
+| `supabase/`     | Supabase configuration and integration          |
+
+## 📄 License
+
+This project is open-source and available under the [MIT License](LICENSE).
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
+
+---
+
+Made by [pro-boost](https://github.com/pro-boost)
