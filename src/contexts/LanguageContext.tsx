@@ -1,4 +1,3 @@
-
 import React, {
   createContext,
   useContext,
@@ -78,9 +77,13 @@ const translations: Translations = {
     fr: "Stock",
     ar: "المخزون",
   },
+  adress: {
+    fr: "Institut Imam Ouarch, Filles Pour L'éducation Musulmane, Meknes",
+    ar: "مكناس  مؤسسة الإمام ورش بنات للتعليم العتيق",
+  },
   allStock: {
-    fr: "Tout le stock",
-    ar: "كل المخزون",
+    fr: " Tous les stocks",
+    ar: "  كل المخازن",
   },
   inStock: {
     fr: "En stock",
@@ -583,7 +586,7 @@ const translations: Translations = {
   messageSentSuccess: {
     fr: "Message envoyé avec succès!",
     ar: "تم إرسال الرسالة بنجاح!",
-  }
+  },
 };
 
 interface LanguageContextType {

@@ -1,51 +1,30 @@
+import { useLanguage } from "@/contexts/LanguageContext";
 
-import React, { useEffect, useRef } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-
-// Note: In a real implementation, you would use a proper mapping library
-// like Mapbox, Google Maps, or Leaflet. This is a simplified placeholder.
 const MapComponent: React.FC = () => {
-  const mapRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-
-  useEffect(() => {
-    // In a real implementation, this is where you would initialize the map
-    const mapElement = mapRef.current;
-    if (mapElement) {
-      // Simulate map with a placeholder
-      const mapPlaceholder = document.createElement('div');
-      mapPlaceholder.style.width = '100%';
-      mapPlaceholder.style.height = '100%';
-      mapPlaceholder.style.backgroundImage = 'url(/placeholder.svg)';
-      mapPlaceholder.style.backgroundSize = 'cover';
-      mapPlaceholder.style.backgroundPosition = 'center';
-      mapPlaceholder.style.display = 'flex';
-      mapPlaceholder.style.alignItems = 'center';
-      mapPlaceholder.style.justifyContent = 'center';
-      
-      // Add a marker element
-      const marker = document.createElement('div');
-      marker.className = 'bg-tactical text-white px-4 py-2 rounded-lg shadow-lg';
-      marker.textContent = 'Nidal Boots';
-      
-      mapPlaceholder.appendChild(marker);
-      mapElement.appendChild(mapPlaceholder);
-    }
-  }, []);
 
   return (
     <div className="rounded-lg overflow-hidden shadow-lg border border-border bg-card">
       <div className="p-4 bg-muted">
-        <h3 className="font-semibold text-lg">{t('findUs')}</h3>
+        <h3 className="font-semibold text-lg">{t("findUs")}</h3>
       </div>
-      <div 
-        ref={mapRef} 
-        className="w-full h-64 relative"
-      />
+      <div>
+        <div className="overflow-hidden w-full h-full group">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.9522402356783!2d-5.548214609786988!3d33.86512170050147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda0454452435207%3A0xbcac173b743a8a49!2sInstitut%20Imam%20Ouarch%2C%20Filles%20Pour%20L&#39;%C3%A9ducation%20Musulmane!5e0!3m2!1sfr!2sma!4v1747336994354!5m2!1sfr!2sma"
+            width="100%"
+            height="100%"
+            frameBorder="0"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Nidals Location"
+            className="w-full h-full transition-transform duration-300 ease-in-out group-hover:scale-105"
+          />
+        </div>
+      </div>
       <div className="p-4">
-        <p className="text-muted-foreground">
-          123 Rue Exemple, Casablanca, Maroc
-        </p>
+        <p className="text-muted-foreground">{t("adress")}</p>
       </div>
     </div>
   );

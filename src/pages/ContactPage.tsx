@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import Navbar from "@/components/Navbar";
@@ -61,7 +60,11 @@ const ContactPage = () => {
                   <label htmlFor="subject" className="text-sm font-medium">
                     {t("subject")}
                   </label>
-                  <Input id="subject" placeholder={t("messageSubject")} required />
+                  <Input
+                    id="subject"
+                    placeholder={t("messageSubject")}
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -99,10 +102,12 @@ const ContactPage = () => {
                     <div>
                       <h3 className="font-medium mb-1">{t("email")}</h3>
                       <a
-                        href="mailto:contact@nidalboots.com"
+                        href="mailto:nidal.benalla3@gmail.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary"
                       >
-                        contact@nidalboots.com
+                        nidal.benalla3@gmail.com
                       </a>
                     </div>
                   </div>
@@ -112,10 +117,12 @@ const ContactPage = () => {
                     <div>
                       <h3 className="font-medium mb-1">{t("phone")}</h3>
                       <a
-                        href="tel:+212123456789"
+                        href="https://wa.me/+212617828917"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary"
                       >
-                        +212 123-456789
+                        +212.6.17.82.89.17
                       </a>
                     </div>
                   </div>
@@ -124,9 +131,13 @@ const ContactPage = () => {
                     <MapPin className="text-primary mt-0.5 flex-shrink-0" />
                     <div>
                       <h3 className="font-medium mb-1">{t("address")}</h3>
-                      <p className="text-muted-foreground">
-                        123 Rue Exemple, Casablanca, Maroc
-                      </p>
+                      <a
+                        href="https://www.google.com/maps?ll=33.864917,-5.548397&z=15&t=m&hl=fr&gl=MA&mapclient=embed&cid=13595266919245187657"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <p className="text-muted-foreground">{t("adress")}</p>
+                      </a>
                     </div>
                   </div>
 
@@ -134,7 +145,7 @@ const ContactPage = () => {
                     <h3 className="font-medium mb-3">{t("findUsOn")}</h3>
                     <div className="flex space-x-4 rtl:space-x-reverse">
                       <a
-                        href="https://instagram.com"
+                        href="https://www.instagram.com/mag.ben.arm?utm_source=qr&igsh=bGI3dnJhZzhxeTNz"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-muted hover:bg-muted/80 text-foreground p-2 rounded-full"
@@ -142,7 +153,7 @@ const ContactPage = () => {
                         <Instagram size={20} />
                       </a>
                       <a
-                        href="https://facebook.com"
+                        href="https://www.facebook.com/share/1BVx2hDXaC/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-muted hover:bg-muted/80 text-foreground p-2 rounded-full"
