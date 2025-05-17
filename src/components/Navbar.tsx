@@ -57,11 +57,11 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-lg border-b border-border">
       <div className="container mx-auto py-3 px-4">
-        <div className="flex items-center justify-between gap-8">
+        <div className="flex items-center justify-between gap-2 md:gap-8">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 min-w-[160px]">
             <Target className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-heading font-bold text-primary tracking-tight">
+            <span className="text-xl md:text-2xl font-heading font-bold text-primary tracking-tight">
               {t("siteTitle")}
             </span>
           </Link>
@@ -98,122 +98,144 @@ const Navbar = () => {
           </nav>
 
           {/* Right Side Actions */}
-          <div className="flex items-center gap-2">
-            {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="text-foreground hover:text-primary"
-            >
-              {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-            </Button>
+          <div className="flex items-center">
+            <div className="hidden md:flex items-center gap-2">
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="text-foreground hover:text-primary"
+              >
+                {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+              </Button>
 
-            {/* Language Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Globe size={20} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setLanguage("fr")}>
-                  Français {language === "fr" && "✓"}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage("ar")}>
-                  العربية {language === "ar" && "✓"}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              {/* Language Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Language Dropdown"
+                  >
+                    <Globe size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLanguage("fr")}>
+                    Français {language === "fr" && "✓"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage("ar")}>
+                    العربية {language === "ar" && "✓"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-            {/* User Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User size={20} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {user ? (
-                  <>
-                    <DropdownMenuItem className="font-medium">
-                      {t("yourAccount")}: {user.username}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/favorites">{t("favorites")}</Link>
-                    </DropdownMenuItem>
-                    {user.isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link to="/admin">{t("admin")}</Link>
+              {/* User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="User Dropdown"
+                  >
+                    <User size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user ? (
+                    <>
+                      <DropdownMenuItem className="font-medium">
+                        {t("yourAccount")}: {user.username}
                       </DropdownMenuItem>
-                    )}
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => {
-                        logout();
-                        window.location.href = "/";
-                      }}
-                    >
-                      {t("logout")}
-                    </DropdownMenuItem>
-                  </>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/favorites">{t("favorites")}</Link>
+                      </DropdownMenuItem>
+                      {user.isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin">{t("admin")}</Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          logout();
+                          window.location.href = "/";
+                        }}
+                      >
+                        {t("logout")}
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/auth/login">{t("login")}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/auth/signup">{t("signup")}</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <div className="flex items-center ">
+              {/* Favorites */}
+              <Link to="/favorites">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  aria-label="Favorites"
+                >
+                  <Heart size={20} />
+                  {favorites.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 z-10">
+                      {favorites.length}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+
+              {/* Cart */}
+              <Link to="/cart">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative"
+                  aria-label="Cart"
+                >
+                  <ShoppingBag size={20} />
+                  {itemCount > 0 && (
+                    <span className=" absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
+                      {itemCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+
+              {/* Mobile Menu Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={toggleMenu}
+                aria-label="Mobile Menu Toggle"
+              >
+                {mobileMenuOpen ? (
+                  <X size={20} className="text-primary" />
                 ) : (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth/login">{t("login")}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/auth/signup">{t("signup")}</Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Favorites */}
-            <Link to="/favorites">
-              <Button variant="ghost" size="icon" className="relative">
-                <Heart size={20} />
-                {favorites.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1 z-10">
-                    {favorites.length}
-                  </span>
+                  <Menu size={20} />
                 )}
               </Button>
-            </Link>
-
-            {/* Cart */}
-            <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative">
-                <ShoppingBag size={20} />
-                {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full min-w-[20px] h-5 flex items-center justify-center px-1">
-                    {itemCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-
-            {/* Mobile Menu Toggle */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={toggleMenu}
-            >
-              {mobileMenuOpen ? (
-                <X size={20} className="text-primary" />
-              ) : (
-                <Menu size={20} />
-              )}
-            </Button>
+            </div>
           </div>
         </div>
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border mt-3 space-y-4">
+          <div className="md:hidden px-4 py-4 border-t border-border mt-3 space-y-4">
             {/* Mobile Search */}
             <form onSubmit={handleSearch} className="px-2">
               <div className="relative">
@@ -252,6 +274,88 @@ const Navbar = () => {
                 {t("contactUs")}
               </Link>
             </nav>
+            <div className="flex justify-between items-center ">
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="text-foreground hover:text-primary"
+                aria-label="Theme Toggle"
+              >
+                {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+              </Button>
+
+              {/* Language Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Language Dropdown"
+                  >
+                    <Globe size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setLanguage("fr")}>
+                    Français {language === "fr" && "✓"}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage("ar")}>
+                    العربية {language === "ar" && "✓"}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {/* User Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="User Dropdown"
+                  >
+                    <User size={20} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user ? (
+                    <>
+                      <DropdownMenuItem className="font-medium">
+                        {t("yourAccount")}: {user.username}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <Link to="/favorites">{t("favorites")}</Link>
+                      </DropdownMenuItem>
+                      {user.isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin">{t("admin")}</Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          logout();
+                          window.location.href = "/";
+                        }}
+                      >
+                        {t("logout")}
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <Link to="/auth/login">{t("login")}</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link to="/auth/signup">{t("signup")}</Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         )}
       </div>

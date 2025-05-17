@@ -101,6 +101,10 @@
     @apply relative text-foreground hover:text-primary transition-colors duration-200 after:content-[''] after:absolute after:w-full after:scale-x-0 after:h-0.5 after:bottom-0 after:left-0 after:bg-primary after:origin-bottom-right after:transition-transform after:duration-300 hover:after:scale-x-100 hover:after:origin-bottom-left;
   }
   
+  .input-style {
+    @apply w-full px-4 py-2 pl-10 rounded-full bg-muted/50 border border-border appearance-none focus:outline-none focus:ring focus:ring-primary/20;
+  }
+  
   .hero-animated-bg {
     @apply bg-gradient-to-br from-background to-secondary/20;
   }
