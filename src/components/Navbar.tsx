@@ -25,6 +25,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { AnimatePresence, motion } from "framer-motion";
 
 const Navbar = () => {
   const { t, language, setLanguage } = useLanguage();
@@ -234,130 +235,138 @@ const Navbar = () => {
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden px-4 py-4 border-t border-border mt-3 space-y-4">
-            {/* Mobile Search */}
-            <form onSubmit={handleSearch} className="px-2">
-              <div className="relative">
-                <input
-                  type="search"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={t("search")}
-                  className="w-full px-4 py-2 pl-10 rounded-full bg-muted/50 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2218%22%20y1%3D%226%22%20x2%3D%226%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%226%22%20x2%3D%2218%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E')] [&::-webkit-search-cancel-button]:w-4 [&::-webkit-search-cancel-button]:h-4 [&::-webkit-search-cancel-button]:mr-2 [&::-webkit-search-cancel-button]:cursor-pointer"
-                />
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              </div>
-            </form>
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              className="fixed top-16 left-0 w-full z-50 md:hidden bg-background px-4 py-4 border-t border-border space-y-4 shadow-lg"
+            >
+              {/* Mobile Search */}
+              <form onSubmit={handleSearch} className="px-2 py-4">
+                <div className="relative">
+                  <input
+                    type="search"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={t("search")}
+                    className="w-full px-4 py-2 pl-10 rounded-full bg-muted/50 border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-cancel-button]:bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23f97316%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cline%20x1%3D%2218%22%20y1%3D%226%22%20x2%3D%226%22%20y2%3D%2218%22%2F%3E%3Cline%20x1%3D%226%22%20y1%3D%226%22%20x2%3D%2218%22%20y2%3D%2218%22%2F%3E%3C%2Fsvg%3E')] [&::-webkit-search-cancel-button]:w-4 [&::-webkit-search-cancel-button]:h-4 [&::-webkit-search-cancel-button]:mr-2 [&::-webkit-search-cancel-button]:cursor-pointer"
+                  />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                </div>
+              </form>
+              <nav className="flex flex-col gap-4 px-4 py-4 border-t border-border space-y-4">
+                <Link
+                  to="/"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
+                >
+                  {t("home")}
+                </Link>
+                <Link
+                  to="/products"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
+                >
+                  {t("products")}
+                </Link>
+                <Link
+                  to="/contact"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
+                >
+                  {t("contactUs")}
+                </Link>
+              </nav>
+              <div className="flex justify-between items-end px-4  border-t border-border  space-y-4 ">
+                {/* Theme Toggle */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={toggleTheme}
+                  className="text-foreground hover:text-primary"
+                  aria-label="Theme Toggle"
+                >
+                  {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
+                </Button>
 
-            <nav className="flex flex-col gap-4">
-              <Link
-                to="/"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
-              >
-                {t("home")}
-              </Link>
-              <Link
-                to="/products"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
-              >
-                {t("products")}
-              </Link>
-              <Link
-                to="/contact"
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-2 py-1 hover:bg-muted rounded-md transition-colors"
-              >
-                {t("contactUs")}
-              </Link>
-            </nav>
-            <div className="flex justify-between items-center ">
-              {/* Theme Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                className="text-foreground hover:text-primary"
-                aria-label="Theme Toggle"
-              >
-                {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-              </Button>
+                {/* Language Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Language Dropdown"
+                    >
+                      <Globe size={20} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => setLanguage("fr")}>
+                      Français {language === "fr" && "✓"}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setLanguage("ar")}>
+                      العربية {language === "ar" && "✓"}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-              {/* Language Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="Language Dropdown"
-                  >
-                    <Globe size={20} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setLanguage("fr")}>
-                    Français {language === "fr" && "✓"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage("ar")}>
-                    العربية {language === "ar" && "✓"}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              {/* User Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    aria-label="User Dropdown"
-                  >
-                    <User size={20} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  {user ? (
-                    <>
-                      <DropdownMenuItem className="font-medium">
-                        {t("yourAccount")}: {user.username}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem asChild>
-                        <Link to="/favorites">{t("favorites")}</Link>
-                      </DropdownMenuItem>
-                      {user.isAdmin && (
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin">{t("admin")}</Link>
+                {/* User Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="User Dropdown"
+                    >
+                      <User size={20} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    {user ? (
+                      <>
+                        <DropdownMenuItem className="font-medium">
+                          {t("yourAccount")}: {user.username}
                         </DropdownMenuItem>
-                      )}
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => {
-                          logout();
-                          window.location.href = "/";
-                        }}
-                      >
-                        {t("logout")}
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link to="/auth/login">{t("login")}</Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild>
-                        <Link to="/auth/signup">{t("signup")}</Link>
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </div>
-        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/favorites">{t("favorites")}</Link>
+                        </DropdownMenuItem>
+                        {user.isAdmin && (
+                          <DropdownMenuItem asChild>
+                            <Link to="/admin">{t("admin")}</Link>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => {
+                            logout();
+                            window.location.href = "/";
+                          }}
+                        >
+                          {t("logout")}
+                        </DropdownMenuItem>
+                      </>
+                    ) : (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/auth/login">{t("login")}</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/auth/signup">{t("signup")}</Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </header>
   );
