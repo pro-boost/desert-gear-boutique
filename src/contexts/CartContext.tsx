@@ -36,21 +36,42 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   // Load cart from localStorage when user changes
   useEffect(() => {
     if (user) {
+      // For signed-in users, load their synced cart
       const storedCart = localStorage.getItem(`cart_${user.id}`);
       if (storedCart) {
         setItems(JSON.parse(storedCart));
       } else {
-        setItems([]);
+        // If no synced cart exists, try to load the local cart
+        const localCart = localStorage.getItem("local_cart");
+        if (localCart) {
+          setItems(JSON.parse(localCart));
+          // Save the local cart to the user's synced cart
+          localStorage.setItem(`cart_${user.id}`, localCart);
+          // Clear the local cart
+          localStorage.removeItem("local_cart");
+        } else {
+          setItems([]);
+        }
       }
     } else {
-      setItems([]);
+      // For non-signed-in users, load the local cart
+      const localCart = localStorage.getItem("local_cart");
+      if (localCart) {
+        setItems(JSON.parse(localCart));
+      } else {
+        setItems([]);
+      }
     }
   }, [user]);
 
   // Save cart to localStorage when it changes
   useEffect(() => {
     if (user) {
+      // For signed-in users, save to their synced cart
       localStorage.setItem(`cart_${user.id}`, JSON.stringify(items));
+    } else {
+      // For non-signed-in users, save to local cart
+      localStorage.setItem("local_cart", JSON.stringify(items));
     }
   }, [items, user]);
 

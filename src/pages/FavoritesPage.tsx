@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";

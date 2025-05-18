@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import { useUser, SignInButton } from "@clerk/clerk-react";
 import {
   getProductById,
@@ -72,13 +72,9 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = () => {
-    if (!isSignedIn) {
-      toast.error(t("loginRequired"));
-      return;
-    }
-
     if (product && product.inStock && selectedSize) {
       addToCart(product, 1, selectedSize);
+      toast.success(t("addedToCart"));
     }
   };
 
@@ -242,27 +238,18 @@ const ProductDetail = () => {
 
             {/* Actions */}
             <div className="flex gap-2">
-              {isSignedIn ? (
-                <Button
-                  className="flex-1"
-                  disabled={!product.inStock || !selectedSize}
-                  onClick={handleAddToCart}
-                >
-                  <ShoppingBag className="mr-2 h-4 w-4" />
-                  {product.inStock
-                    ? !selectedSize
-                      ? t("selectSizeFirst")
-                      : t("addToCart")
-                    : t("outOfStock")}
-                </Button>
-              ) : (
-                <SignInButton mode="modal">
-                  <Button className="flex-1">
-                    <ShoppingBag className="mr-2 h-4 w-4" />
-                    {t("loginToAddToCart")}
-                  </Button>
-                </SignInButton>
-              )}
+              <Button
+                className="flex-1"
+                disabled={!product.inStock || !selectedSize}
+                onClick={handleAddToCart}
+              >
+                <ShoppingBag className="mr-2 h-4 w-4" />
+                {product.inStock
+                  ? !selectedSize
+                    ? t("selectSizeFirst")
+                    : t("addToCart")
+                  : t("outOfStock")}
+              </Button>
 
               <Button
                 variant="outline"

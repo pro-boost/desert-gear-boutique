@@ -63,24 +63,8 @@ const AppRoutes = () => {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/shipping" element={<Shipping />} />
         <Route path="/returns" element={<Returns />} />
-
-        {/* Protected Routes */}
-        <Route
-          path="/cart"
-          element={
-            <SignedIn>
-              <CartPage />
-            </SignedIn>
-          }
-        />
-        <Route
-          path="/favorites"
-          element={
-            <SignedIn>
-              <FavoritesPage />
-            </SignedIn>
-          }
-        />
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/favorites" element={<FavoritesPage />} />
 
         {/* Admin Route */}
         <Route

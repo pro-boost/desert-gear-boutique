@@ -22,21 +22,42 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load favorites from localStorage when user changes
   useEffect(() => {
     if (user) {
+      // For signed-in users, load their synced favorites
       const storedFavorites = localStorage.getItem(`favorites_${user.id}`);
       if (storedFavorites) {
         setItems(JSON.parse(storedFavorites));
       } else {
-        setItems([]);
+        // If no synced favorites exist, try to load the local favorites
+        const localFavorites = localStorage.getItem("local_favorites");
+        if (localFavorites) {
+          setItems(JSON.parse(localFavorites));
+          // Save the local favorites to the user's synced favorites
+          localStorage.setItem(`favorites_${user.id}`, localFavorites);
+          // Clear the local favorites
+          localStorage.removeItem("local_favorites");
+        } else {
+          setItems([]);
+        }
       }
     } else {
-      setItems([]);
+      // For non-signed-in users, load the local favorites
+      const localFavorites = localStorage.getItem("local_favorites");
+      if (localFavorites) {
+        setItems(JSON.parse(localFavorites));
+      } else {
+        setItems([]);
+      }
     }
   }, [user]);
 
   // Save favorites to localStorage when they change
   useEffect(() => {
     if (user) {
+      // For signed-in users, save to their synced favorites
       localStorage.setItem(`favorites_${user.id}`, JSON.stringify(items));
+    } else {
+      // For non-signed-in users, save to local favorites
+      localStorage.setItem("local_favorites", JSON.stringify(items));
     }
   }, [items, user]);
 
@@ -71,10 +92,5 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useFavorites = () => {
-  const context = useContext(FavoritesContext);
-  if (context === undefined) {
-    throw new Error("useFavorites must be used within a FavoritesProvider");
-  }
-  return context;
-};
+// Export the context for use in the hook
+export { FavoritesContext };

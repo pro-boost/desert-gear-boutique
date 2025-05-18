@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -45,11 +45,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!isSignedIn) {
-      toast.error(t("loginRequired"));
-      return;
-    }
 
     if (!product.inStock) {
       return;
@@ -171,11 +166,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             onClick={handleAddToCart}
           >
             <ShoppingBag className="mr-2 h-4 w-4" />
-            {!isSignedIn
-              ? t("loginToAddToCart")
-              : product.inStock
-              ? t("addToCart")
-              : t("outOfStock")}
+            {product.inStock ? t("addToCart") : t("outOfStock")}
           </Button>
         </CardFooter>
       </div>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
-import { useFavorites } from "@/contexts/FavoritesContext";
+import { useFavorites } from "@/hooks/useFavorites";
 import {
   useUser,
   UserButton,
