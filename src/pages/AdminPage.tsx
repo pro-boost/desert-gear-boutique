@@ -8,6 +8,7 @@ import {
   deleteProduct,
   getCategories,
   addCategory,
+  resetProducts,
 } from "@/services/productService";
 import { Product, PRODUCT_SIZES } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { PlusCircle, Trash, Edit, Save, X, Check } from "lucide-react";
+import {
+  PlusCircle,
+  Trash,
+  Edit,
+  Save,
+  X,
+  Check,
+  RotateCcw,
+} from "lucide-react";
 import ImageDropzone from "@/components/ImageDropzone";
 
 // Product form interface
@@ -314,11 +323,27 @@ const AdminPage = () => {
     }));
   };
 
+  const handleResetProducts = () => {
+    resetProducts();
+    setProducts(getProducts());
+    toast.success(t("productsReset"));
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-grow py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-heading font-bold mb-8">{t("admin")}</h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-heading font-bold">{t("admin")}</h1>
+            <Button
+              variant="destructive"
+              onClick={handleResetProducts}
+              className="flex items-center gap-2"
+            >
+              <RotateCcw className="h-4 w-4" />
+              {t("resetProducts")}
+            </Button>
+          </div>
 
           <Tabs
             value={activeTab}

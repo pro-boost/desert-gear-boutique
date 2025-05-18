@@ -1,4 +1,3 @@
-
 import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
 
 // Save products to localStorage
@@ -44,12 +43,26 @@ export const addCategory = (category: string): boolean => {
   return true;
 };
 
+// Reset products to sample data
+export const resetProducts = (): void => {
+  // Clear existing products
+  localStorage.removeItem('products');
+  // Save sample products
+  saveProducts(SAMPLE_PRODUCTS);
+};
+
 // Get products from localStorage or use default samples
 export const getProducts = (): Product[] => {
   const storedProducts = localStorage.getItem('products');
   if (storedProducts) {
     try {
       const products = JSON.parse(storedProducts);
+      // If products array is empty or sizes are missing, reset to sample data
+      if (!products.length || products.some((p: Product) => !p.sizes || !p.sizes.length)) {
+        console.log("Products data is invalid, resetting to sample data");
+        resetProducts();
+        return SAMPLE_PRODUCTS;
+      }
       // Ensure all products have a sizes array
       return products.map((product: Product) => ({
         ...product,
@@ -58,13 +71,13 @@ export const getProducts = (): Product[] => {
     } catch (error) {
       console.error("Failed to parse products from localStorage:", error);
       // If parsing fails, use sample products
-      saveProducts(SAMPLE_PRODUCTS);
+      resetProducts();
       return SAMPLE_PRODUCTS;
     }
   }
 
   // If no products in localStorage, use imported sample products
-  saveProducts(SAMPLE_PRODUCTS);
+  resetProducts();
   return SAMPLE_PRODUCTS;
 };
 

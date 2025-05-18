@@ -596,6 +596,18 @@ const translations: Translations = {
     fr: "Se connecter pour ajouter au panier",
     ar: "تسجيل الدخول لإضافة إلى السلة",
   },
+  buyNow: {
+    fr: "Acheter maintenant",
+    ar: "اشتر الآن",
+  },
+  resetProducts: {
+    fr: "Réinitialiser les produits",
+    ar: "إعادة تعيين المنتجات",
+  },
+  productsReset: {
+    fr: "Les produits ont été réinitialisés avec succès",
+    ar: "تم إعادة تعيين المنتجات بنجاح",
+  },
 };
 
 interface LanguageContextType {
