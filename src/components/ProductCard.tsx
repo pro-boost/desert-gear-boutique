@@ -56,7 +56,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
     } else {
       // If product doesn't have sizes, add directly to cart
       addToCart(product, 1, "one-size");
-      toast.success(t("addedToCart"));
     }
   };
 

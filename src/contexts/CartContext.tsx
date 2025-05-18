@@ -8,6 +8,7 @@ import React, {
 import { useUser } from "@clerk/clerk-react";
 import { Product, PRODUCT_SIZES } from "@/types/product";
 import { toast } from "@/components/ui/sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // Export the CartItem type so it can be imported in other files
 export interface CartItem {
@@ -31,6 +32,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { user } = useUser();
+  const { t } = useLanguage();
   const [items, setItems] = useState<CartItem[]>([]);
 
   // Load cart from localStorage when user changes
@@ -88,13 +90,13 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
             ? { ...item, quantity: newQuantity }
             : item
         );
+        toast.success(t("updatedCart"));
         return updatedItems;
       }
 
+      toast.success(t("addedToCart"));
       return [...prev, { product, quantity, selectedSize: size }];
     });
-
-    toast.success("Product added to cart");
   };
 
   const updateQuantity = (
@@ -117,17 +119,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   const removeItem = (productId: string, size: string) => {
-    setItems((prev) =>
-      prev.filter(
+    setItems((prev) => {
+      const item = prev.find(
+        (item) => item.product.id === productId && item.selectedSize === size
+      );
+      if (item) {
+        toast.success(t("removedFromCart"));
+      }
+      return prev.filter(
         (item) => !(item.product.id === productId && item.selectedSize === size)
-      )
-    );
-    toast.success("Product removed from cart");
+      );
+    });
   };
 
   const clearCart = () => {
     setItems([]);
-    toast.success("Cart cleared");
+    toast.success(t("cartCleared"));
   };
 
   const totalPrice = items.reduce(

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { Product } from "@/types/product";
+import { toast } from "@/components/ui/sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface FavoritesContextType {
   items: Product[];
@@ -17,6 +19,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { user } = useUser();
+  const { t } = useLanguage();
   const [items, setItems] = useState<Product[]>([]);
 
   // Load favorites from localStorage when user changes
@@ -64,6 +67,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   const addToFavorites = (product: Product) => {
     setItems((prev) => {
       if (!prev.find((item) => item.id === product.id)) {
+        toast.success(t("addedToFavorites"));
         return [...prev, product];
       }
       return prev;
@@ -71,7 +75,13 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const removeFromFavorites = (productId: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== productId));
+    setItems((prev) => {
+      const product = prev.find((item) => item.id === productId);
+      if (product) {
+        toast.success(t("removedFromFavorites"));
+      }
+      return prev.filter((item) => item.id !== productId);
+    });
   };
 
   const isFavorite = (productId: string) => {

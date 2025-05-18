@@ -74,7 +74,6 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (product && product.inStock && selectedSize) {
       addToCart(product, 1, selectedSize);
-      toast.success(t("addedToCart"));
     }
   };
 
