@@ -13,7 +13,7 @@ import { CheckoutForm } from "@/components/cart/CheckoutForm";
 
 const CartPage = () => {
   const { t } = useLanguage();
-  const { items, clearCart } = useCart();
+  const { items, clearCart, totalPrice } = useCart();
   const navigate = useNavigate();
 
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
@@ -110,7 +110,11 @@ const CartPage = () => {
                 </div>
 
                 <div className="p-4">
-                  <CheckoutForm onSubmit={handleSubmitOrder} />
+                  <CheckoutForm
+                    onSubmit={handleSubmitOrder}
+                    cartItems={items}
+                    totalPrice={totalPrice}
+                  />
                 </div>
               </div>
             </div>

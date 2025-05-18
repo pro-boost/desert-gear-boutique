@@ -6,23 +6,71 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
+import { CartItem } from "@/contexts/CartContext";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CheckoutFormData {
   full_name: string;
   email: string;
   phone: string;
+  address_line1: string;
 }
 
 interface CheckoutFormProps {
   onSubmit: (formData: Omit<ShippingAddress, "id">) => void;
+  cartItems: CartItem[];
+  totalPrice: number;
 }
 
-export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSubmit }) => {
+export const CheckoutForm: React.FC<CheckoutFormProps> = ({
+  onSubmit,
+  cartItems,
+  totalPrice,
+}) => {
   const [formData, setFormData] = useState<CheckoutFormData>({
     full_name: "",
     email: "",
     phone: "",
+    address_line1: "",
   });
+
+  const generateWhatsAppMessage = (formData: CheckoutFormData) => {
+    const itemsList = cartItems
+      .map((item) => {
+        const price = item.product.discountPrice || item.product.price;
+        const itemTotal = price * item.quantity;
+        return `*${item.product.name}*
+Size: ${item.selectedSize}
+Quantity: ${item.quantity}
+Price: ${price.toFixed(2)} Dh
+Subtotal: ${itemTotal.toFixed(2)} Dh
+-------------------`;
+      })
+      .join("\n\n");
+
+    const message = `*New Order from Desert Gear Boutique* 🛍️
+
+*Customer Details:*
+Name: ${formData.full_name}
+Phone: ${formData.phone}
+Email: ${formData.email}
+
+*Delivery Address:*
+${formData.address_line1}
+Morocco
+
+*Order Items:*
+${itemsList}
+
+*Total Amount:* ${totalPrice.toFixed(2)} Dh
+
+Thank you for your order! We'll contact you shortly to confirm your order.`;
+
+    // Encode the message for WhatsApp URL
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappNumber = "212661880323"; // Your WhatsApp number
+    return `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,13 +79,18 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSubmit }) => {
       full_name: formData.full_name,
       email: formData.email,
       phone: formData.phone,
-      // Add required fields with default values
-      address_line1: "Will be collected during delivery",
-      city: "Will be collected during delivery",
-      state: "Will be collected during delivery",
-      postal_code: "Will be collected during delivery",
+      address_line1: formData.address_line1,
+      city: "Morocco", // Default value
+      state: "Morocco", // Default value
+      postal_code: "", // Empty value
       country: "Morocco",
     };
+
+    // Generate WhatsApp message and open in new tab
+    const whatsappUrl = generateWhatsAppMessage(formData);
+    window.open(whatsappUrl, "_blank");
+
+    // Submit the form data
     onSubmit(shippingData);
   };
 
@@ -47,8 +100,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSubmit }) => {
         <AlertCircle className="h-4 w-4" />
         <AlertTitle>Pay after delivery</AlertTitle>
         <AlertDescription>
-          We'll contact you to confirm your order and collect your delivery
-          address.
+          We'll contact you to confirm your order and deliver to your address.
         </AlertDescription>
       </Alert>
 
@@ -90,6 +142,20 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({ onSubmit }) => {
           }
           required
           placeholder="Enter your phone number"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="address_line1">Delivery Address</Label>
+        <Textarea
+          id="address_line1"
+          value={formData.address_line1}
+          onChange={(e) =>
+            setFormData((prev) => ({ ...prev, address_line1: e.target.value }))
+          }
+          required
+          placeholder="Enter your complete delivery address"
+          className="min-h-[100px]"
         />
       </div>
 
