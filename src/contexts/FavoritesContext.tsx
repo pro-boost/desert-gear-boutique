@@ -1,17 +1,9 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { toast } from "@/components/ui/sonner";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
 import { Product } from "@/types/product";
-import { useAuth } from "./AuthContext";
-import { useLanguage } from "./LanguageContext";
 
 interface FavoritesContextType {
-  favorites: Product[];
+  items: Product[];
   addToFavorites: (product: Product) => void;
   removeFromFavorites: (productId: string) => void;
   isFavorite: (productId: string) => boolean;
@@ -21,93 +13,54 @@ const FavoritesContext = createContext<FavoritesContextType | undefined>(
   undefined
 );
 
-export const FavoritesProvider: React.FC<{ children: ReactNode }> = ({
+export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user } = useAuth();
-  const [favorites, setFavorites] = useState<Product[]>([]);
-  const storageKey = user ? `favorites-${user.id}` : "favorites-guest";
-  const { t } = useLanguage();
+  const { user } = useUser();
+  const [items, setItems] = useState<Product[]>([]);
 
-  const saveFavorites = (favorites: Product[]) => {
-    try {
-      // Limit the data being stored by only keeping essential fields
-      const limitedFavorites = favorites.map(
-        ({ id, name, price, images, discountPrice }) => ({
-          id,
-          name,
-          price,
-          images,
-          discountPrice,
-        })
-      );
-
-      const favoritesData = JSON.stringify(limitedFavorites);
-      localStorage.setItem(storageKey, favoritesData);
-    } catch (error) {
-      console.error("Error saving favorites:", error);
-      // If storage is full, try to clear old data
-      try {
-        localStorage.clear();
-        const limitedFavorites = favorites.map(
-          ({ id, name, price, images, discountPrice }) => ({
-            id,
-            name,
-            price,
-            images,
-            discountPrice,
-          })
-        );
-        localStorage.setItem(storageKey, JSON.stringify(limitedFavorites));
-      } catch (retryError) {
-        console.error(
-          "Failed to save favorites after clearing storage:",
-          retryError
-        );
-      }
-    }
-  };
-
-  const loadFavorites = (): Product[] => {
-    try {
-      const favoritesData = localStorage.getItem(storageKey);
-      if (!favoritesData) return [];
-      return JSON.parse(favoritesData);
-    } catch (error) {
-      console.error("Error loading favorites:", error);
-      return [];
-    }
-  };
-
+  // Load favorites from localStorage when user changes
   useEffect(() => {
-    setFavorites(loadFavorites());
+    if (user) {
+      const storedFavorites = localStorage.getItem(`favorites_${user.id}`);
+      if (storedFavorites) {
+        setItems(JSON.parse(storedFavorites));
+      } else {
+        setItems([]);
+      }
+    } else {
+      setItems([]);
+    }
   }, [user]);
 
+  // Save favorites to localStorage when they change
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(items));
+    }
+  }, [items, user]);
+
   const addToFavorites = (product: Product) => {
-    setFavorites((prev) => {
-      const newFavorites = [...prev, product];
-      saveFavorites(newFavorites);
-      toast.success(`${product.name} ajouté aux favoris`);
-      return newFavorites;
+    setItems((prev) => {
+      if (!prev.find((item) => item.id === product.id)) {
+        return [...prev, product];
+      }
+      return prev;
     });
   };
 
   const removeFromFavorites = (productId: string) => {
-    setFavorites((prev) => {
-      const newFavorites = prev.filter((item) => item.id !== productId);
-      saveFavorites(newFavorites);
-      return newFavorites;
-    });
+    setItems((prev) => prev.filter((item) => item.id !== productId));
   };
 
   const isFavorite = (productId: string) => {
-    return favorites.some((item) => item.id === productId);
+    return items.some((item) => item.id === productId);
   };
 
   return (
     <FavoritesContext.Provider
       value={{
-        favorites,
+        items,
         addToFavorites,
         removeFromFavorites,
         isFavorite,

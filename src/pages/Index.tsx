@@ -4,8 +4,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import ProductCard from "@/components/ProductCard";
 import MapComponent from "@/components/MapComponent";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import { getFeaturedProducts, getNewArrivals } from "@/services/productService";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -94,151 +92,145 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col scroll-smooth">
-      <Navbar />
+    <div className="scroll-smooth">
+      {/* Hero Section with animated background */}
+      <section
+        ref={(el) => (sectionsRef.current[0] = el)}
+        className="relative bg-muted min-h-[100vh] h-screen flex items-center justify-center py-8 md:py-24 snap-start overflow-hidden"
+      >
+        {/* Animated background */}
+        <div className="hero-animated-bg absolute inset-0 w-full h-full">
+          <div className="animate-float absolute top-10 left-[10%] w-24 md:w-32 h-24 md:h-32 rounded-full bg-primary/20 blur-2xl"></div>
+          <div className="animate-float-delay absolute bottom-10 right-[10%] w-32 md:w-40 h-32 md:h-40 rounded-full bg-secondary/30 blur-3xl"></div>
+          <div className="animate-float-slow absolute top-1/4 right-1/4 w-20 md:w-24 h-20 md:h-24 rounded-full bg-accent/20 blur-xl"></div>
+          <div className="animate-pulse absolute bottom-1/4 left-1/4 w-32 md:w-40 h-32 md:h-40 rounded-full bg-primary/10 blur-2xl"></div>
+        </div>
 
-      <main className="flex-grow snap-y snap-mandatory">
-        {/* Hero Section with animated background */}
-        <section
-          ref={(el) => (sectionsRef.current[0] = el)}
-          className="relative bg-muted min-h-[100vh] h-screen flex items-center justify-center py-8 md:py-24 snap-start overflow-hidden"
-        >
-          {/* Animated background */}
-          <div className="hero-animated-bg absolute inset-0 w-full h-full">
-            <div className="animate-float absolute top-10 left-[10%] w-24 md:w-32 h-24 md:h-32 rounded-full bg-primary/20 blur-2xl"></div>
-            <div className="animate-float-delay absolute bottom-10 right-[10%] w-32 md:w-40 h-32 md:h-40 rounded-full bg-secondary/30 blur-3xl"></div>
-            <div className="animate-float-slow absolute top-1/4 right-1/4 w-20 md:w-24 h-20 md:h-24 rounded-full bg-accent/20 blur-xl"></div>
-            <div className="animate-pulse absolute bottom-1/4 left-1/4 w-32 md:w-40 h-32 md:h-40 rounded-full bg-primary/10 blur-2xl"></div>
-          </div>
-
-          <div className="container mx-auto px-4 md:px-16 relative z-10">
-            <div className="flex flex-col gap-8 md:gap-6 md:flex-row items-center justify-center">
-              <div className="w-full md:w-1/2 text-center md:text-left scroll-animate">
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
-                  {t("welcomeMessage")}
-                </h1>
-                <p className="text-base sm:text-lg mb-6 md:mb-8 text-muted-foreground max-w-md mx-auto md:mx-0">
-                  {t("bestEquipment")}
-                </p>
-                <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-                  <Button
-                    asChild
-                    size="lg"
-                    className="bg-primary hover:bg-primary/90 hover:scale-105 transition-all w-full sm:w-auto"
-                  >
-                    <Link to="/products">{t("shopNow")}</Link>
-                  </Button>
-                  <Button
-                    asChild
-                    variant="outline"
-                    size="lg"
-                    className="hover:scale-105 transition-all w-full sm:w-auto"
-                  >
-                    <Link to="/contact">{t("contactUs")}</Link>
-                  </Button>
-                </div>
-              </div>
-              <div className="w-full md:w-1/2 scroll-animate mt-6 md:mt-0">
-                <div className="w-full h-[200px] sm:h-[400px] md:h-96 relative rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]">
-                  <img
-                    src="/images/main/thomas-de-luze-t9wX36U3BEs-unsplash.webp"
-                    alt={t("equipmentDescription")}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Products Section */}
-        <section
-          ref={(el) => (sectionsRef.current[1] = el)}
-          className="py-16 snap-start min-h-screen flex items-center"
-        >
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
-              {t("featured")}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.map((product, index) => (
-                <div
-                  key={product.id}
-                  className={`scroll-animate transition-all duration-300 delay-${
-                    index * 100
-                  }`}
+        <div className="container mx-auto px-4 md:px-16 relative z-10">
+          <div className="flex flex-col gap-8 md:gap-6 md:flex-row items-center justify-center">
+            <div className="w-full md:w-1/2 text-center md:text-left scroll-animate">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold mb-4">
+                {t("welcomeMessage")}
+              </h1>
+              <p className="text-base sm:text-lg mb-6 md:mb-8 text-muted-foreground max-w-md mx-auto md:mx-0">
+                {t("bestEquipment")}
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 hover:scale-105 transition-all w-full sm:w-auto"
                 >
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-            <div className="mt-10 text-center scroll-animate">
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="hover:scale-105 transition-all"
-              >
-                <Link to="/products">{t("exploreProducts")}</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* New Arrivals Section */}
-        <section
-          ref={(el) => (sectionsRef.current[2] = el)}
-          className="py-16 bg-muted snap-start min-h-screen flex items-center"
-        >
-          <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
-              {t("newArrivals")}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {newArrivals.map((product, index) => (
-                <div
-                  key={product.id}
-                  className={`scroll-animate transition-all duration-300 delay-${
-                    index * 100
-                  }`}
+                  <Link to="/products">{t("shopNow")}</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="lg"
+                  className="hover:scale-105 transition-all w-full sm:w-auto"
                 >
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* About/Contact Section */}
-        <section
-          ref={(el) => (sectionsRef.current[3] = el)}
-          className="py-16 snap-start min-h-screen flex items-center"
-        >
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="scroll-animate">
-                <h2 className="text-3xl font-heading font-bold mb-6">
-                  {t("aboutUs")}
-                </h2>
-                <p className="text-muted-foreground mb-4">
-                  {t("aboutUsDescription")}
-                </p>
-                <p className="text-muted-foreground mb-6">
-                  {t("productSelection")}
-                </p>
-                <Button asChild className="hover:scale-105 transition-all">
                   <Link to="/contact">{t("contactUs")}</Link>
                 </Button>
               </div>
-              <div className="scroll-animate">
-                <MapComponent />
+            </div>
+            <div className="w-full md:w-1/2 scroll-animate mt-6 md:mt-0">
+              <div className="w-full h-[200px] sm:h-[400px] md:h-96 relative rounded-lg overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02]">
+                <img
+                  src="/images/main/thomas-de-luze-t9wX36U3BEs-unsplash.webp"
+                  alt={t("equipmentDescription")}
+                  className="object-cover w-full h-full"
+                />
               </div>
             </div>
           </div>
-        </section>
-      </main>
+        </div>
+      </section>
 
-      <Footer />
+      {/* Featured Products Section */}
+      <section
+        ref={(el) => (sectionsRef.current[1] = el)}
+        className="py-16 snap-start min-h-screen flex items-center"
+      >
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
+            {t("featured")}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {featuredProducts.map((product, index) => (
+              <div
+                key={product.id}
+                className={`scroll-animate transition-all duration-300 delay-${
+                  index * 100
+                }`}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-10 text-center scroll-animate">
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="hover:scale-105 transition-all"
+            >
+              <Link to="/products">{t("exploreProducts")}</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* New Arrivals Section */}
+      <section
+        ref={(el) => (sectionsRef.current[2] = el)}
+        className="py-16 bg-muted snap-start min-h-screen flex items-center"
+      >
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
+            {t("newArrivals")}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {newArrivals.map((product, index) => (
+              <div
+                key={product.id}
+                className={`scroll-animate transition-all duration-300 delay-${
+                  index * 100
+                }`}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* About/Contact Section */}
+      <section
+        ref={(el) => (sectionsRef.current[3] = el)}
+        className="py-16 snap-start min-h-screen flex items-center"
+      >
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="scroll-animate">
+              <h2 className="text-3xl font-heading font-bold mb-6">
+                {t("aboutUs")}
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                {t("aboutUsDescription")}
+              </p>
+              <p className="text-muted-foreground mb-6">
+                {t("productSelection")}
+              </p>
+              <Button asChild className="hover:scale-105 transition-all">
+                <Link to="/contact">{t("contactUs")}</Link>
+              </Button>
+            </div>
+            <div className="scroll-animate">
+              <MapComponent />
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

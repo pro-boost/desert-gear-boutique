@@ -588,6 +588,14 @@ const translations: Translations = {
     fr: "Message envoyé avec succès!",
     ar: "تم إرسال الرسالة بنجاح!",
   },
+  loginRequired: {
+    fr: "Veuillez vous connecter pour ajouter des articles au panier",
+    ar: "يرجى تسجيل الدخول لإضافة منتجات إلى السلة",
+  },
+  loginToAddToCart: {
+    fr: "Se connecter pour ajouter au panier",
+    ar: "تسجيل الدخول لإضافة إلى السلة",
+  },
 };
 
 interface LanguageContextType {
@@ -600,6 +608,14 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(
   undefined
 );
+
+const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error("useLanguage must be used within a LanguageProvider");
+  }
+  return context;
+};
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -640,10 +656,4 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({
   );
 };
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error("useLanguage must be used within a LanguageProvider");
-  }
-  return context;
-};
+export { useLanguage };

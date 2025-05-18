@@ -5,30 +5,23 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { Product } from "@/types/product";
-import { toast } from "react-hot-toast";
+import { useUser } from "@clerk/clerk-react";
+import { Product, PRODUCT_SIZES } from "@/types/product";
+import { toast } from "@/components/ui/sonner";
 
 // Export the CartItem type so it can be imported in other files
-export type CartItem = {
+export interface CartItem {
   product: Product;
   quantity: number;
-  selectedSize?: string;
-};
+  selectedSize: string;
+}
 
 interface CartContextType {
-  cartItems: CartItem[];
-  addItem: (product: Product, selectedSize?: string) => void;
-  removeItem: (productId: string, selectedSize?: string) => void;
-  updateQuantity: (
-    productId: string,
-    quantity: number,
-    selectedSize?: string
-  ) => void;
-  clearCart: () => void;
-  getCartTotal: () => number;
-  // Add missing properties
-  itemCount: number;
   items: CartItem[];
+  addToCart: (product: Product, quantity: number, size: string) => void;
+  updateQuantity: (productId: string, quantity: number, size: string) => void;
+  removeItem: (productId: string, size: string) => void;
+  clearCart: () => void;
   totalPrice: number;
 }
 
@@ -37,123 +30,99 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    if (typeof window === "undefined") {
-      return [];
-    }
-    const storedItems = localStorage.getItem("cartItems");
-    return storedItems ? JSON.parse(storedItems) : [];
-  });
+  const { user } = useUser();
+  const [items, setItems] = useState<CartItem[]>([]);
 
-  // Calculate total price
-  const totalPrice = cartItems.reduce(
-    (total, item) =>
-      total +
-      (item.product.discountPrice || item.product.price) * item.quantity,
-    0
-  );
-
-  // Calculate item count
-  const itemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
-
+  // Load cart from localStorage when user changes
   useEffect(() => {
-    localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems]);
-
-  const addItem = (product: Product, selectedSize?: string) => {
-    setCartItems((prevItems) => {
-      // Check if the product with the same size already exists in the cart
-      const existingItemIndex = prevItems.findIndex(
-        (item) =>
-          item.product.id === product.id && item.selectedSize === selectedSize
-      );
-
-      if (existingItemIndex >= 0) {
-        // Product with same size exists, increment its quantity
-        const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += 1;
-        return updatedItems;
+    if (user) {
+      const storedCart = localStorage.getItem(`cart_${user.id}`);
+      if (storedCart) {
+        setItems(JSON.parse(storedCart));
       } else {
-        // Add new product to cart
-        return [
-          ...prevItems,
-          {
-            product,
-            quantity: 1,
-            selectedSize:
-              selectedSize ||
-              (product.sizes.length > 0 ? product.sizes[0] : undefined),
-          },
-        ];
+        setItems([]);
       }
-    });
+    } else {
+      setItems([]);
+    }
+  }, [user]);
 
-    // Show success toast
-    toast.success("Item added to cart");
-  };
+  // Save cart to localStorage when it changes
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem(`cart_${user.id}`, JSON.stringify(items));
+    }
+  }, [items, user]);
 
-  const removeItem = (productId: string, selectedSize?: string) => {
-    setCartItems((prevItems) => {
-      const updatedItems = prevItems.filter(
-        (item) =>
-          !(item.product.id === productId && item.selectedSize === selectedSize)
+  const addToCart = (product: Product, quantity: number, size: string) => {
+    setItems((prev) => {
+      const existingItem = prev.find(
+        (item) => item.product.id === product.id && item.selectedSize === size
       );
-      return updatedItems;
+
+      if (existingItem) {
+        const newQuantity = existingItem.quantity + quantity;
+        const updatedItems = prev.map((item) =>
+          item.product.id === product.id && item.selectedSize === size
+            ? { ...item, quantity: newQuantity }
+            : item
+        );
+        return updatedItems;
+      }
+
+      return [...prev, { product, quantity, selectedSize: size }];
     });
-    toast.success("Item removed from cart");
+
+    toast.success("Product added to cart");
   };
 
   const updateQuantity = (
     productId: string,
     quantity: number,
-    selectedSize?: string
+    size: string
   ) => {
-    if (quantity <= 0) {
-      removeItem(productId, selectedSize);
+    if (quantity < 1) {
+      removeItem(productId, size);
       return;
     }
 
-    setCartItems((prevItems) => {
-      const updatedItems = prevItems.map((item) => {
-        if (
-          item.product.id === productId &&
-          item.selectedSize === selectedSize
-        ) {
-          return { ...item, quantity: quantity };
-        }
-        return item;
-      });
-      return updatedItems;
-    });
+    setItems((prev) =>
+      prev.map((item) =>
+        item.product.id === productId && item.selectedSize === size
+          ? { ...item, quantity }
+          : item
+      )
+    );
+  };
+
+  const removeItem = (productId: string, size: string) => {
+    setItems((prev) =>
+      prev.filter(
+        (item) => !(item.product.id === productId && item.selectedSize === size)
+      )
+    );
+    toast.success("Product removed from cart");
   };
 
   const clearCart = () => {
-    setCartItems([]);
-    localStorage.removeItem("cartItems");
+    setItems([]);
     toast.success("Cart cleared");
   };
 
-  const getCartTotal = (): number => {
-    return cartItems.reduce(
-      (total, item) =>
-        total +
-        (item.product.discountPrice || item.product.price) * item.quantity,
-      0
-    );
-  };
+  const totalPrice = items.reduce(
+    (sum, item) =>
+      sum + (item.product.discountPrice || item.product.price) * item.quantity,
+    0
+  );
 
   return (
     <CartContext.Provider
       value={{
-        cartItems,
-        addItem,
-        removeItem,
+        items,
+        addToCart,
         updateQuantity,
+        removeItem,
         clearCart,
-        getCartTotal,
-        // Add these properties to make them available through the context
-        itemCount,
-        items: cartItems,
         totalPrice,
       }}
     >
@@ -164,7 +133,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useCart must be used within a CartProvider");
   }
   return context;

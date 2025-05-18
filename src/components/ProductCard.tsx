@@ -1,13 +1,22 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Product } from "@/types/product";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/contexts/FavoritesContext";
+import { useUser } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, Target } from "lucide-react";
+import { toast } from "@/components/ui/sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductCardProps {
   product: Product;
@@ -16,9 +25,12 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   const { t } = useLanguage();
-  const { addItem } = useCart();
+  const { addToCart } = useCart();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
+  const { isSignedIn } = useUser();
+  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [selectedSize, setSelectedSize] = useState<string>("");
 
   const handleFavoriteToggle = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -33,8 +45,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (product.inStock) {
-      addItem(product);
+
+    if (!isSignedIn) {
+      toast.error(t("loginRequired"));
+      return;
+    }
+
+    if (!product.inStock) {
+      return;
+    }
+
+    if (product.sizes && product.sizes.length > 0) {
+      // If product has sizes, navigate to product detail page
+      navigate(`/products/${product.id}`);
+    } else {
+      // If product doesn't have sizes, add directly to cart
+      addToCart(product, 1, "one-size");
+      toast.success(t("addedToCart"));
     }
   };
 
@@ -44,23 +71,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
 
   return (
     <Card
-      className={`group overflow-hidden h-full flex flex-col border-2 animate-cardPop`}
-      style={{ animationDelay: `${delay * 100}ms` }}
+      className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg ${
+        delay ? `animate-fade-in [animation-delay:${delay}ms]` : ""
+      }`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="h-full flex flex-col">
-        <div className="relative h-[280px] overflow-hidden bg-muted">
-          <Link to={`/products/${product.id}`}>
+      <div className="flex flex-col h-full">
+        <div className="relative aspect-square">
+          <Link to={`/products/${product.id}`} className="block h-full">
             <img
               src={
                 product.images[0] ||
                 "https://images.unsplash.com/photo-1452378174528-3090a4bba7b2"
               }
               alt={product.name}
-              className={`w-full h-full object-cover transition-all duration-700 ${
-                isHovered ? "scale-110" : "scale-100"
-              }`}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           </Link>
 
@@ -145,7 +171,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             onClick={handleAddToCart}
           >
             <ShoppingBag className="mr-2 h-4 w-4" />
-            {product.inStock ? t("addToCart") : t("outOfStock")}
+            {!isSignedIn
+              ? t("loginToAddToCart")
+              : product.inStock
+              ? t("addToCart")
+              : t("outOfStock")}
           </Button>
         </CardFooter>
       </div>

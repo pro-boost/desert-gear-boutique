@@ -105,14 +105,14 @@ After building the project, the static files will be located in the `dist/` dire
 
 ## 📁 Key Directories Explained
 
-| Directory       | Purpose                                         |
-|-----------------|-------------------------------------------------|
-| `public/`       | Contains static assets like images and icons    |
+| Directory         | Purpose                                       |
+| ----------------- | --------------------------------------------- |
+| `public/`         | Contains static assets like images and icons  |
 | `src/components/` | Reusable React components                     |
-| `src/pages/`    | Page-level components                           |
-| `src/styles/`   | Tailwind CSS configurations and custom styles   |
-| `src/utils/`    | Utility functions and helpers                   |
-| `supabase/`     | Supabase configuration and integration          |
+| `src/pages/`      | Page-level components                         |
+| `src/styles/`     | Tailwind CSS configurations and custom styles |
+| `src/utils/`      | Utility functions and helpers                 |
+| `supabase/`       | Supabase configuration and integration        |
 
 ## 📄 License
 
@@ -121,6 +121,87 @@ This project is open-source and available under the [MIT License](LICENSE).
 ## 🤝 Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
+
+## Authentication Setup with Clerk
+
+This project uses Clerk for authentication. Follow these steps to set up authentication:
+
+1. Create a Clerk account and application:
+
+   - Go to [Clerk Dashboard](https://dashboard.clerk.dev)
+   - Create a new application
+   - Get your publishable key from the API Keys section
+
+2. Set up environment variables:
+
+   - Copy `.env.example` to `.env`
+   - Add your Clerk publishable key:
+     ```
+     VITE_CLERK_PUBLISHABLE_KEY=your_publishable_key_here
+     ```
+
+3. Set up admin users:
+
+   - In the Clerk Dashboard, go to Users
+   - Select the user you want to make an admin
+   - Go to Public Metadata
+   - Add `isAdmin: true`
+   - Save changes
+
+4. Available authentication features:
+
+   - Sign in/Sign up with email
+   - Protected routes for authenticated users
+   - Admin-only routes
+   - User profile management
+   - Persistent cart and favorites per user
+
+5. Authentication routes:
+   - `/sign-in` - Sign in page
+   - `/sign-up` - Sign up page
+   - Protected routes require authentication
+   - Admin routes require admin privileges
+
+## Development
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+3. Build for production:
+   ```bash
+   npm run build
+   ```
+
+## Features
+
+- User authentication with Clerk
+- Product catalog
+- Shopping cart
+- Favorites list
+- Admin dashboard
+- Multi-language support (French, Arabic)
+- Dark/Light theme
+- Responsive design
+
+## Tech Stack
+
+- React
+- TypeScript
+- Vite
+- Clerk (Authentication)
+- Tailwind CSS
+- Shadcn/ui
+- React Router
+- Framer Motion
 
 ---
 

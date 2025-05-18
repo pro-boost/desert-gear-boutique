@@ -1,83 +1,55 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { BrowserRouter } from "react-router-dom";
+import { ClerkProvider, ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import AuthLayout from "@/pages/auth/AuthLayout";
-import BackToTopButton from "@/components/BackToTopButton";
+import AppRoutes from "@/routes";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { Toaster } from "@/components/ui/sonner";
 
-// Pages
-import Index from "./pages/Index";
-import ProductsPage from "./pages/ProductsPage";
-import ProductDetail from "./pages/ProductDetail";
-import CartPage from "./pages/CartPage";
-import FavoritesPage from "./pages/FavoritesPage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import AdminPage from "./pages/AdminPage";
-import ContactPage from "./pages/ContactPage";
-import NotFound from "./pages/NotFound";
-import AboutUs from "./pages/AboutUs";
-import Shipping from "./pages/Shipping";
-import Returns from "./pages/Returns";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <CartProvider>
-            <FavoritesProvider>
-              <TooltipProvider>
-                <Toaster />
-                <Sonner />
-                <BrowserRouter>
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/products" element={<ProductsPage />} />
-                    <Route path="/products/:id" element={<ProductDetail />} />
-                    <Route path="/cart" element={<CartPage />} />
-                    <Route path="/auth" element={<AuthLayout />}>
-                      <Route path="login" element={<LoginPage />} />
-                      <Route path="signup" element={<SignupPage />} />
-                    </Route>
-                    <Route path="/contact" element={<ContactPage />} />
-                    <Route path="/about" element={<AboutUs />} />
-                    <Route path="/shipping" element={<Shipping />} />
-                    <Route path="/returns" element={<Returns />} />
-
-                    {/* Public Favorites Page - no login required */}
-                    <Route path="/favorites" element={<FavoritesPage />} />
-
-                    {/* Admin Route - Protected, only for admins */}
-                    <Route
-                      path="/admin"
-                      element={
-                        <ProtectedRoute adminOnly>
-                          <AdminPage />
-                        </ProtectedRoute>
-                      }
-                    />
-
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                  <BackToTopButton />
-                </BrowserRouter>
-              </TooltipProvider>
-            </FavoritesProvider>
-          </CartProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+// Loading component for Clerk
+const ClerkLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
 );
+
+const App = () => {
+  const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+  if (!clerkPubKey) {
+    throw new Error("Missing Clerk Publishable Key");
+  }
+
+  return (
+    <LanguageProvider>
+      <ThemeProvider>
+        <ClerkProvider publishableKey={clerkPubKey}>
+          <ClerkLoading>
+            <ClerkLoadingFallback />
+          </ClerkLoading>
+          <ClerkLoaded>
+            <BrowserRouter>
+              <CartProvider>
+                <FavoritesProvider>
+                  <div className="min-h-screen flex flex-col">
+                    <Navbar />
+                    <main className="flex-grow">
+                      <AppRoutes />
+                    </main>
+                    <Footer />
+                    <Toaster />
+                  </div>
+                </FavoritesProvider>
+              </CartProvider>
+            </BrowserRouter>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </ThemeProvider>
+    </LanguageProvider>
+  );
+};
 
 export default App;

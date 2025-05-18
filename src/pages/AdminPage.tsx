@@ -1,24 +1,20 @@
-
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { 
-  getProducts, 
-  addProduct, 
-  updateProduct, 
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
   deleteProduct,
   getCategories,
   addCategory,
-} from '@/services/productService';
-import { Product, PRODUCT_SIZES } from '@/types/product';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { toast } from '@/components/ui/sonner';
+} from "@/services/productService";
+import { Product, PRODUCT_SIZES } from "@/types/product";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/components/ui/sonner";
 import {
   Select,
   SelectContent,
@@ -45,12 +41,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -67,15 +58,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { 
-  PlusCircle, 
-  Trash, 
-  Edit, 
-  Save, 
-  X,
-  Check
-} from 'lucide-react';
-import ImageDropzone from '@/components/ImageDropzone';
+import { PlusCircle, Trash, Edit, Save, X, Check } from "lucide-react";
+import ImageDropzone from "@/components/ImageDropzone";
 
 // Product form interface
 interface ProductFormData {
@@ -93,11 +77,11 @@ interface ProductFormData {
 
 // Initial form data
 const initialFormData: ProductFormData = {
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   price: 0,
-  category: 'boots',
-  images: ['/placeholder.svg'],
+  category: "boots",
+  images: ["/placeholder.svg"],
   inStock: true,
   featured: false,
   sizes: [],
@@ -105,162 +89,164 @@ const initialFormData: ProductFormData = {
 
 const AdminPage = () => {
   const { t } = useLanguage();
-  const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [products, setProducts] = useState<Product[]>([]);
   const [formData, setFormData] = useState<ProductFormData>(initialFormData);
   const [isEditing, setIsEditing] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("products");
   const [categories, setCategories] = useState<string[]>([]);
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState("");
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: boolean }>({});
-  
+  const [selectedSizes, setSelectedSizes] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   useEffect(() => {
-    // Redirect if not admin
-    if (user === null) {
-      navigate('/login');
-      toast.error("You need to log in to access this page.");
-      return;
-    }
-    
-    if (user && !user.isAdmin) {
-      navigate('/');
-      toast.error("You need admin privileges to access this page.");
-      return;
-    }
-    
+    // TODO: Replace with Clerk authentication
+    // Will use Clerk's useUser() hook to check for admin role
+    // const { user } = useUser();
+    // if (!user?.publicMetadata?.isAdmin) {
+    //   navigate('/');
+    //   return;
+    // }
+
     // Load products and categories
     setProducts(getProducts());
     setCategories(getCategories());
-  }, [user, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     // Update available sizes when category changes
-    const categorySizes = PRODUCT_SIZES[formData.category as keyof typeof PRODUCT_SIZES] || [];
+    const categorySizes =
+      PRODUCT_SIZES[formData.category as keyof typeof PRODUCT_SIZES] || [];
     setAvailableSizes(categorySizes);
-    
+
     // When editing or changing category, update the selected sizes
     const newSelectedSizes: { [key: string]: boolean } = {};
-    categorySizes.forEach(size => {
+    categorySizes.forEach((size) => {
       newSelectedSizes[size] = formData.sizes.includes(size);
     });
     setSelectedSizes(newSelectedSizes);
-    
+
     console.log("Category changed to:", formData.category);
     console.log("Available sizes:", categorySizes);
     console.log("Selected sizes:", newSelectedSizes);
     console.log("Form data sizes:", formData.sizes);
   }, [formData.category, formData.sizes]);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    
-    setFormData(prev => ({
+
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' || name === 'discountPrice'
-        ? parseFloat(value || '0')
-        : value
+      [name]:
+        name === "price" || name === "discountPrice"
+          ? parseFloat(value || "0")
+          : value,
     }));
   };
-  
+
   const handleCheckboxChange = (name: string, checked: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: checked
+      [name]: checked,
     }));
   };
-  
+
   const handleSelectChange = (name: string, value: string) => {
-    if (name === 'category') {
+    if (name === "category") {
       // When category changes, reset sizes
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         [name]: value,
-        sizes: [] // Reset sizes when category changes
+        sizes: [], // Reset sizes when category changes
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
 
   const handleSizeChange = (size: string, checked: boolean) => {
-    setSelectedSizes(prev => ({
+    setSelectedSizes((prev) => ({
       ...prev,
-      [size]: checked
+      [size]: checked,
     }));
-    
+
     // Update formData.sizes based on selectedSizes
-    setFormData(prev => {
-      const newSizes = checked 
+    setFormData((prev) => {
+      const newSizes = checked
         ? [...prev.sizes, size].filter((v, i, a) => a.indexOf(v) === i) // Add size if checked
-        : prev.sizes.filter(s => s !== size); // Remove size if unchecked
-      
+        : prev.sizes.filter((s) => s !== size); // Remove size if unchecked
+
       console.log("Updating sizes:", newSizes);
       return {
         ...prev,
-        sizes: newSizes
+        sizes: newSizes,
       };
     });
   };
-  
+
   const handleSubmitCategory = () => {
-    if (newCategory.trim() !== '') {
+    if (newCategory.trim() !== "") {
       const success = addCategory(newCategory.trim().toLowerCase());
       if (success) {
         toast.success(`Category "${newCategory}" added successfully`);
         setCategories(getCategories());
-        setNewCategory('');
+        setNewCategory("");
         setCategoryDialogOpen(false);
       } else {
         toast.error(`Category "${newCategory}" already exists`);
       }
     }
   };
-  
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       // Get selected sizes from the state
       const selectedSizesList = Object.entries(selectedSizes)
         .filter(([_, isSelected]) => isSelected)
         .map(([size]) => size);
-      
+
       console.log("Selected sizes for submission:", selectedSizesList);
-      
+
       const productData = {
         ...formData,
-        sizes: selectedSizesList
+        sizes: selectedSizesList,
       };
-      
+
       if (isEditing && productData.id) {
         // Update existing product
         const updatedProduct = updateProduct({
           ...(productData as Product),
-          createdAt: products.find(p => p.id === productData.id)?.createdAt || Date.now(),
+          createdAt:
+            products.find((p) => p.id === productData.id)?.createdAt ||
+            Date.now(),
         });
-        
-        setProducts(prev => 
-          prev.map(p => p.id === updatedProduct.id ? updatedProduct : p)
+
+        setProducts((prev) =>
+          prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
         );
-        
+
         toast.success(`${productData.name} updated successfully`);
       } else {
         // Add new product
         const newProduct = addProduct(productData);
-        
-        setProducts(prev => [...prev, newProduct]);
-        
+
+        setProducts((prev) => [...prev, newProduct]);
+
         toast.success(`${productData.name} added successfully`);
       }
-      
+
       // Reset form
       resetForm();
     } catch (error) {
@@ -268,44 +254,45 @@ const AdminPage = () => {
       console.error(error);
     }
   };
-  
+
   const handleEdit = (product: Product) => {
     console.log("Editing product:", product);
     console.log("Product sizes:", product.sizes);
-    
+
     // Initialize size selection based on product sizes
     const newSelectedSizes: { [key: string]: boolean } = {};
-    const categorySizes = PRODUCT_SIZES[product.category as keyof typeof PRODUCT_SIZES] || [];
-    
-    categorySizes.forEach(size => {
+    const categorySizes =
+      PRODUCT_SIZES[product.category as keyof typeof PRODUCT_SIZES] || [];
+
+    categorySizes.forEach((size) => {
       newSelectedSizes[size] = (product.sizes || []).includes(size);
     });
-    
+
     console.log("Setting selected sizes:", newSelectedSizes);
     setSelectedSizes(newSelectedSizes);
-    
+
     setFormData({
       ...product,
       sizes: product.sizes || [],
     });
-    
+
     setIsEditing(true);
     setActiveTab("add-product");
   };
-  
+
   const handleDelete = (productId: string) => {
     setDeleteProductId(productId);
   };
-  
+
   const confirmDelete = () => {
     if (deleteProductId) {
       deleteProduct(deleteProductId);
-      setProducts(prev => prev.filter(p => p.id !== deleteProductId));
+      setProducts((prev) => prev.filter((p) => p.id !== deleteProductId));
       setDeleteProductId(null);
       toast.success("Product deleted successfully");
     }
   };
-  
+
   const resetForm = () => {
     setFormData(initialFormData);
     setIsEditing(false);
@@ -314,44 +301,44 @@ const AdminPage = () => {
   };
 
   const handleImageUpload = (imageData: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      images: [imageData]
+      images: [imageData],
     }));
   };
 
   const handleImageRemove = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      images: ['/placeholder.svg']
+      images: ["/placeholder.svg"],
     }));
   };
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
       <main className="flex-grow py-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-heading font-bold mb-8">
-            {t('admin')}
-          </h1>
-          
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+          <h1 className="text-3xl font-heading font-bold mb-8">{t("admin")}</h1>
+
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="space-y-4"
+          >
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="products">{t('manageProducts')}</TabsTrigger>
+              <TabsTrigger value="products">{t("manageProducts")}</TabsTrigger>
               <TabsTrigger value="add-product">
-                {isEditing ? t('editProduct') : t('addProduct')}
+                {isEditing ? t("editProduct") : t("addProduct")}
               </TabsTrigger>
             </TabsList>
-            
+
             {/* Products List */}
             <TabsContent value="products" className="space-y-4">
               <Card>
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <div>
-                      <CardTitle>{t('products')}</CardTitle>
+                      <CardTitle>{t("products")}</CardTitle>
                       <CardDescription>
                         Manage your product inventory, prices, and availability.
                       </CardDescription>
@@ -379,8 +366,8 @@ const AdminPage = () => {
                         {products.map((product) => (
                           <TableRow key={product.id}>
                             <TableCell>
-                              <img 
-                                src={product.images[0] || '/placeholder.svg'} 
+                              <img
+                                src={product.images[0] || "/placeholder.svg"}
                                 alt={product.name}
                                 className="w-12 h-12 object-cover rounded"
                               />
@@ -392,7 +379,9 @@ const AdminPage = () => {
                             <TableCell>
                               {product.discountPrice ? (
                                 <div className="flex flex-col">
-                                  <span>{product.discountPrice.toFixed(2)} Dh</span>
+                                  <span>
+                                    {product.discountPrice.toFixed(2)} Dh
+                                  </span>
                                   <span className="text-sm text-muted-foreground line-through">
                                     {product.price.toFixed(2)} Dh
                                   </span>
@@ -402,12 +391,16 @@ const AdminPage = () => {
                               )}
                             </TableCell>
                             <TableCell className="text-center">
-                              <span className={`px-2 py-1 rounded text-xs ${
-                                product.inStock 
-                                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                                  : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                              }`}>
-                                {product.inStock ? t('inStock') : t('outOfStock')}
+                              <span
+                                className={`px-2 py-1 rounded text-xs ${
+                                  product.inStock
+                                    ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                                }`}
+                              >
+                                {product.inStock
+                                  ? t("inStock")
+                                  : t("outOfStock")}
                               </span>
                             </TableCell>
                             <TableCell className="text-right">
@@ -436,32 +429,40 @@ const AdminPage = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={() => {
-                    setActiveTab("add-product");
-                    setIsEditing(false);
-                    setFormData(initialFormData);
-                    setSelectedSizes({}); // Reset selected sizes
-                  }}>
+                  <Button
+                    onClick={() => {
+                      setActiveTab("add-product");
+                      setIsEditing(false);
+                      setFormData(initialFormData);
+                      setSelectedSizes({}); // Reset selected sizes
+                    }}
+                  >
                     <PlusCircle className="mr-2 h-4 w-4" />
-                    {t('addProduct')}
+                    {t("addProduct")}
                   </Button>
                 </CardFooter>
               </Card>
             </TabsContent>
-            
+
             {/* Add/Edit Product Form */}
             <TabsContent value="add-product">
               <Card>
                 <CardHeader>
-                  <CardTitle>{isEditing ? t('editProduct') : t('addProduct')}</CardTitle>
+                  <CardTitle>
+                    {isEditing ? t("editProduct") : t("addProduct")}
+                  </CardTitle>
                   <CardDescription>
-                    {isEditing 
+                    {isEditing
                       ? "Make changes to the existing product information."
                       : "Fill out the form below to add a new product."}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={handleSubmit} id="product-form" className="space-y-4">
+                  <form
+                    onSubmit={handleSubmit}
+                    id="product-form"
+                    className="space-y-4"
+                  >
                     {/* Product Name */}
                     <div className="space-y-1">
                       <label htmlFor="name" className="text-sm font-medium">
@@ -475,21 +476,23 @@ const AdminPage = () => {
                         required
                       />
                     </div>
-                    
+
                     {/* Category */}
                     <div className="space-y-1">
                       <label htmlFor="category" className="text-sm font-medium">
-                        {t('category')}
+                        {t("category")}
                       </label>
                       <Select
                         value={formData.category}
-                        onValueChange={(value) => handleSelectChange('category', value)}
+                        onValueChange={(value) =>
+                          handleSelectChange("category", value)
+                        }
                       >
                         <SelectTrigger id="category">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                         <SelectContent>
-                          {categories.map(category => (
+                          {categories.map((category) => (
                             <SelectItem key={category} value={category}>
                               {t(category)}
                             </SelectItem>
@@ -497,11 +500,14 @@ const AdminPage = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    
+
                     {/* Description */}
                     <div className="space-y-1">
-                      <label htmlFor="description" className="text-sm font-medium">
-                        {t('description')}
+                      <label
+                        htmlFor="description"
+                        className="text-sm font-medium"
+                      >
+                        {t("description")}
                       </label>
                       <Textarea
                         id="description"
@@ -512,12 +518,12 @@ const AdminPage = () => {
                         required
                       />
                     </div>
-                    
+
                     {/* Price */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1">
                         <label htmlFor="price" className="text-sm font-medium">
-                          {t('price')}
+                          {t("price")}
                         </label>
                         <div className="relative">
                           <Input
@@ -531,15 +537,20 @@ const AdminPage = () => {
                             required
                           />
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span className="text-sm text-muted-foreground">Dh</span>
+                            <span className="text-sm text-muted-foreground">
+                              Dh
+                            </span>
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Discount Price */}
                       <div className="space-y-1">
-                        <label htmlFor="discountPrice" className="text-sm font-medium">
-                          {t('discount')} {t('price')} (Optional)
+                        <label
+                          htmlFor="discountPrice"
+                          className="text-sm font-medium"
+                        >
+                          {t("discount")} {t("price")} (Optional)
                         </label>
                         <div className="relative">
                           <Input
@@ -548,16 +559,18 @@ const AdminPage = () => {
                             type="number"
                             step="0.01"
                             min="0"
-                            value={formData.discountPrice || ''}
+                            value={formData.discountPrice || ""}
                             onChange={handleInputChange}
                           />
                           <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span className="text-sm text-muted-foreground">Dh</span>
+                            <span className="text-sm text-muted-foreground">
+                              Dh
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Sizes */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium">
@@ -565,18 +578,18 @@ const AdminPage = () => {
                       </label>
                       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
                         {availableSizes.map((size) => (
-                          <div 
+                          <div
                             key={size}
                             className="flex items-center space-x-2 border rounded-md p-2"
                           >
                             <Checkbox
                               id={`size-${size}`}
                               checked={selectedSizes[size] || false}
-                              onCheckedChange={(checked) => 
+                              onCheckedChange={(checked) =>
                                 handleSizeChange(size, !!checked)
                               }
                             />
-                            <label 
+                            <label
                               htmlFor={`size-${size}`}
                               className="text-sm cursor-pointer flex-1"
                             >
@@ -591,7 +604,7 @@ const AdminPage = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     {/* Image Upload */}
                     <div className="space-y-1">
                       <label className="text-sm font-medium">
@@ -603,32 +616,38 @@ const AdminPage = () => {
                         onImageRemove={handleImageRemove}
                       />
                     </div>
-                    
+
                     {/* Status Checkboxes */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id="inStock"
                           checked={formData.inStock}
-                          onCheckedChange={(checked) => 
-                            handleCheckboxChange('inStock', !!checked)
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange("inStock", !!checked)
                           }
                         />
-                        <label htmlFor="inStock" className="text-sm font-medium cursor-pointer">
-                          {t('inStock')}
+                        <label
+                          htmlFor="inStock"
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          {t("inStock")}
                         </label>
                       </div>
-                      
+
                       <div className="flex items-center space-x-2">
                         <Checkbox
                           id="featured"
                           checked={formData.featured || false}
-                          onCheckedChange={(checked) => 
-                            handleCheckboxChange('featured', !!checked)
+                          onCheckedChange={(checked) =>
+                            handleCheckboxChange("featured", !!checked)
                           }
                         />
-                        <label htmlFor="featured" className="text-sm font-medium cursor-pointer">
-                          {t('featured')}
+                        <label
+                          htmlFor="featured"
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          {t("featured")}
                         </label>
                       </div>
                     </div>
@@ -639,22 +658,22 @@ const AdminPage = () => {
                     {isEditing ? (
                       <>
                         <X className="mr-2 h-4 w-4" />
-                        {t('cancel')}
+                        {t("cancel")}
                       </>
                     ) : (
-                      t('cancel')
+                      t("cancel")
                     )}
                   </Button>
                   <Button type="submit" form="product-form">
                     {isEditing ? (
                       <>
                         <Save className="mr-2 h-4 w-4" />
-                        {t('saveChanges')}
+                        {t("saveChanges")}
                       </>
                     ) : (
                       <>
                         <PlusCircle className="mr-2 h-4 w-4" />
-                        {t('addProduct')}
+                        {t("addProduct")}
                       </>
                     )}
                   </Button>
@@ -664,27 +683,32 @@ const AdminPage = () => {
           </Tabs>
         </div>
       </main>
-      
-      <Footer />
-      
+
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteProductId} onOpenChange={() => setDeleteProductId(null)}>
+      <AlertDialog
+        open={!!deleteProductId}
+        onOpenChange={() => setDeleteProductId(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the product from the database.
+              This action cannot be undone. This will permanently delete the
+              product from the database.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       {/* Add Category Dialog */}
       <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
         <DialogContent>
@@ -694,7 +718,7 @@ const AdminPage = () => {
               Enter a name for the new product category.
             </DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <label htmlFor="newCategory" className="text-sm font-medium">
@@ -708,12 +732,18 @@ const AdminPage = () => {
               />
             </div>
           </div>
-          
+
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCategoryDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setCategoryDialogOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleSubmitCategory} disabled={!newCategory.trim()}>
+            <Button
+              onClick={handleSubmitCategory}
+              disabled={!newCategory.trim()}
+            >
               Add Category
             </Button>
           </DialogFooter>

@@ -1,100 +1,87 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-
 export interface ShippingAddress {
-  id?: string;
-  user_id?: string;
+  id: string;
   full_name: string;
-  national_id: string;
-  address: string;
-  phone_number: string;
+  address_line1: string;
+  address_line2?: string;
+  city: string;
+  state: string;
+  postal_code: string;
+  country: string;
+  phone: string;
+}
+
+export interface OrderItem {
+  product_id: string;
+  quantity: number;
+  price: number;
+}
+
+export interface Order {
+  id: string;
+  // TODO: Replace with Clerk user ID
+  user_id: string;
+  amount: number;
+  payment_method: string;
+  status: string;
+  shipping_address_id: string;
+  items: OrderItem[];
+  created_at: string;
 }
 
 // Save shipping address for the current user
-export const saveShippingAddress = async (address: Omit<ShippingAddress, 'user_id' | 'id'>) => {
-  // Get the current authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+export const saveShippingAddress = async (addressData: Omit<ShippingAddress, 'id'>): Promise<ShippingAddress> => {
+  // TODO: Get user ID from Clerk's useUser() hook
+  // const { user } = useUser();
+  // const userId = user?.id;
   
-  if (!user) {
-    throw new Error('User must be authenticated to save shipping address');
-  }
-  
-  // Add the user_id to the address data
-  const addressWithUserId = {
-    ...address,
-    user_id: user.id
+  const address: ShippingAddress = {
+    id: `addr_${Date.now()}`,
+    ...addressData
   };
   
-  const { data, error } = await supabase
-    .from('shipping_addresses')
-    .insert(addressWithUserId)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error saving shipping address:', error);
-    throw error;
-  }
-  
-  return data;
+  // In a real app, this would be an API call with the user's ID
+  // For now, we'll store it in localStorage with a placeholder user ID
+  const userId = 'temp_user_id'; // This will be replaced with Clerk user ID
+  localStorage.setItem(`shipping_address_${userId}`, JSON.stringify(address));
+  return address;
 };
 
-// Get all shipping addresses for the current user
-export const getShippingAddresses = async () => {
-  // Get the current authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+// Get shipping address for the current user
+export const getShippingAddress = async (): Promise<ShippingAddress | null> => {
+  // TODO: Get user ID from Clerk's useUser() hook
+  // const { user } = useUser();
+  // const userId = user?.id;
   
-  if (!user) {
-    throw new Error('User must be authenticated to get shipping addresses');
-  }
-  
-  const { data, error } = await supabase
-    .from('shipping_addresses')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false });
-  
-  if (error) {
-    console.error('Error fetching shipping addresses:', error);
-    throw error;
-  }
-  
-  return data || [];
+  const userId = 'temp_user_id'; // This will be replaced with Clerk user ID
+  const address = localStorage.getItem(`shipping_address_${userId}`);
+  return address ? JSON.parse(address) : null;
 };
 
-// Create a new order with shipping information
+// Create a new order
 export const createOrder = async (
-  items: { product_id: string; quantity: number; price: number }[],
+  items: OrderItem[],
   shippingAddressId: string
-) => {
-  // Get the current authenticated user
-  const { data: { user } } = await supabase.auth.getUser();
+): Promise<{ id: string }> => {
+  // TODO: Get user ID from Clerk's useUser() hook
+  // const { user } = useUser();
+  // const userId = user?.id;
   
-  if (!user) {
-    throw new Error('User must be authenticated to create an order');
-  }
-  
+  const userId = 'temp_user_id'; // This will be replaced with Clerk user ID
   const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   
-  const orderData = {
-    user_id: user.id,
+  const orderData: Order = {
+    id: `ord_${Date.now()}`,
+    user_id: userId, // This will be replaced with Clerk user ID
     amount: totalAmount,
     payment_method: 'pay_on_delivery',
+    status: 'pending',
     shipping_address_id: shippingAddressId,
-    confirmation_status: 'pending',
+    items,
+    created_at: new Date().toISOString()
   };
   
-  const { data, error } = await supabase
-    .from('orders')
-    .insert(orderData)
-    .select()
-    .single();
+  // In a real app, this would be an API call
+  localStorage.setItem(`order_${orderData.id}`, JSON.stringify(orderData));
   
-  if (error) {
-    console.error('Error creating order:', error);
-    throw error;
-  }
-  
-  return data;
+  return { id: orderData.id };
 };
