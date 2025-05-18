@@ -44,86 +44,111 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
   const totalPrice = price * item.quantity;
 
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center py-4 border-b border-border">
-      {/* Product Image */}
-      <Link
-        to={`/products/${item.product.id}`}
-        className="w-20 h-20 rounded overflow-hidden mr-4 mb-3 sm:mb-0 flex-shrink-0"
-      >
-        <img
-          src={item.product.images[0] || "/placeholder.svg"}
-          alt={item.product.name}
-          className="w-full h-full object-cover"
-        />
-      </Link>
-
-      {/* Product Info */}
-      <div className="flex-grow mr-4">
+    <div className="grid grid-cols-12 gap-4 items-start sm:items-center py-4 border-b border-border">
+      {/* Product Image and Info - 5 columns on desktop */}
+      <div className="col-span-8 sm:col-span-5 flex items-start gap-3">
         <Link
           to={`/products/${item.product.id}`}
-          className="font-medium hover:text-primary"
+          className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-sm"
         >
-          {item.product.name}
+          <img
+            src={item.product.images[0] || "/placeholder.svg"}
+            alt={item.product.name}
+            className="w-full h-full object-cover"
+          />
         </Link>
-        {item.selectedSize && (
-          <div className="text-sm text-muted-foreground">
-            Size: {item.selectedSize}
+        <div className="flex-grow min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-grow min-w-0">
+              <Link
+                to={`/products/${item.product.id}`}
+                className="font-medium hover:text-primary text-sm block mb-1 truncate"
+              >
+                {item.product.name}
+              </Link>
+              {item.selectedSize && (
+                <div className="text-sm text-muted-foreground">
+                  Size: {item.selectedSize}
+                </div>
+              )}
+            </div>
+            {/* Mobile Delete Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRemove}
+              className="text-muted-foreground hover:text-destructive sm:hidden -mt-1 -mr-2"
+            >
+              <Trash size={16} />
+            </Button>
           </div>
-        )}
+          {/* Mobile Price */}
+          <div className="sm:hidden mt-2">
+            <div className="text-sm font-medium">{price.toFixed(2)} Dh</div>
+          </div>
+        </div>
       </div>
 
-      {/* Price */}
-      <div className="text-right mr-4 min-w-[80px]">{price.toFixed(2)} Dh</div>
+      {/* Desktop Price - 2 columns */}
+      <div className="hidden sm:block sm:col-span-2 text-right">
+        <div className="font-medium">{price.toFixed(2)} Dh</div>
+      </div>
 
-      {/* Quantity */}
-      <div className="flex items-center border border-border rounded-md mr-4">
+      {/* Quantity Controls - 3 columns */}
+      <div className="col-span-4 sm:col-span-3 flex items-center justify-end sm:justify-center">
+        <div className="flex items-center border border-border rounded-md bg-background">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted"
+            onClick={() => handleQuantityChange(item.quantity - 1)}
+            disabled={item.quantity <= 1}
+          >
+            <Minus size={14} />
+          </Button>
+          <span className="w-8 text-center font-medium">{item.quantity}</span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 hover:bg-muted"
+            onClick={() => handleQuantityChange(item.quantity + 1)}
+          >
+            <Plus size={14} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop Total - 2 columns */}
+      <div className="hidden sm:block sm:col-span-2 text-right">
+        <div className="font-semibold">{totalPrice.toFixed(2)} Dh</div>
+      </div>
+
+      {/* Desktop Delete Button */}
+      <div className="hidden sm:block sm:col-span-1">
         <Button
           variant="ghost"
           size="icon"
-          className="h-8 w-8"
-          onClick={() => handleQuantityChange(item.quantity - 1)}
-          disabled={item.quantity <= 1}
+          onClick={handleRemove}
+          className="text-muted-foreground hover:text-destructive mx-auto"
         >
-          <Minus size={14} />
-        </Button>
-        <span className="w-8 text-center">{item.quantity}</span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-          onClick={() => handleQuantityChange(item.quantity + 1)}
-        >
-          <Plus size={14} />
+          <Trash size={18} />
         </Button>
       </div>
 
-      {/* Total */}
-      <div className="font-semibold mr-4 min-w-[80px] text-right">
-        {totalPrice.toFixed(2)} Dh
+      {/* Mobile Total */}
+      <div className="col-span-12 sm:hidden flex justify-between items-center mt-2 pt-2 border-t border-border/50">
+        <div className="text-sm font-semibold">
+          Total: {totalPrice.toFixed(2)} Dh
+        </div>
       </div>
-
-      {/* Remove Button */}
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={handleRemove}
-        className="text-muted-foreground hover:text-destructive"
-      >
-        <Trash size={18} />
-      </Button>
     </div>
   );
 };
 
-// Update form data type to match ShippingAddress
+// Update form data type to match simplified requirements
 interface CheckoutFormData {
   full_name: string;
-  address_line1: string;
-  address_line2?: string;
-  city: string;
-  state: string;
-  postal_code: string;
-  country: string;
+  email: string;
   phone: string;
 }
 
@@ -134,17 +159,25 @@ const CheckoutForm = ({
 }) => {
   const [formData, setFormData] = useState<CheckoutFormData>({
     full_name: "",
-    address_line1: "",
-    city: "",
-    state: "",
-    postal_code: "",
-    country: "Morocco", // Default country
+    email: "",
     phone: "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    // Convert form data to match ShippingAddress type
+    const shippingData = {
+      full_name: formData.full_name,
+      email: formData.email,
+      phone: formData.phone,
+      // Add required fields with default values
+      address_line1: "Will be collected during delivery",
+      city: "Will be collected during delivery",
+      state: "Will be collected during delivery",
+      postal_code: "Will be collected during delivery",
+      country: "Morocco",
+    };
+    onSubmit(shippingData);
   };
 
   return (
@@ -158,82 +191,53 @@ const CheckoutForm = ({
             setFormData((prev) => ({ ...prev, full_name: e.target.value }))
           }
           required
+          placeholder="Enter your full name"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address_line1">Address Line 1</Label>
+        <Label htmlFor="email">Email Address</Label>
         <Input
-          id="address_line1"
-          value={formData.address_line1}
+          id="email"
+          type="email"
+          value={formData.email}
           onChange={(e) =>
-            setFormData((prev) => ({ ...prev, address_line1: e.target.value }))
+            setFormData((prev) => ({ ...prev, email: e.target.value }))
           }
           required
+          placeholder="Enter your email address"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address_line2">Address Line 2 (Optional)</Label>
+        <Label htmlFor="phone">Phone Number</Label>
         <Input
-          id="address_line2"
-          value={formData.address_line2}
+          id="phone"
+          type="tel"
+          value={formData.phone}
           onChange={(e) =>
-            setFormData((prev) => ({ ...prev, address_line2: e.target.value }))
+            setFormData((prev) => ({ ...prev, phone: e.target.value }))
           }
+          required
+          placeholder="Enter your phone number"
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="city">City</Label>
-          <Input
-            id="city"
-            value={formData.city}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, city: e.target.value }))
-            }
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="state">State/Province</Label>
-          <Input
-            id="state"
-            value={formData.state}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, state: e.target.value }))
-            }
-            required
-          />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="postal_code">Postal Code</Label>
-          <Input
-            id="postal_code"
-            value={formData.postal_code}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, postal_code: e.target.value }))
-            }
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, phone: e.target.value }))
-            }
-            required
-          />
+      <div className="text-sm text-muted-foreground space-y-2">
+        <p>By placing your order, you agree to our:</p>
+        <div className="flex flex-col space-y-1">
+          <Link
+            to="/shipping"
+            className="text-primary hover:underline inline-flex items-center"
+          >
+            Shipping Policy
+          </Link>
+          <Link
+            to="/returns"
+            className="text-primary hover:underline inline-flex items-center"
+          >
+            Return Policy
+          </Link>
         </div>
       </div>
 
@@ -248,23 +252,15 @@ const CartPage = () => {
   const { t } = useLanguage();
   const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
-  const { isSignedIn } = useUser();
 
   const [isCheckoutStep, setIsCheckoutStep] = useState(false);
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
 
   const handleProceedToCheckout = () => {
-    if (!isSignedIn) {
-      toast.error(t("loginRequired"));
-      navigate("/sign-in", { state: { returnTo: "/cart" } });
-      return;
-    }
-
     if (items.length === 0) {
       toast.error(t("emptyCart"));
       return;
     }
-
     setIsCheckoutStep(true);
   };
 
@@ -321,15 +317,17 @@ const CartPage = () => {
         </h1>
 
         {items.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Cart Items and Order Summary */}
             <div
               className={`${
-                isCheckoutStep ? "hidden lg:block" : ""
-              } lg:col-span-2`}
+                isCheckoutStep
+                  ? "hidden lg:block lg:col-span-2"
+                  : "lg:col-span-2"
+              }`}
             >
-              <div className="bg-card rounded-lg border border-border overflow-hidden">
-                <div className="p-4 border-b border-border bg-muted">
+              <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+                <div className="p-4 border-b border-border bg-muted/50">
                   <h2 className="font-semibold">
                     {items.length} {items.length === 1 ? "item" : "items"}
                   </h2>
@@ -337,18 +335,15 @@ const CartPage = () => {
 
                 <div className="p-4">
                   {/* Headers on larger screens */}
-                  <div className="hidden sm:flex text-sm text-muted-foreground mb-2">
-                    <div className="flex-grow ml-24">Product</div>
-                    <div className="min-w-[80px] text-right mr-4">Price</div>
-                    <div className="min-w-[96px] text-center mr-4">
-                      Quantity
-                    </div>
-                    <div className="min-w-[80px] text-right mr-4">Total</div>
-                    <div className="w-9"></div>
+                  <div className="hidden sm:grid grid-cols-12 gap-4 text-sm text-muted-foreground mb-2 px-4">
+                    <div className="col-span-5">Product</div>
+                    <div className="col-span-2 text-right">Price</div>
+                    <div className="col-span-3 text-center">Quantity</div>
+                    <div className="col-span-2 text-right">Total</div>
                   </div>
 
                   {/* Cart Items */}
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     {items.map((item) => (
                       <CartItemRow
                         key={`${item.product.id}-${item.selectedSize}`}
@@ -370,62 +365,76 @@ const CartPage = () => {
                     </Button>
                   </div>
                 </div>
+
+                {/* Order Summary */}
+                <div className="border-t border-border">
+                  <div className="p-4 border-b border-border bg-muted/50">
+                    <h2 className="font-semibold">{t("total")}</h2>
+                  </div>
+
+                  <div className="p-4 space-y-4">
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">Subtotal:</span>
+                      <span className="font-medium">
+                        {totalPrice.toFixed(2)} Dh
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">Shipping:</span>
+                      <span>Free</span>
+                    </div>
+
+                    <div className="flex justify-between py-2 text-lg font-semibold">
+                      <span>Total:</span>
+                      <span>{totalPrice.toFixed(2)} Dh</span>
+                    </div>
+
+                    <Button
+                      className="w-full lg:hidden"
+                      onClick={handleProceedToCheckout}
+                    >
+                      Proceed to Checkout
+                    </Button>
+
+                    <div className="text-center text-sm text-muted-foreground mt-4 lg:hidden">
+                      <p>Pay after receiving your order</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Order Summary or Checkout Form */}
-            <div className="lg:col-span-1">
-              <div className="bg-card rounded-lg border border-border overflow-hidden sticky top-24">
-                <div className="p-4 border-b border-border bg-muted">
-                  <h2 className="font-semibold">
-                    {isCheckoutStep ? "Customer Information" : t("total")}
-                  </h2>
+            {/* Checkout Form - Always visible on desktop */}
+            <div
+              className={`${
+                isCheckoutStep ? "block" : "hidden lg:block"
+              } lg:col-span-1`}
+            >
+              <div className="bg-card rounded-lg border border-border overflow-hidden lg:sticky lg:top-24 shadow-sm">
+                <div className="p-4 border-b border-border bg-muted/50 flex items-center justify-between">
+                  <h2 className="font-semibold">Order Information</h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsCheckoutStep(false)}
+                    className="lg:hidden"
+                  >
+                    <ArrowLeft className="mr-2 h-4 w-4" />
+                    Back to Cart
+                  </Button>
                 </div>
 
                 <div className="p-4 space-y-4">
-                  {isCheckoutStep ? (
-                    <>
-                      <Alert>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertTitle>Pay after delivery</AlertTitle>
-                        <AlertDescription>
-                          We'll contact you to confirm your order before
-                          shipping.
-                        </AlertDescription>
-                      </Alert>
-                      <CheckoutForm onSubmit={handleSubmitOrder} />
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Subtotal:</span>
-                        <span className="font-medium">
-                          {totalPrice.toFixed(2)} Dh
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between py-2 border-b border-border">
-                        <span className="text-muted-foreground">Shipping:</span>
-                        <span>Free</span>
-                      </div>
-
-                      <div className="flex justify-between py-2 text-lg font-semibold">
-                        <span>Total:</span>
-                        <span>{totalPrice.toFixed(2)} Dh</span>
-                      </div>
-
-                      <Button
-                        className="w-full"
-                        onClick={handleProceedToCheckout}
-                      >
-                        Proceed to Checkout
-                      </Button>
-
-                      <div className="text-center text-sm text-muted-foreground mt-4">
-                        <p>Pay after receiving your order</p>
-                      </div>
-                    </>
-                  )}
+                  <Alert>
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Pay after delivery</AlertTitle>
+                    <AlertDescription>
+                      We'll contact you to confirm your order and collect your
+                      delivery address.
+                    </AlertDescription>
+                  </Alert>
+                  <CheckoutForm onSubmit={handleSubmitOrder} />
                 </div>
               </div>
             </div>
