@@ -309,17 +309,20 @@ const AdminPage = () => {
     setActiveTab("products");
   };
 
-  const handleImageUpload = (imageData: string) => {
+  const handleImageUpload = (imageData: string | string[]) => {
     setFormData((prev) => ({
       ...prev,
-      images: [imageData],
+      // If multiple is enabled, concatenate new images, otherwise replace
+      images: Array.isArray(imageData)
+        ? [...prev.images, ...imageData]
+        : [imageData],
     }));
   };
 
-  const handleImageRemove = () => {
+  const handleImageRemove = (index: number) => {
     setFormData((prev) => ({
       ...prev,
-      images: ["/placeholder.svg"],
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -637,8 +640,9 @@ const AdminPage = () => {
                       </label>
                       <ImageDropzone
                         onImageUpload={handleImageUpload}
-                        currentImage={formData.images[0]}
+                        currentImages={formData.images}
                         onImageRemove={handleImageRemove}
+                        multiple={true}
                       />
                     </div>
 

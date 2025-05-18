@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useUser, SignInButton } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import {
   getProductById,
   getProductsByCategory,
@@ -12,7 +12,7 @@ import { Product } from "@/types/product";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ArrowLeft, ShoppingCart } from "lucide-react";
+import { Heart, ArrowLeft, ShoppingCart, ArrowRight } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -37,63 +37,30 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
 
   useEffect(() => {
-    if (id) {
-      console.log("Loading product with ID:", id);
-      const foundProduct = getProductById(id);
-      console.log("Found product:", foundProduct);
-      console.log("Product sizes:", foundProduct?.sizes);
-      console.log("Is product in stock:", foundProduct?.inStock);
-
-      if (foundProduct) {
-        setProduct(foundProduct);
-        // Only set the selected size if the product has sizes
-        if (foundProduct.sizes && foundProduct.sizes.length > 0) {
-          console.log("Product has sizes:", foundProduct.sizes);
-          setSelectedSize(foundProduct.sizes[0]);
-          console.log("Set initial selected size to:", foundProduct.sizes[0]);
-        } else {
-          console.log("Product has no sizes");
-          setSelectedSize("");
-        }
-
-        // Get related products from the same category
-        const related = getProductsByCategory(foundProduct.category)
-          .filter((p) => p.id !== id)
-          .slice(0, 4);
-
-        setRelatedProducts(related);
-      } else {
-        console.log("No product found with ID:", id);
-      }
-
-      setLoading(false);
+    if (!id) return;
+    const foundProduct = getProductById(id);
+    if (foundProduct) {
+      setProduct(foundProduct);
+      setSelectedSize(foundProduct.sizes?.[0] || "");
+      const related = getProductsByCategory(foundProduct.category)
+        .filter((p) => p.id !== id)
+        .slice(0, 4);
+      setRelatedProducts(related);
     }
+    setLoading(false);
   }, [id]);
-
-  // Add a log when selectedSize changes
-  useEffect(() => {
-    console.log("Selected size changed to:", selectedSize);
-  }, [selectedSize]);
-
-  // Add a log when product changes
-  useEffect(() => {
-    console.log("Product updated:", product);
-    console.log("Product sizes after update:", product?.sizes);
-  }, [product]);
 
   const handleFavoriteToggle = () => {
     if (!product) return;
-
-    if (isFavorite(product.id)) {
-      removeFromFavorites(product.id);
-    } else {
-      addToFavorites(product);
-    }
+    isFavorite(product.id)
+      ? removeFromFavorites(product.id)
+      : addToFavorites(product);
   };
 
   const handleAddToCart = () => {
     if (product && product.inStock && selectedSize) {
       addToCart(product, 1, selectedSize);
+      toast.success(t("addedToCart"));
     }
   };
 
@@ -104,11 +71,7 @@ const ProductDetail = () => {
     }
   };
 
-  // In the size selection section, add more logging
-  const handleSizeChange = (value: string) => {
-    console.log("Size selection changed to:", value);
-    setSelectedSize(value);
-  };
+  const handleSizeChange = (value: string) => setSelectedSize(value);
 
   if (loading) {
     return (
@@ -122,9 +85,7 @@ const ProductDetail = () => {
     return (
       <main className="flex-grow py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-heading font-bold mb-6">
-            {t("productNotFound")}
-          </h1>
+          <h1 className="text-3xl font-bold mb-6">{t("productNotFound")}</h1>
           <Button asChild>
             <Link to="/products">
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -136,17 +97,13 @@ const ProductDetail = () => {
     );
   }
 
-  // Ensure product.sizes is always an array, even if undefined
-  const productSizes = product.sizes || [];
   const hasDiscount =
     product.discountPrice && product.discountPrice < product.price;
-  const favorited = isFavorite(product.id);
 
   return (
     <main className="flex-grow py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          {/* Back Button */}
           <div className="mb-8">
             <Button asChild variant="outline" size="sm">
               <Link to="/products">
@@ -156,23 +113,58 @@ const ProductDetail = () => {
             </Button>
           </div>
 
-          {/* Product Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             {/* Product Images */}
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg h-full">
-              <div className="relative h-full">
-                <div className="aspect-square w-full overflow-hidden">
-                  <img
-                    src={product.images[activeImage] || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-                  />
+            <div className="bg-card rounded-xl overflow-hidden shadow-lg p-4">
+              <div className="relative">
+                {/* Main Image Slider */}
+                <div className="aspect-square w-full overflow-hidden relative">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${activeImage * 100}%)` }}
+                  >
+                    {product.images.map((imgSrc, index) => (
+                      <img
+                        key={index}
+                        src={imgSrc || "/placeholder.svg"}
+                        alt={`${product.name} image ${index + 1}`}
+                        className="w-full h-full object-cover flex-shrink-0"
+                      />
+                    ))}
+                  </div>
+
+                  {/* Navigation Arrows */}
+                  {product.images.length > 1 && (
+                    <>
+                      <button
+                        onClick={() =>
+                          setActiveImage((prev) =>
+                            prev === 0 ? product.images.length - 1 : prev - 1
+                          )
+                        }
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-background/50 text-foreground p-2 rounded-full hover:bg-background/70 transition-colors z-10"
+                      >
+                        <ArrowLeft className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() =>
+                          setActiveImage((prev) =>
+                            prev === product.images.length - 1 ? 0 : prev + 1
+                          )
+                        }
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-background/50 text-foreground p-2 rounded-full hover:bg-background/70 transition-colors z-10"
+                      >
+                        <ArrowRight className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
                 </div>
 
-                {/* Thumbnail Gallery */}
+                {/* Thumbnail Gallery (Horizontal) */}
                 {product.images.length > 1 && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/80 to-transparent p-4">
-                    <div className="flex space-x-3 overflow-auto">
+                  <div className="mt-4 overflow-x-auto">
+                    <div className="flex space-x-3 pb-2">
+                      {/* No need for dummy images here, just map actual images */}
                       {product.images.map((img, index) => (
                         <button
                           key={index}
@@ -203,11 +195,7 @@ const ProductDetail = () => {
             <div className="bg-card rounded-xl p-8 shadow-lg">
               <div className="space-y-6">
                 <div>
-                  <h1 className="text-3xl font-heading font-bold mb-3">
-                    {product.name}
-                  </h1>
-
-                  {/* Price */}
+                  <h1 className="text-3xl font-bold mb-3">{product.name}</h1>
                   <div className="flex items-center space-x-4 mb-6">
                     {hasDiscount ? (
                       <>
@@ -234,8 +222,6 @@ const ProductDetail = () => {
                       </span>
                     )}
                   </div>
-
-                  {/* Availability */}
                   <div className="mb-6">
                     <Badge
                       variant={product.inStock ? "outline" : "destructive"}
@@ -254,19 +240,19 @@ const ProductDetail = () => {
                   <Select
                     value={selectedSize}
                     onValueChange={handleSizeChange}
-                    disabled={!product.inStock || productSizes.length === 0}
+                    disabled={!product.inStock || !product.sizes?.length}
                   >
                     <SelectTrigger className="w-full max-w-[200px]">
                       <SelectValue
                         placeholder={
-                          productSizes.length
+                          product.sizes?.length
                             ? t("selectSize")
                             : t("noSizesAvailable")
                         }
                       />
                     </SelectTrigger>
                     <SelectContent>
-                      {productSizes.map((size) => (
+                      {product.sizes?.map((size) => (
                         <SelectItem key={size} value={size}>
                           {size}
                         </SelectItem>
@@ -290,7 +276,6 @@ const ProductDetail = () => {
                   >
                     {t("buyNow")}
                   </Button>
-
                   <Button
                     variant="outline"
                     size="icon"
@@ -300,7 +285,6 @@ const ProductDetail = () => {
                   >
                     <ShoppingCart className="h-6 w-6" />
                   </Button>
-
                   <Button
                     variant="outline"
                     size="icon"
@@ -309,7 +293,9 @@ const ProductDetail = () => {
                   >
                     <Heart
                       className={`h-6 w-6 ${
-                        favorited ? "fill-tactical text-tactical" : ""
+                        isFavorite(product.id)
+                          ? "fill-tactical text-tactical"
+                          : ""
                       }`}
                     />
                   </Button>
@@ -321,12 +307,12 @@ const ProductDetail = () => {
           {/* Related Products */}
           {relatedProducts.length > 0 && (
             <div className="bg-card rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-heading font-bold mb-8 text-center sm:text-left">
+              <h2 className="text-2xl font-bold mb-8 text-center sm:text-left">
                 {t("relatedProducts")}
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {relatedProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {relatedProducts.map((related) => (
+                  <ProductCard key={related.id} product={related} />
                 ))}
               </div>
             </div>
