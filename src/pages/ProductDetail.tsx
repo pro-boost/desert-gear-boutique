@@ -19,6 +19,7 @@ import {
   ShoppingCart,
   ArrowRight,
   Loader2,
+  X,
 } from "lucide-react";
 import {
   Select,
@@ -28,6 +29,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+interface CartItem {
+  size: string;
+  quantity: number;
+}
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,7 +50,9 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [selectedSize, setSelectedSize] = useState<string>("");
+  const [quantity, setQuantity] = useState<number>(1);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -69,7 +79,7 @@ const ProductDetail = () => {
 
         if (mounted) {
           setProduct(foundProduct);
-          setSelectedSize(foundProduct.sizes?.[0] || "");
+          setSelectedSizes(Array(foundProduct.sizes?.length || 0).fill(""));
         }
 
         // Get related products
@@ -118,26 +128,85 @@ const ProductDetail = () => {
 
   const handleFavoriteToggle = () => {
     if (!product) return;
-    isFavorite(product.id)
-      ? removeFromFavorites(product.id)
-      : addToFavorites(product);
+    if (isFavorite(product.id)) {
+      removeFromFavorites(product.id);
+    } else {
+      addToFavorites(product);
+    }
+  };
+
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    if (!isNaN(value) && value > 0) {
+      const oldQuantity = quantity;
+      const newQuantity = value;
+
+      setQuantity(newQuantity);
+
+      // Preserve existing size selections when changing quantity
+      setSelectedSizes((prev) => {
+        if (newQuantity > oldQuantity) {
+          // Add empty strings for new items
+          return [...prev, ...Array(newQuantity - oldQuantity).fill("")];
+        } else {
+          // Remove items from the end
+          return prev.slice(0, newQuantity);
+        }
+      });
+    }
+  };
+
+  const handleSizeChange = (index: number, size: string) => {
+    setSelectedSizes((prev) => {
+      const newSizes = [...prev];
+      newSizes[index] = size;
+      return newSizes;
+    });
   };
 
   const handleAddToCart = () => {
-    if (product && product.inStock && selectedSize) {
-      addToCart(product, 1, selectedSize);
-      toast.success(t("addedToCart"));
+    if (!product || !product.inStock) return;
+
+    // Check if all items have a size selected
+    const hasAllSizesSelected = selectedSizes
+      .slice(0, quantity)
+      .every((size) => size !== "");
+    if (!hasAllSizesSelected) {
+      toast.error(t("selectSizeForAllItems"));
+      return;
     }
+
+    // Add each item to cart with its selected size
+    selectedSizes.slice(0, quantity).forEach((size) => {
+      addToCart(product, 1, size);
+    });
+
+    // Reset the form
+    setQuantity(1);
+    setSelectedSizes([]);
+    toast.success(t("addedToCart"));
   };
 
   const handleBuyNow = () => {
-    if (product && product.inStock && selectedSize) {
-      addToCart(product, 1, selectedSize);
-      navigate("/cart");
-    }
-  };
+    if (!product || !product.inStock) return;
 
-  const handleSizeChange = (value: string) => setSelectedSize(value);
+    // Check if all items have a size selected
+    const hasAllSizesSelected = selectedSizes
+      .slice(0, quantity)
+      .every((size) => size !== "");
+    if (!hasAllSizesSelected) {
+      toast.error(t("selectSizeForAllItems"));
+      return;
+    }
+
+    // Add each item to cart with its selected size
+    selectedSizes.slice(0, quantity).forEach((size) => {
+      addToCart(product, 1, size);
+    });
+
+    // Navigate to cart
+    navigate("/cart");
+  };
 
   if (loading) {
     return (
@@ -190,7 +259,7 @@ const ProductDetail = () => {
                     {product.images.map((imgSrc, index) => (
                       <img
                         key={index}
-                        src={imgSrc || "/placeholder.svg"}
+                        src={imgSrc}
                         alt={`${product.name} image ${index + 1}`}
                         className="w-full h-full object-cover flex-shrink-0"
                       />
@@ -243,7 +312,7 @@ const ProductDetail = () => {
                           `}
                         >
                           <img
-                            src={img || "/placeholder.svg"}
+                            src={img}
                             alt={`${product.name} thumbnail ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
@@ -257,7 +326,8 @@ const ProductDetail = () => {
 
             {/* Product Info */}
             <div className="bg-card rounded-xl p-8 shadow-lg">
-              <div className="space-y-6">
+              <div className="space-y-8">
+                {/* Product Title and Price */}
                 <div>
                   <h1 className="text-3xl font-bold mb-3">{product.name}</h1>
                   <div className="flex items-center space-x-4 mb-6">
@@ -297,33 +367,88 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Size Selection */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium">
-                    {t("size")}
-                  </label>
-                  <Select
-                    value={selectedSize}
-                    onValueChange={handleSizeChange}
-                    disabled={!product.inStock || !product.sizes?.length}
-                  >
-                    <SelectTrigger className="w-full max-w-[200px]">
-                      <SelectValue
-                        placeholder={
-                          product.sizes?.length
-                            ? t("selectSize")
-                            : t("noSizesAvailable")
-                        }
-                      />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {product.sizes?.map((size) => (
-                        <SelectItem key={size} value={size}>
-                          {size}
-                        </SelectItem>
+                {product.inStock && (
+                  <div className="space-y-4">
+                    <h4 className="text-sm font-medium">{t("selectSizes")}</h4>
+                    <div className="grid gap-3">
+                      {Array.from({ length: quantity }).map((_, index) => (
+                        <div
+                          key={index}
+                          className={`
+                            relative flex items-center gap-4 p-4 rounded-lg border
+                            ${
+                              selectedSizes[index]
+                                ? "border-primary/50 bg-primary/5"
+                                : "border-border"
+                            }
+                            transition-colors duration-200
+                          `}
+                        >
+                          {/* Item Number Badge */}
+                          <div className="absolute -left-2 -top-2">
+                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
+                              {index + 1}
+                            </div>
+                          </div>
+
+                          {/* Size Selection */}
+                          <div className="flex-1">
+                            <Select
+                              value={selectedSizes[index] || ""}
+                              onValueChange={(value) =>
+                                handleSizeChange(index, value)
+                              }
+                              disabled={
+                                !product.inStock || !product.sizes?.length
+                              }
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue
+                                  placeholder={
+                                    product.sizes?.length
+                                      ? t("selectSize")
+                                      : t("noSizesAvailable")
+                                  }
+                                />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {product.sizes?.map((size) => (
+                                  <SelectItem key={size} value={size}>
+                                    {size}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+
+                          {/* Selected Size Badge */}
+                          {selectedSizes[index] && (
+                            <Badge variant="secondary" className="ml-2">
+                              {selectedSizes[index]}
+                            </Badge>
+                          )}
+                        </div>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Quantity Selection */}
+                {product.inStock && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      {t("quantity")}
+                    </label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={quantity}
+                      onChange={handleQuantityChange}
+                      className="w-32"
+                      disabled={!product.inStock}
+                    />
+                  </div>
+                )}
 
                 {/* Description */}
                 <div className="space-y-2">
@@ -331,20 +456,33 @@ const ProductDetail = () => {
                   <p className="text-muted-foreground">{product.description}</p>
                 </div>
 
-                {/* Actions */}
+                {/* Action Buttons */}
                 <div className="flex items-center gap-3 pt-4">
                   <Button
                     className="flex-1 py-6 text-lg"
-                    disabled={!product.inStock || !selectedSize}
+                    disabled={
+                      !product?.inStock ||
+                      quantity === 0 ||
+                      selectedSizes
+                        .slice(0, quantity)
+                        .some((size) => size === "")
+                    }
                     onClick={handleBuyNow}
                   >
+                    <ArrowRight className="mr-2 h-5 w-5" />
                     {t("buyNow")}
                   </Button>
                   <Button
                     variant="outline"
                     size="icon"
                     className="w-14 h-14"
-                    disabled={!product.inStock || !selectedSize}
+                    disabled={
+                      !product?.inStock ||
+                      quantity === 0 ||
+                      selectedSizes
+                        .slice(0, quantity)
+                        .some((size) => size === "")
+                    }
                     onClick={handleAddToCart}
                   >
                     <ShoppingCart className="h-6 w-6" />

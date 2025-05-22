@@ -31,7 +31,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-sm"
         >
           <img
-            src={item.product.images[0] || "/placeholder.svg"}
+            src={item.product.images[0]}
             alt={item.product.name}
             className="w-full h-full object-cover"
           />

@@ -45,18 +45,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!product.inStock) {
-      return;
-    }
-
-    if (product.sizes && product.sizes.length > 0) {
-      // If product has sizes, navigate to product detail page
-      navigate(`/products/${product.id}`);
-    } else {
-      // If product doesn't have sizes, add directly to cart
-      addToCart(product, 1, "one-size");
-    }
+    navigate(`/products/${product.id}`);
   };
 
   const favorited = isFavorite(product.id);
@@ -75,10 +64,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
         <div className="relative aspect-square">
           <Link to={`/products/${product.id}`} className="block h-full">
             <img
-              src={
-                product.images[0] ||
-                "https://images.unsplash.com/photo-1452378174528-3090a4bba7b2"
-              }
+              src={product.images[0]}
               alt={product.name}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
@@ -165,7 +151,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             onClick={handleAddToCart}
           >
             <ShoppingBag className="mr-2 h-4 w-4" />
-            {product.inStock ? t("addToCart") : t("outOfStock")}
+            {product.inStock ? t("viewDetails") : t("outOfStock")}
           </Button>
         </CardFooter>
       </div>

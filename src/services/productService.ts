@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
+import { Product, ProductFilters, PRODUCT_CATEGORIES } from '@/types/product';
 import { toast } from '@/components/ui/sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -76,14 +76,6 @@ export const addCategory = (category: string): boolean => {
   categories.push(category);
   saveCategories(categories);
   return true;
-};
-
-// Reset products to sample data
-export const resetProducts = (): void => {
-  // Clear existing products
-  localStorage.removeItem('products');
-  // Save sample products
-  saveProducts(SAMPLE_PRODUCTS);
 };
 
 // Get all products

@@ -35,15 +35,33 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   });
 
   const generateWhatsAppMessage = (formData: CheckoutFormData) => {
-    const itemsList = cartItems
+    // Group items by product
+    const groupedItems = cartItems.reduce((acc, item) => {
+      const key = item.product.id;
+      if (!acc[key]) {
+        acc[key] = {
+          name: item.product.name,
+          price: item.product.discountPrice || item.product.price,
+          sizes: [],
+          totalQuantity: 0,
+          subtotal: 0,
+        };
+      }
+      acc[key].sizes.push(item.selectedSize);
+      acc[key].totalQuantity += item.quantity;
+      acc[key].subtotal +=
+        (item.product.discountPrice || item.product.price) * item.quantity;
+      return acc;
+    }, {} as Record<string, { name: string; price: number; sizes: string[]; totalQuantity: number; subtotal: number }>);
+
+    // Convert grouped items to message format
+    const itemsList = Object.values(groupedItems)
       .map((item) => {
-        const price = item.product.discountPrice || item.product.price;
-        const itemTotal = price * item.quantity;
-        return `*${item.product.name}*
-Size: ${item.selectedSize}
-Quantity: ${item.quantity}
-Price: ${price.toFixed(2)} Dh
-Subtotal: ${itemTotal.toFixed(2)} Dh
+        return `*${item.name}*
+Quantity: ${item.totalQuantity}
+Sizes: ${item.sizes.join(" - ")}
+Price per item: ${item.price.toFixed(2)} Dh
+Subtotal: ${item.subtotal.toFixed(2)} Dh
 -------------------`;
       })
       .join("\n\n");
@@ -62,7 +80,9 @@ Morocco
 *Order Items:*
 ${itemsList}
 
-*Total Amount:* ${totalPrice.toFixed(2)} Dh
+*Order Summary:*
+Total Items: ${cartItems.reduce((sum, item) => sum + item.quantity, 0)}
+Total Amount: ${totalPrice.toFixed(2)} Dh
 
 Thank you for your order! We'll contact you shortly to confirm your order.`;
 
