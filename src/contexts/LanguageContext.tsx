@@ -613,7 +613,7 @@ const translations: Translations = {
     ar: "تم إعادة تعيين المنتجات بنجاح",
   },
   welcomeToDesertGear: {
-    fr: "Bienvenue chez Desert Gear Boutique",
+    fr: "Bienvenue chez Strike Gear Boutique",
     ar: "مرحباً بكم في ديزرت جير بوتيك",
   },
   heroSubtitle: {

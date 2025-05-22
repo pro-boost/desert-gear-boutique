@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import {
   SignedIn,
   SignedOut,
@@ -7,21 +8,28 @@ import {
   SignUp,
 } from "@clerk/clerk-react";
 import { useUser } from "@clerk/clerk-react";
-
-// Pages
-import HomePage from "./pages/HomePage";
-import ProductsPage from "./pages/ProductsPage";
-import ProductDetail from "./pages/ProductDetail";
-import CartPage from "./pages/CartPage";
-import FavoritesPage from "./pages/FavoritesPage";
-import AdminPage from "./pages/AdminPage";
-import ContactPage from "./pages/ContactPage";
-import NotFound from "./pages/NotFound";
-import AboutUs from "./pages/AboutUs";
-import Shipping from "./pages/Shipping";
-import Returns from "./pages/Returns";
 import BackToTopButton from "./components/BackToTopButton";
-import ProductFormPage from "./pages/ProductFormPage";
+
+// Lazy load all pages
+const HomePage = lazy(() => import("./pages/HomePage"));
+const ProductsPage = lazy(() => import("./pages/ProductsPage"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const CartPage = lazy(() => import("./pages/CartPage"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const ContactPage = lazy(() => import("./pages/ContactPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AboutUs = lazy(() => import("./pages/AboutUs"));
+const Shipping = lazy(() => import("./pages/Shipping"));
+const Returns = lazy(() => import("./pages/Returns"));
+const ProductFormPage = lazy(() => import("./pages/ProductFormPage"));
+
+// Loading component for routes
+const RouteLoadingFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 // Protected route component using Clerk
 const ProtectedRoute = ({
@@ -34,11 +42,7 @@ const ProtectedRoute = ({
   const { user, isLoaded } = useUser();
 
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <RouteLoadingFallback />;
   }
 
   if (!user) {
@@ -55,121 +59,85 @@ const ProtectedRoute = ({
 const AppRoutes = () => {
   return (
     <>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/products/:id" element={<ProductDetail />} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/about" element={<AboutUs />} />
-        <Route path="/shipping" element={<Shipping />} />
-        <Route path="/returns" element={<Returns />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/favorites" element={<FavoritesPage />} />
+      <Suspense fallback={<RouteLoadingFallback />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/about" element={<AboutUs />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/returns" element={<Returns />} />
 
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <ProtectedRoute adminOnly>
-              <AdminPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/products/new"
-          element={
-            <ProtectedRoute adminOnly>
-              <ProductFormPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin/products/:id/edit"
-          element={
-            <ProtectedRoute adminOnly>
-              <ProductFormPage />
-            </ProtectedRoute>
-          }
-        />
+          {/* Auth Routes */}
+          <Route
+            path="/sign-in/*"
+            element={
+              <SignedOut>
+                <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" />
+              </SignedOut>
+            }
+          />
+          <Route
+            path="/sign-up/*"
+            element={
+              <SignedOut>
+                <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
+              </SignedOut>
+            }
+          />
 
-        {/* Auth Routes */}
-        <Route
-          path="/sign-in/*"
-          element={
-            <SignedOut>
-              <SignInPage />
-            </SignedOut>
-          }
-        />
-        <Route
-          path="/sign-up/*"
-          element={
-            <SignedOut>
-              <SignUpPage />
-            </SignedOut>
-          }
-        />
+          {/* Protected Routes */}
+          <Route
+            path="/cart"
+            element={
+              <SignedIn>
+                <CartPage />
+              </SignedIn>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <SignedIn>
+                <FavoritesPage />
+              </SignedIn>
+            }
+          />
 
-        {/* Catch all */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Admin Routes */}
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/products/new"
+            element={
+              <ProtectedRoute adminOnly>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/products/:id/edit"
+            element={
+              <ProtectedRoute adminOnly>
+                <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* 404 Route */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
       <BackToTopButton />
     </>
-  );
-};
-
-// Clerk Sign In Page
-const SignInPage = () => {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
-        <SignIn
-          routing="path"
-          path="/sign-in"
-          signUpUrl="/sign-up"
-          redirectUrl="/"
-          appearance={{
-            elements: {
-              rootBox: "mx-auto",
-              card: "shadow-none",
-              headerTitle: "text-2xl font-bold",
-              headerSubtitle: "text-muted-foreground",
-              socialButtonsBlockButton: "bg-muted hover:bg-muted/80",
-              formButtonPrimary: "bg-primary hover:bg-primary/90",
-              footerActionLink: "text-primary hover:text-primary/90",
-            },
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-// Clerk Sign Up Page
-const SignUpPage = () => {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-md mx-auto">
-        <SignUp
-          routing="path"
-          path="/sign-up"
-          signInUrl="/sign-in"
-          redirectUrl="/"
-          appearance={{
-            elements: {
-              rootBox: "mx-auto",
-              card: "shadow-none",
-              headerTitle: "text-2xl font-bold",
-              headerSubtitle: "text-muted-foreground",
-              socialButtonsBlockButton: "bg-muted hover:bg-muted/80",
-              formButtonPrimary: "bg-primary hover:bg-primary/90",
-              footerActionLink: "text-primary hover:text-primary/90",
-            },
-          }}
-        />
-      </div>
-    </div>
   );
 };
 

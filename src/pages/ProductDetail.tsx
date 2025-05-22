@@ -31,6 +31,7 @@ import {
 import { toast } from "@/components/ui/sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Image } from "@/components/ui/image";
 
 interface CartItem {
   size: string;
@@ -257,11 +258,12 @@ const ProductDetail = () => {
                     style={{ transform: `translateX(-${activeImage * 100}%)` }}
                   >
                     {product.images.map((imgSrc, index) => (
-                      <img
+                      <Image
                         key={index}
                         src={imgSrc}
                         alt={`${product.name} image ${index + 1}`}
                         className="w-full h-full object-cover flex-shrink-0"
+                        loading={index === 0 ? "eager" : "lazy"}
                       />
                     ))}
                   </div>
@@ -311,10 +313,11 @@ const ProductDetail = () => {
                             }
                           `}
                         >
-                          <img
+                          <Image
                             src={img}
                             alt={`${product.name} thumbnail ${index + 1}`}
                             className="w-full h-full object-cover"
+                            loading="lazy"
                           />
                         </button>
                       ))}

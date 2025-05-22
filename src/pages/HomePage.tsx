@@ -83,14 +83,24 @@ const HomePage = () => {
           transition={{ duration: 1 }}
           className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30 z-10"
         />
-        <motion.img
-          initial={{ scale: 1.1 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
+        <img
           src="/images/main/soldier-8499582_1280.webp"
           alt="Desert Gear Boutique"
           className="absolute inset-0 w-full h-full object-cover"
+          fetchPriority="high"
+          loading="eager"
+          style={{
+            animation: "scaleIn 1.5s ease-out forwards",
+          }}
         />
+        <style>
+          {`
+            @keyframes scaleIn {
+              from { transform: scale(1.1); }
+              to { transform: scale(1); }
+            }
+          `}
+        </style>
         <div className="container max-w-5xl mx-auto px-4 relative z-20 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

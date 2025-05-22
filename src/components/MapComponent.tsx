@@ -1,22 +1,64 @@
+import React, { useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { lazy, Suspense } from "react";
+import { useInView } from "react-intersection-observer";
+import {
+  addPassiveEventListener,
+  removeEventListener,
+} from "@/utils/eventListeners";
+
+// Lazy load the actual map component
+const MapIframe = lazy(() => import("@/components/MapIframe"));
 
 const MapComponent: React.FC = () => {
   const { t } = useLanguage();
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Add passive event listeners for touch and wheel events
+    const handleTouchStart = (e: TouchEvent) => {
+      // Handle touch start if needed
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      // Handle wheel events if needed
+    };
+
+    addPassiveEventListener(container, "touchstart", handleTouchStart);
+    addPassiveEventListener(container, "wheel", handleWheel);
+
+    return () => {
+      removeEventListener(container, "touchstart", handleTouchStart);
+      removeEventListener(container, "wheel", handleWheel);
+    };
+  }, []);
 
   return (
-    <div className="h-[300px] w-full">
-      <div className="overflow-hidden w-full h-full group">
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3312.9522402356783!2d-5.548214609786988!3d33.86512170050147!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xda0454452435207%3A0xbcac173b743a8a49!2sInstitut%20Imam%20Ouarch%2C%20Filles%20Pour%20L&#39;%C3%A9ducation%20Musulmane!5e0!3m2!1sfr!2sma!4v1747336994354!5m2!1sfr!2sma"
-          width="100%"
-          height="100%"
-          frameBorder="0"
-          style={{ border: 0 }}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          title="Nidals Location"
-          className="w-full h-full transition-transform duration-300 ease-in-out group-hover:scale-105"
-        />
+    <div
+      ref={ref}
+      className="relative w-full h-[400px] md:h-[500px] rounded-2xl overflow-hidden"
+    >
+      <div ref={containerRef} className="w-full h-full">
+        {inView ? (
+          <Suspense
+            fallback={
+              <div className="w-full h-full flex items-center justify-center bg-muted animate-pulse">
+                <div className="text-muted-foreground">{t("loading")}</div>
+              </div>
+            }
+          >
+            <MapIframe />
+          </Suspense>
+        ) : (
+          <div className="w-full h-full bg-muted animate-pulse" />
+        )}
       </div>
     </div>
   );
