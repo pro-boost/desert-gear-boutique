@@ -21,6 +21,7 @@ import AboutUs from "./pages/AboutUs";
 import Shipping from "./pages/Shipping";
 import Returns from "./pages/Returns";
 import BackToTopButton from "./components/BackToTopButton";
+import ProductFormPage from "./pages/ProductFormPage";
 
 // Protected route component using Clerk
 const ProtectedRoute = ({
@@ -66,12 +67,28 @@ const AppRoutes = () => {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/favorites" element={<FavoritesPage />} />
 
-        {/* Admin Route */}
+        {/* Admin Routes */}
         <Route
           path="/admin"
           element={
             <ProtectedRoute adminOnly>
               <AdminPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/products/new"
+          element={
+            <ProtectedRoute adminOnly>
+              <ProductFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/products/:id/edit"
+          element={
+            <ProtectedRoute adminOnly>
+              <ProductFormPage />
             </ProtectedRoute>
           }
         />

@@ -15,6 +15,13 @@ import {
 } from "@/components/ui/select";
 import { Search, Loader2 } from "lucide-react";
 import { useSupabase } from "@/hooks/useSupabase";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
 
 const ProductsPage = () => {
   const { t } = useLanguage();
@@ -37,13 +44,24 @@ const ProductsPage = () => {
   });
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<
+    { name: string; sizes: string[] }[]
+  >([]);
   const [searchValue, setSearchValue] = useState(initialSearch);
 
   useEffect(() => {
-    // Fetch the categories once when the component mounts
-    setCategories(getCategories());
-  }, []);
+    const loadCategories = async () => {
+      try {
+        const client = await getClient();
+        const categoriesData = await getCategories(client);
+        setCategories(categoriesData);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+
+    loadCategories();
+  }, [getClient]);
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -111,62 +129,88 @@ const ProductsPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row gap-4 mb-8">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder={t("searchProducts")}
-              value={searchValue}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="pl-10"
-            />
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col gap-8">
+          {/* Filters Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle>{t("filterProducts")}</CardTitle>
+              <CardDescription>
+                {t("filterProductsDescription")}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      placeholder={t("searchProducts")}
+                      value={searchValue}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="pl-10 w-full"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Select
+                    value={filters.category}
+                    onValueChange={handleCategoryChange}
+                  >
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder={t("selectCategory")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("allCategories")}</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.name} value={category.name}>
+                          {t(category.name)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={
+                      filters.inStock === undefined
+                        ? "all"
+                        : String(filters.inStock)
+                    }
+                    onValueChange={handleStockChange}
+                  >
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder={t("stockStatus")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("allProducts")}</SelectItem>
+                      <SelectItem value="true">{t("inStock")}</SelectItem>
+                      <SelectItem value="false">{t("outOfStock")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
           </div>
-        </div>
-        <div className="flex gap-4">
-          <Select value={filters.category} onValueChange={handleCategoryChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={t("selectCategory")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("allCategories")}</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {t(category)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select
-            value={
-              filters.inStock === undefined ? "all" : String(filters.inStock)
-            }
-            onValueChange={handleStockChange}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={t("stockStatus")} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t("allProducts")}</SelectItem>
-              <SelectItem value="true">{t("inStock")}</SelectItem>
-              <SelectItem value="false">{t("outOfStock")}</SelectItem>
-            </SelectContent>
-          </Select>
+
+          {/* Empty State */}
+          {products.length === 0 && !loading && (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <p className="text-lg text-muted-foreground">
+                  {t("noProductsFound")}
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
-
-      {products.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">{t("noProductsFound")}</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-      )}
     </div>
   );
 };

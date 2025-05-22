@@ -164,12 +164,36 @@ export type Database = {
         }
         Relationships: []
       }
+      categories: {
+        Row: {
+          name: string
+          sizes: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          name: string
+          sizes: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          name?: string
+          sizes?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_categories_table: {
+        Args: Record<string, never>
+        Returns: void
+      }
     }
     Enums: {
       [_ in never]: never

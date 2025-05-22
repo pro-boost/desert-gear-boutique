@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { checkAndSetAdminStatus } from "@/integrations/supabase/auth";
 import {
   getProducts,
   addProduct,
@@ -9,6 +8,8 @@ import {
   deleteProduct,
   getCategories,
   addCategory,
+  updateCategory,
+  deleteCategory,
 } from "@/services/productService";
 import {
   Product,
@@ -73,10 +74,13 @@ import {
   Check,
   RotateCcw,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import ImageDropzone from "@/components/ImageDropzone";
 import { useSupabase } from "@/hooks/useSupabase";
 import { useAdmin } from "@/hooks/useAdmin";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 // Product form interface
 interface ProductFormData {
@@ -109,6 +113,12 @@ type AvailableSizes = {
   [key: string]: string[];
 };
 
+// Add new interface for category management
+interface Category {
+  name: string;
+  sizes: string[];
+}
+
 const AdminPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
@@ -132,11 +142,11 @@ const AdminPage: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("products");
-  const [categories, setCategories] = useState<string[]>([]);
-  const [newCategory, setNewCategory] = useState("");
-  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
-  const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategorySizes, setNewCategorySizes] = useState<string[]>([]);
+  const [newSize, setNewSize] = useState("");
 
   useEffect(() => {
     if (isLoaded && !isAdmin) {
@@ -153,11 +163,12 @@ const AdminPage: React.FC = () => {
         setLoading(true);
         const client = await getClient();
         const productsData = await getProducts(client);
+        const categoriesData = await getCategories(client);
         setProducts(productsData);
-        setCategories(getCategories());
+        setCategories(categoriesData);
       } catch (error) {
         console.error("Error loading data:", error);
-        toast.error("Failed to load products");
+        toast.error("Failed to load data");
       } finally {
         setLoading(false);
       }
@@ -169,8 +180,7 @@ const AdminPage: React.FC = () => {
   useEffect(() => {
     const category = formData.category || "boots";
     const sizes = (PRODUCT_SIZES as Record<string, string[]>)[category] || [];
-    setAvailableSizes(sizes);
-    setSelectedSizes([]);
+    setNewCategorySizes(sizes);
   }, [formData.category]);
 
   const handleInputChange = (
@@ -211,31 +221,95 @@ const AdminPage: React.FC = () => {
   };
 
   const handleSizeChange = (size: string, checked: boolean) => {
-    setSelectedSizes((prev) => {
-      if (checked) {
-        return [...prev, size];
-      }
-      return prev.filter((s) => s !== size);
-    });
-
-    // Update formData.sizes based on selectedSizes
     setFormData((prev) => ({
       ...prev,
-      sizes: selectedSizes,
+      sizes: checked
+        ? [...prev.sizes, size]
+        : prev.sizes.filter((s) => s !== size),
     }));
   };
 
-  const handleSubmitCategory = () => {
-    if (newCategory.trim() !== "") {
-      const success = addCategory(newCategory.trim().toLowerCase());
-      if (success) {
-        toast.success(`Category "${newCategory}" added successfully`);
-        setCategories(getCategories());
-        setNewCategory("");
-        setCategoryDialogOpen(false);
-      } else {
-        toast.error(`Category "${newCategory}" already exists`);
+  const handleAddSize = () => {
+    if (newSize.trim() && !newCategorySizes.includes(newSize.trim())) {
+      setNewCategorySizes([...newCategorySizes, newSize.trim()]);
+      setNewSize("");
+    }
+  };
+
+  const handleRemoveSize = (size: string) => {
+    setNewCategorySizes(newCategorySizes.filter((s) => s !== size));
+  };
+
+  const handleSaveCategory = async () => {
+    if (!newCategoryName.trim()) return;
+
+    try {
+      const client = await getClient();
+      const category: Omit<Category, "createdAt" | "updatedAt"> = {
+        name: newCategoryName.trim().toLowerCase(),
+        sizes: newCategorySizes,
+      };
+
+      const savedCategory = await addCategory(client, category);
+      if (savedCategory) {
+        setCategories((prev) => [...prev, savedCategory]);
+        setNewCategoryName("");
+        setNewCategorySizes([]);
+        toast.success(`Category "${savedCategory.name}" added successfully`);
       }
+    } catch (error) {
+      console.error("Error saving category:", error);
+      toast.error("Failed to save category");
+    }
+  };
+
+  const handleEditCategory = (category: Category) => {
+    setEditingCategory(category);
+    setNewCategoryName(category.name);
+    setNewCategorySizes(category.sizes);
+  };
+
+  const handleUpdateCategory = async () => {
+    if (!editingCategory || !newCategoryName.trim()) return;
+
+    try {
+      const client = await getClient();
+      const updatedCategory: Omit<Category, "createdAt" | "updatedAt"> = {
+        name: newCategoryName.trim().toLowerCase(),
+        sizes: newCategorySizes,
+      };
+
+      const savedCategory = await updateCategory(client, updatedCategory);
+      if (savedCategory) {
+        setCategories((prev) =>
+          prev.map((cat) =>
+            cat.name === editingCategory.name ? savedCategory : cat
+          )
+        );
+        setEditingCategory(null);
+        setNewCategoryName("");
+        setNewCategorySizes([]);
+        toast.success(`Category "${savedCategory.name}" updated successfully`);
+      }
+    } catch (error) {
+      console.error("Error updating category:", error);
+      toast.error("Failed to update category");
+    }
+  };
+
+  const handleDeleteCategory = async (categoryName: string) => {
+    try {
+      const client = await getClient();
+      const success = await deleteCategory(client, categoryName);
+      if (success) {
+        setCategories((prev) =>
+          prev.filter((cat) => cat.name !== categoryName)
+        );
+        toast.success(`Category "${categoryName}" deleted successfully`);
+      }
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast.error("Failed to delete category");
     }
   };
 
@@ -245,7 +319,7 @@ const AdminPage: React.FC = () => {
       const client = await getClient();
       const productData = {
         ...formData,
-        sizes: selectedSizes,
+        sizes: formData.sizes || [],
       } as Product;
 
       let updatedProduct: Product | null;
@@ -281,18 +355,7 @@ const AdminPage: React.FC = () => {
   };
 
   const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setFormData({
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      discountPrice: product.discountPrice,
-      category: product.category,
-      images: product.images,
-      inStock: product.inStock,
-      featured: product.featured,
-    });
-    setSelectedSizes(product.sizes);
+    navigate(`/admin/products/${product.id}/edit`);
   };
 
   const handleDelete = (productId: string) => {
@@ -331,7 +394,6 @@ const AdminPage: React.FC = () => {
       sizes: [],
     });
     setIsEditing(false);
-    setSelectedSizes([]);
     setActiveTab("products");
   };
 
@@ -352,6 +414,15 @@ const AdminPage: React.FC = () => {
     }));
   };
 
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingCategory) {
+      await handleUpdateCategory();
+    } else {
+      await handleSaveCategory();
+    }
+  };
+
   if (!isLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -366,193 +437,376 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Tabs defaultValue="products" className="space-y-8">
-        <TabsList>
-          <TabsTrigger value="products">{t("products")}</TabsTrigger>
-          <TabsTrigger value="categories">{t("categories")}</TabsTrigger>
-        </TabsList>
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <Button
+            variant="outline"
+            onClick={() => navigate("/")}
+            className="gap-2"
+          >
+            <ArrowLeft size={16} />
+            {t("backToHome")}
+          </Button>
+          <h1 className="text-3xl font-bold">{t("adminDashboard")}</h1>
+        </div>
 
-        <TabsContent value="products" className="space-y-8">
-          <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">{t("manageProducts")}</h1>
-            <Button onClick={() => setCategoryDialogOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {t("addProduct")}
-            </Button>
-          </div>
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <div>
-                  <CardTitle>{t("products")}</CardTitle>
-                  <CardDescription>
-                    Manage your product inventory, prices, and availability.
-                  </CardDescription>
+        <Tabs defaultValue="products" className="space-y-8">
+          <TabsList className="w-full justify-start">
+            <TabsTrigger value="products" className="flex-1 md:flex-none">
+              {t("products")}
+            </TabsTrigger>
+            <TabsTrigger value="categories" className="flex-1 md:flex-none">
+              {t("categories")}
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="products" className="space-y-8">
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <CardTitle>{t("manageProducts")}</CardTitle>
+                    <CardDescription>
+                      {t("manageProductsDescription")}
+                    </CardDescription>
+                  </div>
+                  <Link to="/admin/products/new">
+                    <Button className="w-full md:w-auto">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      {t("addProduct")}
+                    </Button>
+                  </Link>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">Image</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead className="text-center">Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {products.map((product) => (
-                      <TableRow key={product.id}>
-                        <TableCell>
-                          <img
-                            src={product.images[0]}
-                            alt={product.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {product.name}
-                        </TableCell>
-                        <TableCell>{product.category}</TableCell>
-                        <TableCell>
-                          {product.discountPrice ? (
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[80px]">{t("image")}</TableHead>
+                        <TableHead>{t("name")}</TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          {t("category")}
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          {t("price")}
+                        </TableHead>
+                        <TableHead className="text-center">
+                          {t("status")}
+                        </TableHead>
+                        <TableHead className="text-right">
+                          {t("actions")}
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {products.map((product) => (
+                        <TableRow key={product.id}>
+                          <TableCell>
+                            <img
+                              src={product.images[0]}
+                              alt={product.name}
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">
                             <div className="flex flex-col">
-                              <span>{product.discountPrice.toFixed(2)} Dh</span>
-                              <span className="text-sm text-muted-foreground line-through">
-                                {product.price.toFixed(2)} Dh
+                              <span>{product.name}</span>
+                              <span className="text-sm text-muted-foreground md:hidden">
+                                {product.category} • {product.price.toFixed(2)}{" "}
+                                Dh
                               </span>
                             </div>
-                          ) : (
-                            <span>{product.price.toFixed(2)} Dh</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <span
-                            className={`px-2 py-1 rounded text-xs ${
-                              product.inStock
-                                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                                : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                            }`}
-                          >
-                            {product.inStock ? t("inStock") : t("outOfStock")}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleEdit(product)}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {product.category}
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell">
+                            {product.discountPrice ? (
+                              <div className="flex flex-col">
+                                <span>
+                                  {product.discountPrice.toFixed(2)} Dh
+                                </span>
+                                <span className="text-sm text-muted-foreground line-through">
+                                  {product.price.toFixed(2)} Dh
+                                </span>
+                              </div>
+                            ) : (
+                              <span>{product.price.toFixed(2)} Dh</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <Badge
+                              variant={
+                                product.inStock ? "default" : "destructive"
+                              }
+                              className="whitespace-nowrap"
                             >
-                              <Edit size={16} />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleDelete(product.id)}
-                              className="text-destructive hover:text-destructive"
-                            >
-                              <Trash size={16} />
+                              {product.inStock ? t("inStock") : t("outOfStock")}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  navigate(`/admin/products/${product.id}/edit`)
+                                }
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => handleDelete(product.id)}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      {t("deleteProduct")}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {t("deleteProductConfirmation")}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      {t("cancel")}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction onClick={confirmDelete}>
+                                      {t("delete")}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="categories" className="space-y-8">
+            <Card>
+              <CardHeader>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div>
+                    <CardTitle>{t("manageCategories")}</CardTitle>
+                    <CardDescription>
+                      {t("manageCategoriesDescription")}
+                    </CardDescription>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      setEditingCategory(null);
+                      setNewCategoryName("");
+                      setNewCategorySizes([]);
+                    }}
+                    className="w-full md:w-auto"
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    {t("addCategory")}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Category Form */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>
+                        {editingCategory ? t("editCategory") : t("addCategory")}
+                      </CardTitle>
+                      <CardDescription>
+                        {editingCategory
+                          ? t("editCategoryDescription")
+                          : t("addCategoryDescription")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <form
+                        onSubmit={handleCategorySubmit}
+                        className="space-y-6"
+                      >
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="categoryName">
+                              {t("categoryName")}
+                            </Label>
+                            <Input
+                              id="categoryName"
+                              value={newCategoryName}
+                              onChange={(e) =>
+                                setNewCategoryName(e.target.value)
+                              }
+                              placeholder={t("enterCategoryName")}
+                              className="w-full"
+                            />
+                          </div>
+
+                          <div className="space-y-2">
+                            <Label>{t("sizes")}</Label>
+                            <div className="flex flex-col sm:flex-row gap-2">
+                              <Input
+                                value={newSize}
+                                onChange={(e) => setNewSize(e.target.value)}
+                                placeholder={t("enterSize")}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleAddSize();
+                                  }
+                                }}
+                                className="flex-1"
+                              />
+                              <Button
+                                onClick={handleAddSize}
+                                type="button"
+                                className="w-full sm:w-auto"
+                              >
+                                {t("addSize")}
+                              </Button>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card">
+                            {newCategorySizes.map((size) => (
+                              <Badge
+                                key={size}
+                                variant="secondary"
+                                className="flex items-center gap-1"
+                              >
+                                {size}
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-4 w-4 p-0 hover:bg-transparent"
+                                  onClick={() => handleRemoveSize(size)}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </Badge>
+                            ))}
+                          </div>
+
+                          <div className="flex justify-end gap-2">
+                            {editingCategory && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingCategory(null);
+                                  setNewCategoryName("");
+                                  setNewCategorySizes([]);
+                                }}
+                              >
+                                {t("cancel")}
+                              </Button>
+                            )}
+                            <Button type="submit" className="gap-2">
+                              <Save className="h-4 w-4" />
+                              {editingCategory
+                                ? t("saveChanges")
+                                : t("addCategory")}
                             </Button>
                           </div>
-                        </TableCell>
-                      </TableRow>
+                        </div>
+                      </form>
+                    </CardContent>
+                  </Card>
+
+                  {/* Categories List */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {categories.map((category) => (
+                      <Card key={category.name}>
+                        <CardHeader>
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <CardTitle className="text-lg">
+                                {category.name}
+                              </CardTitle>
+                              <CardDescription>
+                                {t("sizes")}: {category.sizes.length}
+                              </CardDescription>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  setEditingCategory(category);
+                                  setNewCategoryName(category.name);
+                                  setNewCategorySizes(category.sizes);
+                                }}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() =>
+                                      handleDeleteCategory(category.name)
+                                    }
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                      {t("deleteCategory")}
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      {t("deleteCategoryConfirmation")}
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>
+                                      {t("cancel")}
+                                    </AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() =>
+                                        handleDeleteCategory(category.name)
+                                      }
+                                    >
+                                      {t("delete")}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-2">
+                            {category.sizes.map((size) => (
+                              <Badge key={size} variant="secondary">
+                                {size}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
                     ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button
-                onClick={() => {
-                  setActiveTab("add-product");
-                  setIsEditing(false);
-                  setFormData(initialFormData);
-                  setSelectedSizes([]); // Reset selected sizes
-                }}
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {t("addProduct")}
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="categories">
-          {/* Add Category Dialog */}
-          <Dialog
-            open={categoryDialogOpen}
-            onOpenChange={setCategoryDialogOpen}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New Category</DialogTitle>
-                <DialogDescription>
-                  Enter a name for the new product category.
-                </DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <label htmlFor="newCategory" className="text-sm font-medium">
-                    Category Name
-                  </label>
-                  <Input
-                    id="newCategory"
-                    value={newCategory}
-                    onChange={(e) => setNewCategory(e.target.value)}
-                    placeholder="Enter category name"
-                  />
+                  </div>
                 </div>
-              </div>
-
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setCategoryDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSubmitCategory}
-                  disabled={!newCategory.trim()}
-                >
-                  Add Category
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </TabsContent>
-      </Tabs>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={!!deleteProductId}
-        onOpenChange={() => setDeleteProductId(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              product from the database.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmDelete}
-              className="bg-destructive text-destructive-foreground"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

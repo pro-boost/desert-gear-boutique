@@ -45,37 +45,162 @@ export const saveCategories = (categories: string[]): void => {
   localStorage.setItem('categories', JSON.stringify(categories));
 };
 
-// Get categories from localStorage or use default ones
-export const getCategories = (): string[] => {
-  const storedCategories = localStorage.getItem('categories');
-  if (storedCategories) {
-    try {
-      return JSON.parse(storedCategories);
-    } catch (error) {
-      console.error("Failed to parse categories from localStorage:", error);
-      // If parsing fails, use default categories
-      saveCategories(PRODUCT_CATEGORIES);
-      return [...PRODUCT_CATEGORIES];
-    }
-  }
+// Add interfaces for category management
+interface Category {
+  name: string;
+  sizes: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}
 
-  // If no categories in localStorage, use imported default categories
-  saveCategories(PRODUCT_CATEGORIES);
-  return [...PRODUCT_CATEGORIES];
+// Check if categories table exists and create it if it doesn't
+export const ensureCategoriesTable = async (
+  client: SupabaseClient<Database>
+): Promise<boolean> => {
+  try {
+    // First check if the table exists
+    const { data: tableExists, error: checkError } = await client
+      .from('categories')
+      .select('count')
+      .limit(1)
+      .maybeSingle();
+
+    if (checkError) {
+      // If the error is about the table not existing, create it
+      if (checkError.message.includes('does not exist')) {
+        // Create the table using a stored procedure
+        const { error: createError } = await client.rpc('create_categories_table');
+        
+        if (createError) {
+          console.error('Error creating categories table:', createError);
+          return false;
+        }
+      } else {
+        console.error('Error checking categories table:', checkError);
+        return false;
+      }
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error ensuring categories table:', error);
+    toast.error('Failed to create categories table');
+    return false;
+  }
+};
+
+// Get categories from localStorage or use default ones
+export const getCategories = async (
+  client: SupabaseClient<Database>
+): Promise<Category[]> => {
+  try {
+    // First, ensure the categories table exists
+    await ensureCategoriesTable(client);
+
+    const { data, error } = await client
+      .from('categories')
+      .select('*')
+      .order('name');
+
+    if (error) throw error;
+
+    return data.map(category => ({
+      name: category.name,
+      sizes: category.sizes,
+      createdAt: category.created_at,
+      updatedAt: category.updated_at
+    }));
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    toast.error('Failed to fetch categories');
+    return [];
+  }
 };
 
 // Add a new category
-export const addCategory = (category: string): boolean => {
-  const categories = getCategories();
-  
-  // Check if category already exists (case insensitive)
-  if (categories.some(c => c.toLowerCase() === category.toLowerCase())) {
+export const addCategory = async (
+  client: SupabaseClient<Database>,
+  category: Omit<Category, 'createdAt' | 'updatedAt'>
+): Promise<Category | null> => {
+  try {
+    const now = new Date().toISOString();
+    const { data, error } = await client
+      .from('categories')
+      .insert({
+        name: category.name,
+        sizes: category.sizes,
+        created_at: now,
+        updated_at: now
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      name: data.name,
+      sizes: data.sizes,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
+  } catch (error) {
+    console.error('Error adding category:', error);
+    toast.error('Failed to add category');
+    return null;
+  }
+};
+
+// Update a category
+export const updateCategory = async (
+  client: SupabaseClient<Database>,
+  category: Omit<Category, 'createdAt' | 'updatedAt'>
+): Promise<Category | null> => {
+  try {
+    const now = new Date().toISOString();
+    const { data, error } = await client
+      .from('categories')
+      .update({
+        sizes: category.sizes,
+        updated_at: now
+      })
+      .eq('name', category.name)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return {
+      name: data.name,
+      sizes: data.sizes,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
+  } catch (error) {
+    console.error('Error updating category:', error);
+    toast.error('Failed to update category');
+    return null;
+  }
+};
+
+// Delete a category
+export const deleteCategory = async (
+  client: SupabaseClient<Database>,
+  categoryName: string
+): Promise<boolean> => {
+  try {
+    const { error } = await client
+      .from('categories')
+      .delete()
+      .eq('name', categoryName);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting category:', error);
+    toast.error('Failed to delete category');
     return false;
   }
-  
-  categories.push(category);
-  saveCategories(categories);
-  return true;
 };
 
 // Get all products
