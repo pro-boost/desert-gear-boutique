@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useUser } from "@clerk/clerk-react";
+import { useSupabase } from "@/hooks/useSupabase";
 import {
   getProductById,
   getProductsByCategory,
@@ -12,7 +13,13 @@ import { Product } from "@/types/product";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ArrowLeft, ShoppingCart, ArrowRight } from "lucide-react";
+import {
+  Heart,
+  ArrowLeft,
+  ShoppingCart,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -28,6 +35,7 @@ const ProductDetail = () => {
   const { addToCart } = useCart();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const { isSignedIn } = useUser();
+  const { getClient } = useSupabase();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -37,18 +45,76 @@ const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<string>("");
 
   useEffect(() => {
-    if (!id) return;
-    const foundProduct = getProductById(id);
-    if (foundProduct) {
-      setProduct(foundProduct);
-      setSelectedSize(foundProduct.sizes?.[0] || "");
-      const related = getProductsByCategory(foundProduct.category)
-        .filter((p) => p.id !== id)
-        .slice(0, 4);
-      setRelatedProducts(related);
-    }
-    setLoading(false);
-  }, [id]);
+    let mounted = true;
+
+    const loadProductAndRelated = async () => {
+      if (!id) {
+        if (mounted) setLoading(false);
+        return;
+      }
+
+      try {
+        if (mounted) setLoading(true);
+        const client = await getClient();
+
+        // Get the main product
+        const foundProduct = await getProductById(client, id);
+        if (!foundProduct) {
+          if (mounted) {
+            toast.error("Product not found");
+            setLoading(false);
+          }
+          return;
+        }
+
+        if (mounted) {
+          setProduct(foundProduct);
+          setSelectedSize(foundProduct.sizes?.[0] || "");
+        }
+
+        // Get related products
+        const related = await getProductsByCategory(
+          client,
+          foundProduct.category
+        );
+        if (mounted) {
+          if (Array.isArray(related)) {
+            setRelatedProducts(related.filter((p) => p.id !== id).slice(0, 4));
+          } else {
+            console.error("Related products is not an array:", related);
+            setRelatedProducts([]);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading product:", error);
+        if (mounted) {
+          toast.error("Failed to load product");
+          setProduct(null);
+          setRelatedProducts([]);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    // Execute the async function
+    const loadData = () => {
+      loadProductAndRelated().catch((error) => {
+        console.error("Error in loadProductAndRelated:", error);
+        if (mounted) {
+          toast.error("Failed to load product");
+          setLoading(false);
+        }
+      });
+    };
+
+    loadData();
+
+    // Cleanup function
+    return () => {
+      mounted = false;
+    };
+  }, [id, getClient]);
 
   const handleFavoriteToggle = () => {
     if (!product) return;
@@ -75,25 +141,23 @@ const ProductDetail = () => {
 
   if (loading) {
     return (
-      <main className="flex-grow flex items-center justify-center py-12">
-        <div className="animate-pulse text-lg">{t("loading")}</div>
-      </main>
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
     );
   }
 
   if (!product) {
     return (
-      <main className="flex-grow py-12">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-6">{t("productNotFound")}</h1>
-          <Button asChild>
-            <Link to="/products">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("backToProducts")}
-            </Link>
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <Button onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t("back")}
           </Button>
         </div>
-      </main>
+      </div>
     );
   }
 

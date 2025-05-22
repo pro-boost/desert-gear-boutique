@@ -1,4 +1,39 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { Product, ProductFilters, SAMPLE_PRODUCTS, PRODUCT_CATEGORIES } from '@/types/product';
+import { toast } from '@/components/ui/sonner';
+import type { Database } from '@/integrations/supabase/types';
+
+type ProductRecord = Database['public']['Tables']['products']['Insert'];
+
+// Helper function to convert snake_case to camelCase
+const convertToCamelCase = <T>(obj: Record<string, unknown>): T => {
+  if (Array.isArray(obj)) {
+    return obj.map(convertToCamelCase) as T;
+  }
+  if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((acc, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      acc[camelKey] = convertToCamelCase(obj[key] as Record<string, unknown>);
+      return acc;
+    }, {} as Record<string, unknown>) as T;
+  }
+  return obj as T;
+};
+
+// Helper function to convert camelCase to snake_case
+const convertToSnakeCase = (product: Omit<Product, 'id' | 'createdAt'>): ProductRecord => {
+  return {
+    name: product.name,
+    description: product.description,
+    price: product.price,
+    discount_price: product.discountPrice ?? null,
+    category: product.category,
+    images: product.images,
+    in_stock: product.inStock,
+    featured: product.featured,
+    sizes: product.sizes,
+  };
+};
 
 // Save products to localStorage
 export const saveProducts = (products: Product[]): void => {
@@ -51,142 +86,216 @@ export const resetProducts = (): void => {
   saveProducts(SAMPLE_PRODUCTS);
 };
 
-// Get products from localStorage or use default samples
-export const getProducts = (): Product[] => {
-  const storedProducts = localStorage.getItem('products');
-  if (storedProducts) {
-    try {
-      const products = JSON.parse(storedProducts);
-      // If products array is empty or sizes are missing, reset to sample data
-      if (!products.length || products.some((p: Product) => !p.sizes || !p.sizes.length)) {
-        console.log("Products data is invalid, resetting to sample data");
-        resetProducts();
-        return SAMPLE_PRODUCTS;
-      }
-      // Ensure all products have a sizes array
-      return products.map((product: Product) => ({
-        ...product,
-        sizes: product.sizes || []
-      }));
-    } catch (error) {
-      console.error("Failed to parse products from localStorage:", error);
-      // If parsing fails, use sample products
-      resetProducts();
-      return SAMPLE_PRODUCTS;
-    }
-  }
+// Get all products
+export const getProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  // If no products in localStorage, use imported sample products
-  resetProducts();
-  return SAMPLE_PRODUCTS;
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    toast.error('Failed to fetch products');
+    return [];
+  }
 };
 
-// Get a product by ID
-export const getProductById = (id: string): Product | undefined => {
-  const products = getProducts();
-  const product = products.find(product => product.id === id);
-  if (product) {
-    // Ensure sizes is always an array
-    return {
-      ...product,
-      sizes: product.sizes || []
-    };
+// Get a single product by ID
+export const getProductById = async (client: SupabaseClient<Database>, id: string): Promise<Product | null> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    return convertToCamelCase<Product>(data);
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    toast.error('Failed to fetch product');
+    return null;
   }
-  return undefined;
 };
 
 // Add a new product
-export const addProduct = (product: Omit<Product, 'id' | 'createdAt'>): Product => {
-  const products = getProducts();
-  
-  const newProduct: Product = {
-    ...product,
-    id: `${product.category}-${Date.now()}`,
-    createdAt: Date.now(),
-    sizes: product.sizes || [], // Ensure sizes are never undefined
-  };
-  
-  products.push(newProduct);
-  saveProducts(products);
-  return newProduct;
+export const addProduct = async (
+  client: SupabaseClient<Database>,
+  product: Omit<Product, 'id' | 'createdAt'>
+): Promise<Product | null> => {
+  try {
+    const productData: ProductRecord = {
+      ...convertToSnakeCase(product),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('products')
+      .insert(productData)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return convertToCamelCase<Product>(data);
+  } catch (error) {
+    console.error('Error adding product:', error);
+    toast.error('Failed to add product');
+    return null;
+  }
 };
 
-// Update an existing product
-export const updateProduct = (updatedProduct: Product): Product => {
-  const products = getProducts();
-  
-  // Ensure sizes is an array
-  const productWithSizes = {
-    ...updatedProduct,
-    sizes: updatedProduct.sizes || [],
-  };
-  
-  const updatedProducts = products.map(product => 
-    product.id === productWithSizes.id ? productWithSizes : product
-  );
-  
-  saveProducts(updatedProducts);
-  return productWithSizes;
+// Update a product
+export const updateProduct = async (
+  client: SupabaseClient<Database>,
+  product: Product
+): Promise<Product | null> => {
+  try {
+    const productData: Database['public']['Tables']['products']['Update'] = {
+      ...convertToSnakeCase(product),
+      updated_at: new Date().toISOString(),
+    };
+
+    const { data, error } = await client
+      .from('products')
+      .update(productData)
+      .eq('id', product.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return convertToCamelCase<Product>(data);
+  } catch (error) {
+    console.error('Error updating product:', error);
+    toast.error('Failed to update product');
+    return null;
+  }
 };
 
-// Delete a product by ID
-export const deleteProduct = (id: string): void => {
-  const products = getProducts();
-  const filteredProducts = products.filter(product => product.id !== id);
-  saveProducts(filteredProducts);
+// Delete a product
+export const deleteProduct = async (
+  client: SupabaseClient<Database>,
+  id: string
+): Promise<boolean> => {
+  try {
+    const { error } = await client
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    toast.error('Failed to delete product');
+    return false;
+  }
 };
 
 // Filter products based on criteria
-export const filterProducts = (filters: ProductFilters): Product[] => {
-  const products = getProducts();
-  console.log('Filtering products with filters:', filters);
-  
-  return products.filter(product => {
-    // Filter by category if specified
+export const filterProducts = async (
+  client: SupabaseClient<Database>,
+  filters: ProductFilters
+): Promise<Product[]> => {
+  try {
+    let query = client
+      .from('products')
+      .select('*');
+
+    // Apply category filter
     if (filters.category && filters.category !== 'all') {
-      if (product.category !== filters.category) {
-        return false;
-      }
+      query = query.eq('category', filters.category);
     }
-    
-    // Filter by stock status if specified
+
+    // Apply stock status filter
     if (filters.inStock !== undefined) {
-      if (product.inStock !== filters.inStock) {
-        return false;
-      }
+      query = query.eq('in_stock', filters.inStock);
     }
-    
-    // Filter by search term if specified
+
+    // Apply search filter
     if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      const nameMatch = product.name.toLowerCase().includes(searchTerm);
-      const descMatch = product.description.toLowerCase().includes(searchTerm);
-      console.log('Searching product:', product.name, 'with term:', searchTerm, 'matches:', nameMatch || descMatch);
-      if (!nameMatch && !descMatch) {
-        return false;
-      }
+      query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
     }
-    
-    return true;
-  });
+
+    const { data, error } = await query.order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error filtering products:', error);
+    toast.error('Failed to filter products');
+    return [];
+  }
 };
 
 // Get featured products
-export const getFeaturedProducts = (): Product[] => {
-  const products = getProducts();
-  return products.filter(product => product.featured);
+export const getFeaturedProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select('*')
+      .eq('featured', true)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    toast.error('Failed to fetch featured products');
+    return [];
+  }
 };
 
 // Get new arrivals (most recent products)
-export const getNewArrivals = (count: number = 4): Product[] => {
-  const products = getProducts();
-  return [...products]
-    .sort((a, b) => b.createdAt - a.createdAt)
-    .slice(0, count);
+export const getNewArrivals = async (
+  client: SupabaseClient<Database>,
+  count: number = 4
+): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(count);
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching new arrivals:', error);
+    toast.error('Failed to fetch new arrivals');
+    return [];
+  }
 };
 
 // Get products by category
-export const getProductsByCategory = (category: string): Product[] => {
-  const products = getProducts();
-  return products.filter(product => product.category === category);
+export const getProductsByCategory = async (
+  client: SupabaseClient<Database>,
+  category: string
+): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select('*')
+      .eq('category', category)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    toast.error('Failed to fetch products by category');
+    return [];
+  }
 };

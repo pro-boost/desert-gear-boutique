@@ -13,12 +13,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
+import { useSupabase } from "@/hooks/useSupabase";
 
 const ProductsPage = () => {
   const { t } = useLanguage();
+  const { getClient } = useSupabase();
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
+  const [loading, setLoading] = useState(true);
 
   // Initialize the filters from the URL query parameters
   const initialCategory = searchParams.get("category") || "all";
@@ -43,185 +46,128 @@ const ProductsPage = () => {
   }, []);
 
   useEffect(() => {
-    // Whenever the filters change, we update the URL search parameters
-    const newParams = new URLSearchParams();
-    if (filters.category && filters.category !== "all") {
-      newParams.set("category", filters.category);
-    }
-    if (filters.inStock !== undefined) {
-      newParams.set("inStock", String(filters.inStock));
-    }
-    if (filters.search) {
-      newParams.set("search", filters.search);
-    }
-    setSearchParams(newParams);
-  }, [filters, setSearchParams]);
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const client = await getClient();
+        const filteredProducts = await filterProducts(client, filters);
+        setProducts(filteredProducts);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    // Whenever the searchParams or filters change, fetch the filtered products
-    const filtered = filterProducts(filters);
-    setProducts(filtered);
-  }, [filters]);
+    loadProducts();
+  }, [filters, getClient]);
 
-  // Handle category changes
-  const handleCategoryChange = (value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      category: value,
-      // Reset the inStock filter when category changes
-      inStock: undefined,
-    }));
-  };
-
-  // Handle stock toggle
-  const handleToggleStock = () => {
-    setFilters((prev) => {
-      let nextStock: boolean | undefined;
-      if (prev.inStock === undefined) nextStock = true;
-      else if (prev.inStock === true) nextStock = false;
-      else nextStock = undefined;
-      return { ...prev, inStock: nextStock };
-    });
-  };
-
-  // Handle search input
-  const handleSearch = () => {
-    console.log("Search triggered with value:", searchValue);
-    setFilters((prev) => {
-      const newFilters = { ...prev, search: searchValue.trim() };
-      console.log("New filters:", newFilters);
-      return newFilters;
-    });
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    console.log("Search value changed:", value);
+  const handleSearch = (value: string) => {
     setSearchValue(value);
-    // Update filters immediately as user types
-    setFilters((prev) => ({
-      ...prev,
-      search: value.trim(),
-    }));
+    setFilters((prev) => ({ ...prev, search: value }));
+    setSearchParams((prev) => {
+      if (value) {
+        prev.set("search", value);
+      } else {
+        prev.delete("search");
+      }
+      return prev;
+    });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault(); // Prevent form submission
-      handleSearch();
-    }
+  const handleCategoryChange = (value: string) => {
+    setFilters((prev) => ({ ...prev, category: value }));
+    setSearchParams((prev) => {
+      if (value && value !== "all") {
+        prev.set("category", value);
+      } else {
+        prev.delete("category");
+      }
+      return prev;
+    });
   };
 
-  const clearFilters = () => {
-    setFilters({ category: "all", inStock: undefined, search: "" });
-    setSearchValue("");
+  const handleStockChange = (value: string) => {
+    const inStock =
+      value === "true" ? true : value === "false" ? false : undefined;
+    setFilters((prev) => ({ ...prev, inStock }));
+    setSearchParams((prev) => {
+      if (inStock !== undefined) {
+        prev.set("inStock", String(inStock));
+      } else {
+        prev.delete("inStock");
+      }
+      return prev;
+    });
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <main className="flex-grow py-8">
-      <div className="container mx-auto px-4">
-        <h1 className="text-3xl font-heading font-bold mb-8">
-          {t("ourProducts")}
-        </h1>
-
-        {/* Filters */}
-        <div className="bg-card p-4 rounded-lg shadow-sm border border-border mb-8">
-          <div className="flex flex-col md:flex-row gap-4 items-center">
-            {/* Search */}
-            <div className="flex-grow w-full md:w-auto">
-              <div className="relative">
-                <Input
-                  type="text"
-                  placeholder={t("search")}
-                  value={searchValue}
-                  onChange={handleSearchChange}
-                  onKeyDown={handleKeyDown}
-                  className="pr-10"
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0"
-                  onClick={handleSearch}
-                >
-                  <Search size={18} />
-                </Button>
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="w-full md:w-48">
-              <Select
-                value={filters.category || "all"}
-                onValueChange={handleCategoryChange}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("category")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("allProducts")}</SelectItem>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {t(category)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Toggle Stock Filter */}
-            <div className="w-full md:w-48">
-              <Select
-                value={
-                  filters.inStock === undefined
-                    ? "all"
-                    : filters.inStock
-                    ? "in"
-                    : "out"
-                }
-                onValueChange={(value) => {
-                  let stockValue: boolean | undefined;
-                  if (value === "in") stockValue = true;
-                  else if (value === "out") stockValue = false;
-                  else stockValue = undefined;
-                  setFilters((prev) => ({ ...prev, inStock: stockValue }));
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t("stock")} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t("allStock")}</SelectItem>
-                  <SelectItem value="in">{t("inStock")}</SelectItem>
-                  <SelectItem value="out">{t("outOfStock")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Clear Filters */}
-            <Button variant="outline" onClick={clearFilters}>
-              {t("cancel")}
-            </Button>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder={t("searchProducts")}
+              value={searchValue}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="pl-10"
+            />
           </div>
         </div>
-
-        {/* Products Grid */}
-        {products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">{t("noProductsFound")}</p>
-            <Button variant="outline" onClick={clearFilters} className="mt-4">
-              {t("cancel")}
-            </Button>
-          </div>
-        )}
+        <div className="flex gap-4">
+          <Select value={filters.category} onValueChange={handleCategoryChange}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("selectCategory")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("allCategories")}</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {t(category)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select
+            value={
+              filters.inStock === undefined ? "all" : String(filters.inStock)
+            }
+            onValueChange={handleStockChange}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("stockStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">{t("allProducts")}</SelectItem>
+              <SelectItem value="true">{t("inStock")}</SelectItem>
+              <SelectItem value="false">{t("outOfStock")}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-    </main>
+
+      {products.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">{t("noProductsFound")}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

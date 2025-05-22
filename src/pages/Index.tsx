@@ -6,29 +6,52 @@ import ProductCard from "@/components/ProductCard";
 import MapComponent from "@/components/MapComponent";
 import { getFeaturedProducts, getNewArrivals } from "@/services/productService";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Product } from "@/types/product";
+import { toast } from "@/components/ui/sonner";
 
-const Index = () => {
+const Index: React.FC = () => {
   const { t } = useLanguage();
   const sectionsRef = useRef<(HTMLElement | null)[]>([]);
   const [lastScrollY, setLastScrollY] = useState(0);
   const scrollingDown = useRef(true);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newArrivals, setNewArrivals] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const featuredProducts = getFeaturedProducts().slice(0, 4);
-  const newArrivals = getNewArrivals(4);
+  useEffect(() => {
+    const loadProducts = async (): Promise<void> => {
+      try {
+        const [featured, arrivals] = await Promise.all([
+          getFeaturedProducts(),
+          getNewArrivals(4),
+        ]);
+        setFeaturedProducts(featured.slice(0, 4));
+        setNewArrivals(arrivals);
+      } catch (error: unknown) {
+        console.error("Error loading products:", error);
+        toast.error(t("errorLoadingProducts"));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadProducts();
+  }, [t]);
 
   // Set up intersection observer for scroll animations
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in");
-            entry.target.classList.remove("opacity-0");
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
+    const handleIntersection = (entries: IntersectionObserverEntry[]): void => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("animate-fade-in");
+          entry.target.classList.remove("opacity-0");
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(handleIntersection, {
+      threshold: 0.1,
+    });
 
     // Select all elements that should be animated
     const animatedElements = document.querySelectorAll(".scroll-animate");
@@ -155,18 +178,24 @@ const Index = () => {
           <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
             {t("featured")}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className={`scroll-animate transition-all duration-300 delay-${
-                  index * 100
-                }`}
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featuredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`scroll-animate transition-all duration-300 delay-${
+                    index * 100
+                  }`}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
           <div className="mt-10 text-center scroll-animate">
             <Button
               asChild
@@ -189,18 +218,24 @@ const Index = () => {
           <h2 className="text-3xl font-heading font-bold mb-8 scroll-animate">
             {t("newArrivals")}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {newArrivals.map((product, index) => (
-              <div
-                key={product.id}
-                className={`scroll-animate transition-all duration-300 delay-${
-                  index * 100
-                }`}
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {newArrivals.map((product, index) => (
+                <div
+                  key={product.id}
+                  className={`scroll-animate transition-all duration-300 delay-${
+                    index * 100
+                  }`}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

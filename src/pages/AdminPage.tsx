@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { checkAndSetAdminStatus } from "@/integrations/supabase/auth";
 import {
   getProducts,
   addProduct,
@@ -10,7 +11,13 @@ import {
   addCategory,
   resetProducts,
 } from "@/services/productService";
-import { Product, PRODUCT_SIZES } from "@/types/product";
+import {
+  Product,
+  ProductFilters,
+  PRODUCT_CATEGORIES,
+  SAMPLE_PRODUCTS,
+  PRODUCT_SIZES,
+} from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -67,8 +74,11 @@ import {
   X,
   Check,
   RotateCcw,
+  Loader2,
 } from "lucide-react";
 import ImageDropzone from "@/components/ImageDropzone";
+import { useSupabase } from "@/hooks/useSupabase";
+import { useAdmin } from "@/hooks/useAdmin";
 
 // Product form interface
 interface ProductFormData {
@@ -96,12 +106,31 @@ const initialFormData: ProductFormData = {
   sizes: [],
 };
 
-const AdminPage = () => {
+// Add type for available sizes
+type AvailableSizes = {
+  [key: string]: string[];
+};
+
+const AdminPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const { getClient } = useSupabase();
+  const { isAdmin, isLoaded } = useAdmin();
 
   const [products, setProducts] = useState<Product[]>([]);
-  const [formData, setFormData] = useState<ProductFormData>(initialFormData);
+  const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [formData, setFormData] = useState<Partial<Product>>({
+    name: "",
+    description: "",
+    price: 0,
+    discountPrice: 0,
+    category: "boots",
+    images: ["/placeholder.svg"],
+    inStock: true,
+    featured: false,
+    sizes: [],
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("products");
@@ -109,42 +138,42 @@ const AdminPage = () => {
   const [newCategory, setNewCategory] = useState("");
   const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
   const [availableSizes, setAvailableSizes] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<{
-    [key: string]: boolean;
-  }>({});
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
 
   useEffect(() => {
-    // TODO: Replace with Clerk authentication
-    // Will use Clerk's useUser() hook to check for admin role
-    // const { user } = useUser();
-    // if (!user?.publicMetadata?.isAdmin) {
-    //   navigate('/');
-    //   return;
-    // }
-
-    // Load products and categories
-    setProducts(getProducts());
-    setCategories(getCategories());
-  }, [navigate]);
+    if (isLoaded && !isAdmin) {
+      toast.error(t("unauthorizedAccess"));
+      navigate("/");
+    }
+  }, [isLoaded, isAdmin, navigate, t]);
 
   useEffect(() => {
-    // Update available sizes when category changes
-    const categorySizes =
-      PRODUCT_SIZES[formData.category as keyof typeof PRODUCT_SIZES] || [];
-    setAvailableSizes(categorySizes);
+    const loadData = async () => {
+      if (!isAdmin) return;
 
-    // When editing or changing category, update the selected sizes
-    const newSelectedSizes: { [key: string]: boolean } = {};
-    categorySizes.forEach((size) => {
-      newSelectedSizes[size] = formData.sizes.includes(size);
-    });
-    setSelectedSizes(newSelectedSizes);
+      try {
+        setLoading(true);
+        const client = await getClient();
+        const productsData = await getProducts(client);
+        setProducts(productsData);
+        setCategories(getCategories());
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    console.log("Category changed to:", formData.category);
-    console.log("Available sizes:", categorySizes);
-    console.log("Selected sizes:", newSelectedSizes);
-    console.log("Form data sizes:", formData.sizes);
-  }, [formData.category, formData.sizes]);
+    loadData();
+  }, [getClient, isAdmin]);
+
+  useEffect(() => {
+    const category = formData.category || "boots";
+    const sizes = (PRODUCT_SIZES as Record<string, string[]>)[category] || [];
+    setAvailableSizes(sizes);
+    setSelectedSizes([]);
+  }, [formData.category]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -184,23 +213,18 @@ const AdminPage = () => {
   };
 
   const handleSizeChange = (size: string, checked: boolean) => {
-    setSelectedSizes((prev) => ({
-      ...prev,
-      [size]: checked,
-    }));
+    setSelectedSizes((prev) => {
+      if (checked) {
+        return [...prev, size];
+      }
+      return prev.filter((s) => s !== size);
+    });
 
     // Update formData.sizes based on selectedSizes
-    setFormData((prev) => {
-      const newSizes = checked
-        ? [...prev.sizes, size].filter((v, i, a) => a.indexOf(v) === i) // Add size if checked
-        : prev.sizes.filter((s) => s !== size); // Remove size if unchecked
-
-      console.log("Updating sizes:", newSizes);
-      return {
-        ...prev,
-        sizes: newSizes,
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      sizes: selectedSizes,
+    }));
   };
 
   const handleSubmitCategory = () => {
@@ -217,95 +241,99 @@ const AdminPage = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      // Get selected sizes from the state
-      const selectedSizesList = Object.entries(selectedSizes)
-        .filter(([_, isSelected]) => isSelected)
-        .map(([size]) => size);
-
-      console.log("Selected sizes for submission:", selectedSizesList);
-
+      const client = await getClient();
       const productData = {
         ...formData,
-        sizes: selectedSizesList,
-      };
+        sizes: selectedSizes,
+      } as Product;
 
-      if (isEditing && productData.id) {
-        // Update existing product
-        const updatedProduct = updateProduct({
-          ...(productData as Product),
-          createdAt:
-            products.find((p) => p.id === productData.id)?.createdAt ||
-            Date.now(),
+      let updatedProduct: Product | null;
+      if (selectedProduct) {
+        updatedProduct = await updateProduct(client, {
+          ...productData,
+          id: selectedProduct.id,
         });
-
-        setProducts((prev) =>
-          prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
-        );
-
-        toast.success(`${productData.name} updated successfully`);
       } else {
-        // Add new product
-        const newProduct = addProduct(productData);
-
-        setProducts((prev) => [...prev, newProduct]);
-
-        toast.success(`${productData.name} added successfully`);
+        updatedProduct = await addProduct(client, productData);
       }
 
-      // Reset form
-      resetForm();
+      if (updatedProduct) {
+        setProducts((prevProducts) => {
+          if (selectedProduct) {
+            return prevProducts.map((p) =>
+              p.id === updatedProduct.id ? updatedProduct : p
+            );
+          }
+          return [...prevProducts, updatedProduct];
+        });
+        toast.success(
+          selectedProduct
+            ? "Product updated successfully"
+            : "Product added successfully"
+        );
+        resetForm();
+      }
     } catch (error) {
-      toast.error("Error saving product");
-      console.error(error);
+      console.error("Error saving product:", error);
+      toast.error("Failed to save product");
     }
   };
 
   const handleEdit = (product: Product) => {
-    console.log("Editing product:", product);
-    console.log("Product sizes:", product.sizes);
-
-    // Initialize size selection based on product sizes
-    const newSelectedSizes: { [key: string]: boolean } = {};
-    const categorySizes =
-      PRODUCT_SIZES[product.category as keyof typeof PRODUCT_SIZES] || [];
-
-    categorySizes.forEach((size) => {
-      newSelectedSizes[size] = (product.sizes || []).includes(size);
-    });
-
-    console.log("Setting selected sizes:", newSelectedSizes);
-    setSelectedSizes(newSelectedSizes);
-
+    setSelectedProduct(product);
     setFormData({
-      ...product,
-      sizes: product.sizes || [],
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      discountPrice: product.discountPrice,
+      category: product.category,
+      images: product.images,
+      inStock: product.inStock,
+      featured: product.featured,
     });
-
-    setIsEditing(true);
-    setActiveTab("add-product");
+    setSelectedSizes(product.sizes);
   };
 
   const handleDelete = (productId: string) => {
     setDeleteProductId(productId);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (deleteProductId) {
-      deleteProduct(deleteProductId);
-      setProducts((prev) => prev.filter((p) => p.id !== deleteProductId));
-      setDeleteProductId(null);
-      toast.success("Product deleted successfully");
+      try {
+        const client = await getClient();
+        const success = await deleteProduct(client, deleteProductId);
+        if (success) {
+          setProducts((prevProducts) =>
+            prevProducts.filter((p) => p.id !== deleteProductId)
+          );
+          setDeleteProductId(null);
+          toast.success("Product deleted successfully");
+        }
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast.error("Failed to delete product");
+      }
     }
   };
 
   const resetForm = () => {
-    setFormData(initialFormData);
+    setFormData({
+      name: "",
+      description: "",
+      price: 0,
+      discountPrice: 0,
+      category: "boots",
+      images: ["/placeholder.svg"],
+      inStock: true,
+      featured: false,
+      sizes: [],
+    });
     setIsEditing(false);
-    setSelectedSizes({});
+    setSelectedSizes([]);
     setActiveTab("products");
   };
 
@@ -326,11 +354,42 @@ const AdminPage = () => {
     }));
   };
 
-  const handleResetProducts = () => {
-    resetProducts();
-    setProducts(getProducts());
-    toast.success(t("productsReset"));
+  const handleResetProducts = async () => {
+    try {
+      const client = await getClient();
+      // Delete all existing products
+      for (const product of products) {
+        await deleteProduct(client, product.id);
+      }
+
+      // Add sample products
+      const newProducts: Product[] = [];
+      for (const product of SAMPLE_PRODUCTS) {
+        const addedProduct = await addProduct(client, product);
+        if (addedProduct) {
+          newProducts.push(addedProduct);
+        }
+      }
+
+      setProducts(newProducts);
+      toast.success("Products reset successfully");
+    } catch (error) {
+      console.error("Error resetting products:", error);
+      toast.error("Failed to reset products");
+    }
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return null; // Will redirect in useEffect
+  }
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -462,7 +521,7 @@ const AdminPage = () => {
                       setActiveTab("add-product");
                       setIsEditing(false);
                       setFormData(initialFormData);
-                      setSelectedSizes({}); // Reset selected sizes
+                      setSelectedSizes([]); // Reset selected sizes
                     }}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -612,7 +671,7 @@ const AdminPage = () => {
                           >
                             <Checkbox
                               id={`size-${size}`}
-                              checked={selectedSizes[size] || false}
+                              checked={selectedSizes.includes(size)}
                               onCheckedChange={(checked) =>
                                 handleSizeChange(size, !!checked)
                               }
