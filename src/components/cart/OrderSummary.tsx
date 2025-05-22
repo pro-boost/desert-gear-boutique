@@ -21,26 +21,26 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
 
       <div className="p-4 space-y-4">
         <div className="flex justify-between py-2 border-b border-border">
-          <span className="text-muted-foreground">Subtotal:</span>
+          <span className="text-muted-foreground">{t("subtotal")}:</span>
           <span className="font-medium">{totalPrice.toFixed(2)} Dh</span>
         </div>
 
         <div className="flex justify-between py-2 border-b border-border">
-          <span className="text-muted-foreground">Shipping:</span>
-          <span>Free</span>
+          <span className="text-muted-foreground">{t("shipping")}:</span>
+          <span>{t("free")}</span>
         </div>
 
         <div className="flex justify-between py-2 text-lg font-semibold">
-          <span>Total:</span>
+          <span>{t("total")}:</span>
           <span>{totalPrice.toFixed(2)} Dh</span>
         </div>
 
         <Button className="w-full lg:hidden" onClick={onProceedToCheckout}>
-          Proceed to Checkout
+          {t("proceedToCheckout")}
         </Button>
 
         <div className="text-center text-sm text-muted-foreground mt-4 lg:hidden">
-          <p>Pay after receiving your order</p>
+          <p>{t("payAfterReceiving")}</p>
         </div>
       </div>
     </div>

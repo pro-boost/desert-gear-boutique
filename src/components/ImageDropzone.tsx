@@ -2,6 +2,7 @@ import React, { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, X } from "lucide-react";
 import { Button } from "./ui/button";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface ImageDropzoneProps {
   onImageUpload: (image: string) => void;
@@ -24,6 +25,7 @@ interface MultiImageDropzoneProps
 type CombinedImageDropzoneProps = ImageDropzoneProps | MultiImageDropzoneProps;
 
 const ImageDropzone = (props: CombinedImageDropzoneProps) => {
+  const { t } = useLanguage();
   const { onImageUpload, onImageRemove, multiple = false } = props;
   const currentImage = "currentImage" in props ? props.currentImage : undefined;
   const currentImages =
@@ -94,7 +96,10 @@ const ImageDropzone = (props: CombinedImageDropzoneProps) => {
               <div key={index} className="relative inline-block">
                 <img
                   src={imgSrc}
-                  alt={`Product preview ${index + 1}`}
+                  alt={t("productPreviewMultiple").replace(
+                    "{index}",
+                    String(index + 1)
+                  )}
                   className="max-w-[100px] max-h-[100px] object-contain mx-auto rounded-md"
                 />
                 {onImageRemove && multiple && (
@@ -115,7 +120,7 @@ const ImageDropzone = (props: CombinedImageDropzoneProps) => {
           <div className="relative inline-block">
             <img
               src={currentImage}
-              alt="Product preview"
+              alt={t("productPreview")}
               className="max-w-[200px] max-h-[200px] object-contain mx-auto rounded-md"
             />
             {onImageRemove && !multiple && (
@@ -135,10 +140,12 @@ const ImageDropzone = (props: CombinedImageDropzoneProps) => {
             <Upload className="mx-auto h-12 w-12 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
               {isDragActive
-                ? "Drop the image(s) here"
+                ? multiple
+                  ? t("dropImagesHereMultiple")
+                  : t("dropImagesHere")
                 : multiple
-                ? "Drag & drop your product images here or click to select (max 5)"
-                : "Drag & drop your product image here or click to select"}
+                ? t("dragDropImages")
+                : t("dragDropImage")}
             </p>
           </div>
         )}

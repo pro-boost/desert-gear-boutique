@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { CartItem } from "@/contexts/CartContext";
 import { Textarea } from "@/components/ui/textarea";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CheckoutFormData {
   full_name: string;
@@ -27,6 +28,7 @@ export const CheckoutForm: React.FC<CheckoutFormProps> = ({
   cartItems,
   totalPrice,
 }) => {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState<CheckoutFormData>({
     full_name: "",
     email: "",
@@ -118,14 +120,12 @@ Thank you for your order! We'll contact you shortly to confirm your order.`;
     <form onSubmit={handleSubmit} className="space-y-4">
       <Alert>
         <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Pay after delivery</AlertTitle>
-        <AlertDescription>
-          We'll contact you to confirm your order and deliver to your address.
-        </AlertDescription>
+        <AlertTitle>{t("payAfterDelivery")}</AlertTitle>
+        <AlertDescription>{t("deliveryConfirmation")}</AlertDescription>
       </Alert>
 
       <div className="space-y-2">
-        <Label htmlFor="full_name">Full Name</Label>
+        <Label htmlFor="full_name">{t("fullName")}</Label>
         <Input
           id="full_name"
           value={formData.full_name}
@@ -133,12 +133,12 @@ Thank you for your order! We'll contact you shortly to confirm your order.`;
             setFormData((prev) => ({ ...prev, full_name: e.target.value }))
           }
           required
-          placeholder="Enter your full name"
+          placeholder={t("enterFullName")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email Address</Label>
+        <Label htmlFor="email">{t("emailAddress")}</Label>
         <Input
           id="email"
           type="email"
@@ -147,12 +147,12 @@ Thank you for your order! We'll contact you shortly to confirm your order.`;
             setFormData((prev) => ({ ...prev, email: e.target.value }))
           }
           required
-          placeholder="Enter your email address"
+          placeholder={t("enterEmailAddress")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
+        <Label htmlFor="phone">{t("phoneNumber")}</Label>
         <Input
           id="phone"
           type="tel"
@@ -161,12 +161,12 @@ Thank you for your order! We'll contact you shortly to confirm your order.`;
             setFormData((prev) => ({ ...prev, phone: e.target.value }))
           }
           required
-          placeholder="Enter your phone number"
+          placeholder={t("enterPhoneNumber")}
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address_line1">Delivery Address</Label>
+        <Label htmlFor="address_line1">{t("deliveryAddress")}</Label>
         <Textarea
           id="address_line1"
           value={formData.address_line1}
@@ -174,31 +174,31 @@ Thank you for your order! We'll contact you shortly to confirm your order.`;
             setFormData((prev) => ({ ...prev, address_line1: e.target.value }))
           }
           required
-          placeholder="Enter your complete delivery address"
+          placeholder={t("enterDeliveryAddress")}
           className="min-h-[100px]"
         />
       </div>
 
       <div className="text-sm text-muted-foreground space-y-2">
-        <p>By placing your order, you agree to our:</p>
+        <p>{t("agreeToPolicies")}</p>
         <div className="flex flex-col space-y-1">
           <Link
             to="/shipping"
             className="text-primary hover:underline inline-flex items-center"
           >
-            Shipping Policy
+            {t("shippingPolicy")}
           </Link>
           <Link
             to="/returns"
             className="text-primary hover:underline inline-flex items-center"
           >
-            Return Policy
+            {t("returnPolicy")}
           </Link>
         </div>
       </div>
 
       <Button type="submit" className="w-full">
-        Place Order
+        {t("placeOrder")}
       </Button>
     </form>
   );

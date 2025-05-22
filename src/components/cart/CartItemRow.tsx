@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useCart, CartItem } from "@/contexts/CartContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Trash, Plus, Minus } from "lucide-react";
 
@@ -10,6 +11,7 @@ interface CartItemRowProps {
 
 export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   const { updateQuantity, removeItem } = useCart();
+  const { t } = useLanguage();
 
   const handleQuantityChange = (newQuantity: number) => {
     updateQuantity(item.product.id, newQuantity, item.selectedSize);
@@ -47,7 +49,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
               </Link>
               {item.selectedSize && (
                 <div className="text-sm text-muted-foreground">
-                  Size: {item.selectedSize}
+                  {t("size")} {item.selectedSize}
                 </div>
               )}
             </div>
@@ -117,7 +119,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
       {/* Mobile Total */}
       <div className="col-span-12 sm:hidden flex justify-between items-center mt-2 pt-2 border-t border-border/50">
         <div className="text-sm font-semibold">
-          Total: {totalPrice.toFixed(2)} Dh
+          {t("total")}: {totalPrice.toFixed(2)} Dh
         </div>
       </div>
     </div>

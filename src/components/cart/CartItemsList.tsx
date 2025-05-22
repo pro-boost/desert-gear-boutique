@@ -20,17 +20,17 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
     <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
       <div className="p-4 border-b border-border bg-muted/50">
         <h2 className="font-semibold">
-          {items.length} {items.length === 1 ? "item" : "items"}
+          {items.length} {items.length === 1 ? t("item") : t("items")}
         </h2>
       </div>
 
       <div className="p-4">
         {/* Headers on larger screens */}
         <div className="hidden sm:grid grid-cols-12 gap-4 text-sm text-muted-foreground mb-2 px-4">
-          <div className="col-span-5">Product</div>
-          <div className="col-span-2 text-right">Price</div>
-          <div className="col-span-3 text-center">Quantity</div>
-          <div className="col-span-2 text-right">Total</div>
+          <div className="col-span-5">{t("product")}</div>
+          <div className="col-span-2 text-right">{t("price")}</div>
+          <div className="col-span-3 text-center">{t("quantity")}</div>
+          <div className="col-span-2 text-right">{t("total")}</div>
         </div>
 
         {/* Cart Items */}
@@ -46,7 +46,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
         {/* Actions */}
         <div className="mt-6 flex justify-between">
           <Button variant="outline" size="sm" onClick={clearCart}>
-            Clear Cart
+            {t("clearCart")}
           </Button>
           <Button asChild variant="outline" size="sm">
             <Link to="/products">

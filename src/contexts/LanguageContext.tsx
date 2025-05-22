@@ -57,6 +57,10 @@ const translations: Translations = {
     fr: "Contactez-nous",
     ar: "اتصل بنا",
   },
+  contactDescription: {
+    fr: "Nous sommes là pour vous aider. N'hésitez pas à nous contacter pour toute question.",
+    ar: "نحن هنا لمساعدتك. لا تتردد في الاتصال بنا لأي استفسار.",
+  },
   aboutUs: {
     fr: "À propos de nous",
     ar: "من نحن",
@@ -206,8 +210,8 @@ const translations: Translations = {
     ar: "سلة التسوق فارغة",
   },
   checkout: {
-    fr: "Passer à la caisse",
-    ar: "إتمام الشراء",
+    fr: "Commande",
+    ar: "الطلب",
   },
   total: {
     fr: "Total",
@@ -374,8 +378,8 @@ const translations: Translations = {
     ar: "جاري إنشاء الحساب...",
   },
   size: {
-    fr: "Taille",
-    ar: "المقاس",
+    fr: "Taille :",
+    ar: "المقاس :",
   },
   selectSize: {
     fr: "Sélectionner une taille",
@@ -607,6 +611,399 @@ const translations: Translations = {
   productsReset: {
     fr: "Les produits ont été réinitialisés avec succès",
     ar: "تم إعادة تعيين المنتجات بنجاح",
+  },
+  welcomeToDesertGear: {
+    fr: "Bienvenue chez Desert Gear Boutique",
+    ar: "مرحباً بكم في ديزرت جير بوتيك",
+  },
+  heroSubtitle: {
+    fr: "Votre destination de confiance pour l'équipement militaire et tactique de haute qualité",
+    ar: "وجهتك الموثوقة للمعدات العسكرية والتكتيكية عالية الجودة",
+  },
+  viewAll: {
+    fr: "Voir tout",
+    ar: "عرض الكل",
+  },
+  whyChooseUs: {
+    fr: "Pourquoi nous choisir",
+    ar: "لماذا تختارنا",
+  },
+  qualityAssuranceDescription: {
+    fr: "Nous garantissons la qualité de chaque produit que nous vendons",
+    ar: "نضمن جودة كل منتج نبيعه",
+  },
+  fastShippingDescription: {
+    fr: "Livraison rapide et fiable dans tout le Maroc",
+    ar: "توصيل سريع وموثوق في جميع أنحاء المغرب",
+  },
+  expertSupport: {
+    fr: "Support expert",
+    ar: "دعم متخصص",
+  },
+  expertSupportDescription: {
+    fr: "Notre équipe d'experts est là pour vous aider",
+    ar: "فريقنا من الخبراء هنا لمساعدتك",
+  },
+  filterProducts: {
+    fr: "Filtrer les produits",
+    ar: "تصفية المنتجات",
+  },
+  filterProductsDescription: {
+    fr: "Utilisez les filtres ci-dessous pour trouver exactement ce que vous cherchez",
+    ar: "استخدم الفلاتر أدناه للعثور على ما تبحث عنه بالضبط",
+  },
+  searchProducts: {
+    fr: "Rechercher des produits...",
+    ar: "البحث عن منتجات...",
+  },
+  selectCategory: {
+    fr: "Sélectionner une catégorie",
+    ar: "اختر فئة",
+  },
+  allCategories: {
+    fr: "Toutes les catégories",
+    ar: "جميع الفئات",
+  },
+  stockStatus: {
+    fr: "État du stock",
+    ar: "حالة المخزون",
+  },
+  viewDetails: {
+    fr: "Voir les détails",
+    ar: "عرض التفاصيل",
+  },
+  selectSizeForAllItems: {
+    fr: "Veuillez sélectionner une taille pour tous les articles",
+    ar: "الرجاء اختيار مقاس لجميع المنتجات",
+  },
+  addedToCart: {
+    fr: "Produit ajouté au panier",
+    ar: "تمت إضافة المنتج إلى السلة",
+  },
+  back: {
+    fr: "Retour",
+    ar: "رجوع",
+  },
+  selectSizes: {
+    fr: "Sélectionner les tailles",
+    ar: "اختر المقاسات",
+  },
+  backToCart: {
+    fr: "Retour au panier",
+    ar: "العودة إلى السلة",
+  },
+  orderInformation: {
+    fr: "Informations de commande",
+    ar: "معلومات الطلب",
+  },
+  emptyCartMessage: {
+    fr: "Vous n'avez pas encore ajouté de produits à votre panier.",
+    ar: "لم تقم بإضافة أي منتجات إلى سلة التسوق بعد.",
+  },
+  cartEmpty: {
+    fr: "Votre panier est vide",
+    ar: "سلة التسوق فارغة",
+  },
+  orderPlacedSuccess: {
+    fr: "Commande passée avec succès ! Nous vous contacterons bientôt pour confirmer votre commande.",
+    ar: "تم تقديم الطلب بنجاح! سنتواصل معك قريبًا لتأكيد طلبك.",
+  },
+  orderPlacementError: {
+    fr: "Un problème est survenu lors de la passation de votre commande. Veuillez réessayer.",
+    ar: "حدثت مشكلة أثناء تقديم طلبك. يرجى المحاولة مرة أخرى.",
+  },
+  updatedCart: {
+    fr: "Panier mis à jour",
+    ar: "تم تحديث السلة",
+  },
+  removedFromCart: {
+    fr: "Produit retiré du panier",
+    ar: "تمت إزالة المنتج من السلة",
+  },
+  cartCleared: {
+    fr: "Panier vidé",
+    ar: "تم تفريغ السلة",
+  },
+  item: {
+    fr: "article",
+    ar: "منتج",
+  },
+  items: {
+    fr: "articles",
+    ar: "منتجات",
+  },
+  product: {
+    fr: "Produit",
+    ar: "المنتج",
+  },
+  clearCart: {
+    fr: "Vider le panier",
+    ar: "تفريغ السلة",
+  },
+  payAfterDelivery: {
+    fr: "Paiement à la livraison",
+    ar: "الدفع عند الاستلام",
+  },
+  deliveryConfirmation: {
+    fr: "Nous vous contacterons pour confirmer votre commande et livrer à votre adresse.",
+    ar: "سنتواصل معك لتأكيد طلبك والتوصيل إلى عنوانك.",
+  },
+  fullName: {
+    fr: "Nom complet",
+    ar: "الاسم الكامل",
+  },
+  enterFullName: {
+    fr: "Entrez votre nom complet",
+    ar: "أدخل اسمك الكامل",
+  },
+  emailAddress: {
+    fr: "Adresse e-mail",
+    ar: "البريد الإلكتروني",
+  },
+  enterEmailAddress: {
+    fr: "Entrez votre adresse e-mail",
+    ar: "أدخل بريدك الإلكتروني",
+  },
+  phoneNumber: {
+    fr: "Numéro de téléphone",
+    ar: "رقم الهاتف",
+  },
+  enterPhoneNumber: {
+    fr: "Entrez votre numéro de téléphone",
+    ar: "أدخل رقم هاتفك",
+  },
+  deliveryAddress: {
+    fr: "Adresse de livraison",
+    ar: "عنوان التوصيل",
+  },
+  enterDeliveryAddress: {
+    fr: "Entrez votre adresse de livraison complète",
+    ar: "أدخل عنوان التوصيل الكامل",
+  },
+  agreeToPolicies: {
+    fr: "En passant votre commande, vous acceptez nos :",
+    ar: "بإتمام طلبك، فإنك توافق على :",
+  },
+  shippingPolicy: {
+    fr: "Politique de livraison",
+    ar: "سياسة الشحن",
+  },
+  placeOrder: {
+    fr: "Passer la commande",
+    ar: "تأكيد الطلب",
+  },
+  subtotal: {
+    fr: "Sous-total",
+    ar: "المجموع الفرعي",
+  },
+  free: {
+    fr: "Gratuit",
+    ar: "مجاني",
+  },
+  proceedToCheckout: {
+    fr: "Passer à la commande",
+    ar: "المتابعة إلى الدفع",
+  },
+  payAfterReceiving: {
+    fr: "Paiement à la réception de votre commande",
+    ar: "الدفع عند استلام طلبك",
+  },
+  // Admin page translations
+  adminDashboard: {
+    fr: "Tableau de bord administrateur",
+    ar: "لوحة تحكم المشرف",
+  },
+  backToHome: {
+    fr: "Retour à l'accueil",
+    ar: "العودة إلى الرئيسية",
+  },
+  categories: {
+    fr: "Catégories",
+    ar: "الفئات",
+  },
+  manageProductsDescription: {
+    fr: "Gérez vos produits, ajoutez-en de nouveaux ou modifiez les existants",
+    ar: "إدارة منتجاتك، إضافة منتجات جديدة أو تعديل المنتجات الموجودة",
+  },
+  manageCategories: {
+    fr: "Gérer les catégories",
+    ar: "إدارة الفئات",
+  },
+  manageCategoriesDescription: {
+    fr: "Gérez les catégories de produits et leurs tailles disponibles",
+    ar: "إدارة فئات المنتجات والمقاسات المتاحة",
+  },
+  addCategory: {
+    fr: "Ajouter une catégorie",
+    ar: "إضافة فئة",
+  },
+  editCategory: {
+    fr: "Modifier la catégorie",
+    ar: "تعديل الفئة",
+  },
+  editCategoryDescription: {
+    fr: "Modifiez les détails de la catégorie et ses tailles disponibles",
+    ar: "تعديل تفاصيل الفئة والمقاسات المتاحة",
+  },
+  addCategoryDescription: {
+    fr: "Créez une nouvelle catégorie avec ses tailles disponibles",
+    ar: "إنشاء فئة جديدة مع المقاسات المتاحة",
+  },
+  categoryName: {
+    fr: "Nom de la catégorie",
+    ar: "اسم الفئة",
+  },
+  enterCategoryName: {
+    fr: "Entrez le nom de la catégorie",
+    ar: "أدخل اسم الفئة",
+  },
+  sizes: {
+    fr: "Tailles",
+    ar: "المقاسات",
+  },
+  enterSize: {
+    fr: "Entrez une taille",
+    ar: "أدخل مقاساً",
+  },
+  addSize: {
+    fr: "Ajouter une taille",
+    ar: "إضافة مقاس",
+  },
+  deleteCategory: {
+    fr: "Supprimer la catégorie",
+    ar: "حذف الفئة",
+  },
+  deleteCategoryConfirmation: {
+    fr: "Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible.",
+    ar: "هل أنت متأكد من رغبتك في حذف هذه الفئة؟ لا يمكن التراجع عن هذا الإجراء.",
+  },
+  image: {
+    fr: "Image",
+    ar: "الصورة",
+  },
+  actions: {
+    fr: "Actions",
+    ar: "الإجراءات",
+  },
+  deleteProductConfirmation: {
+    fr: "Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.",
+    ar: "هل أنت متأكد من رغبتك في حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+  },
+  unauthorizedAccess: {
+    fr: "Accès non autorisé",
+    ar: "وصول غير مصرح به",
+  },
+  // Product form translations
+  backToAdmin: {
+    fr: "Retour à l'administration",
+    ar: "العودة إلى لوحة التحكم",
+  },
+  editProductDetails: {
+    fr: "Modifier les détails du produit",
+    ar: "تعديل تفاصيل المنتج",
+  },
+  addProductDetails: {
+    fr: "Ajouter un nouveau produit",
+    ar: "إضافة منتج جديد",
+  },
+  editProductDescription: {
+    fr: "Modifiez les informations du produit ci-dessous",
+    ar: "قم بتعديل معلومات المنتج أدناه",
+  },
+  addProductDescription: {
+    fr: "Remplissez les informations du produit ci-dessous",
+    ar: "املأ معلومات المنتج أدناه",
+  },
+  productName: {
+    fr: "Nom du produit",
+    ar: "اسم المنتج",
+  },
+  discountPrice: {
+    fr: "Prix réduit",
+    ar: "السعر المخفض",
+  },
+  images: {
+    fr: "Images",
+    ar: "الصور",
+  },
+  productUpdated: {
+    fr: "Produit mis à jour avec succès",
+    ar: "تم تحديث المنتج بنجاح",
+  },
+  productAdded: {
+    fr: "Produit ajouté avec succès",
+    ar: "تمت إضافة المنتج بنجاح",
+  },
+  errorSavingProduct: {
+    fr: "Erreur lors de l'enregistrement du produit",
+    ar: "خطأ في حفظ المنتج",
+  },
+  errorLoadingData: {
+    fr: "Erreur lors du chargement des données",
+    ar: "خطأ في تحميل البيانات",
+  },
+  // ImageDropzone translations
+  dropImagesHere: {
+    fr: "Déposez l'image ici",
+    ar: "أسقط الصورة هنا",
+  },
+  dropImagesHereMultiple: {
+    fr: "Déposez les images ici",
+    ar: "أسقط الصور هنا",
+  },
+  dragDropImage: {
+    fr: "Glissez et déposez votre image de produit ici ou cliquez pour sélectionner",
+    ar: "اسحب وأفلت صورة المنتج هنا أو انقر للاختيار",
+  },
+  dragDropImages: {
+    fr: "Glissez et déposez vos images de produit ici ou cliquez pour sélectionner (max 5)",
+    ar: "اسحب وأفلت صور المنتج هنا أو انقر للاختيار (الحد الأقصى 5)",
+  },
+  productPreview: {
+    fr: "Aperçu du produit",
+    ar: "معاينة المنتج",
+  },
+  productPreviewMultiple: {
+    fr: "Aperçu du produit {index}",
+    ar: "معاينة المنتج {index}",
+  },
+  // Homepage feature translations
+  fastShipping: {
+    fr: "Livraison rapide",
+    ar: "توصيل سريع",
+  },
+  qualityAssurance: {
+    fr: "Garantie qualité",
+    ar: "ضمان الجودة",
+  },
+  // Contact form placeholders
+  yourPhone: {
+    fr: "Votre numéro de téléphone",
+    ar: "رقم هاتفك",
+  },
+  enterPhone: {
+    fr: "+212-600-000-000",
+    ar: "+212-600-000-000",
+  },
+  phoneNumberTooShort: {
+    fr: "Le numéro de téléphone doit contenir au moins 10 chiffres",
+    ar: "يجب أن يحتوي رقم الهاتف على 10 أرقام على الأقل",
+  },
+  phoneNumberFormat: {
+    fr: "Veuillez entrer un numéro de téléphone valide (minimum 10 chiffres)",
+    ar: "الرجاء إدخال رقم هاتف صالح (10 أرقام على الأقل)",
+  },
+  enterSubject: {
+    fr: "Comment pouvons-nous vous aider ?",
+    ar: "كيف يمكننا مساعدتك؟",
+  },
+  enterMessage: {
+    fr: "Écrivez votre message ici...",
+    ar: "اكتب رسالتك هنا...",
+  },
+  direction: {
+    fr: "ltr",
+    ar: "rtl",
   },
 };
 

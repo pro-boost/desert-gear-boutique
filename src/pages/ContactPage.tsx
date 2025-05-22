@@ -16,19 +16,46 @@ const ContactPage = () => {
     subject: "",
     message: "",
   });
+  const [phoneError, setPhoneError] = useState("");
+
+  const validatePhone = (phone: string) => {
+    // Remove any non-digit characters
+    const digitsOnly = phone.replace(/\D/g, "");
+    if (digitsOnly.length < 10) {
+      setPhoneError(t("phoneNumberTooShort"));
+      return false;
+    }
+    setPhoneError("");
+    return true;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    if (id === "phone") {
+      // Only allow digits, spaces, and common phone number separators
+      const sanitizedValue = value.replace(/[^\d\s\-+()]/g, "");
+      setFormData((prev) => ({
+        ...prev,
+        [id]: sanitizedValue,
+      }));
+      validatePhone(sanitizedValue);
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!validatePhone(formData.phone)) {
+      toast.error(t("phoneNumberTooShort"));
+      return;
+    }
 
     // Create WhatsApp message
     const whatsappMessage = `New Contact Form Submission:\n\nName: ${formData.name}\nEmail: ${formData.email}\nPhone: ${formData.phone}\nSubject: ${formData.subject}\nMessage: ${formData.message}`;
@@ -41,17 +68,26 @@ const ContactPage = () => {
     toast.success(t("messageSentSuccess"));
   };
 
+  const isRTL = t("direction") === "rtl";
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-heading font-bold mb-12 text-center">
           {t("contactUs")}
         </h1>
+        <p className="text-lg text-muted-foreground text-center mb-12">
+          {t("contactDescription")}
+        </p>
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-card rounded-xl p-8 shadow-lg">
-            <h2 className="text-2xl font-semibold mb-6 text-center sm:text-left">
+            <h2
+              className={`text-2xl font-semibold mb-6 ${
+                isRTL ? "text-right" : "text-left"
+              }`}
+            >
               {t("sendMessage")}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -66,8 +102,9 @@ const ContactPage = () => {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="Full name"
+                    placeholder={t("enterFullName")}
                     className="w-full"
+                    dir={isRTL ? "rtl" : "ltr"}
                   />
                 </div>
 
@@ -83,6 +120,7 @@ const ContactPage = () => {
                     onChange={handleChange}
                     placeholder="email@example.com"
                     className="w-full"
+                    dir={isRTL ? "rtl" : "ltr"}
                   />
                 </div>
               </div>
@@ -97,9 +135,16 @@ const ContactPage = () => {
                   required
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="+212-600-000-000"
-                  className="w-full"
+                  placeholder={t("enterPhone")}
+                  className={`w-full ${phoneError ? "border-red-500" : ""}`}
+                  dir={isRTL ? "rtl" : "ltr"}
+                  minLength={10}
+                  pattern="[0-9\s\-+()]{10,}"
+                  title={t("phoneNumberFormat")}
                 />
+                {phoneError && (
+                  <p className="text-sm text-red-500 mt-1">{phoneError}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -112,22 +157,24 @@ const ContactPage = () => {
                   required
                   value={formData.subject}
                   onChange={handleChange}
-                  placeholder="How can we help you?"
+                  placeholder={t("enterSubject")}
                   className="w-full"
+                  dir={isRTL ? "rtl" : "ltr"}
                 />
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="message" className="block text-sm font-medium ">
+                <label htmlFor="message" className="block text-sm font-medium">
                   {t("message")}
                 </label>
                 <Textarea
                   id="message"
-                  placeholder={t("typeYourMessage")}
+                  placeholder={t("enterMessage")}
                   required
                   className="min-h-[150px] resize-none"
                   value={formData.message}
                   onChange={handleChange}
+                  dir={isRTL ? "rtl" : "ltr"}
                 />
               </div>
 
@@ -140,13 +187,16 @@ const ContactPage = () => {
           {/* Contact Information */}
           <div className="space-y-8">
             <div className="bg-card rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-semibold mb-6 text-center sm:text-left">
+              <h2
+                className={`text-2xl font-semibold mb-6 ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
+              >
                 {t("findUs")}
               </h2>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <MapPin className="w-6 h-6 text-primary mt-1 flex-shrink-0" />
-
                   <a
                     href="https://www.google.com/maps?ll=33.864917,-5.548397&z=16&t=m&hl=fr&gl=MA&mapclient=embed&cid=13595266919245187657"
                     target="_blank"
@@ -186,7 +236,11 @@ const ContactPage = () => {
             </div>
 
             <div className="bg-card rounded-xl p-8 shadow-lg">
-              <h2 className="text-2xl font-semibold mb-6 text-center sm:text-left">
+              <h2
+                className={`text-2xl font-semibold mb-6 ${
+                  isRTL ? "text-right" : "text-left"
+                }`}
+              >
                 {t("followUs")}
               </h2>
               <div className="flex gap-6 justify-center">

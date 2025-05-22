@@ -21,7 +21,7 @@ const CartPage = () => {
 
   const handleProceedToCheckout = () => {
     if (items.length === 0) {
-      toast.error(t("emptyCart"));
+      toast.error(t("cartEmpty"));
       return;
     }
     setIsCheckoutStep(true);
@@ -31,7 +31,7 @@ const CartPage = () => {
     shippingData: Omit<ShippingAddress, "id">
   ) => {
     if (items.length === 0) {
-      toast.error("Your cart is empty");
+      toast.error(t("cartEmpty"));
       return;
     }
 
@@ -53,9 +53,7 @@ const CartPage = () => {
       // Clear cart after successful order
       clearCart();
 
-      toast.success(
-        "Order placed successfully! We'll contact you shortly to confirm your order."
-      );
+      toast.success(t("orderPlacedSuccess"));
 
       // Redirect to order confirmation or home page
       setTimeout(() => {
@@ -63,7 +61,7 @@ const CartPage = () => {
       }, 2000);
     } catch (error) {
       console.error("Error placing order:", error);
-      toast.error("There was a problem placing your order. Please try again.");
+      toast.error(t("orderPlacementError"));
       setIsProcessingOrder(false);
     }
   };
@@ -72,7 +70,7 @@ const CartPage = () => {
     <main className="flex-grow py-8">
       <div className="container mx-auto px-4">
         <h1 className="text-3xl font-heading font-bold mb-8">
-          {isCheckoutStep ? "Checkout" : t("cart")}
+          {isCheckoutStep ? t("checkout") : t("cart")}
         </h1>
 
         {items.length > 0 ? (
@@ -97,7 +95,7 @@ const CartPage = () => {
             >
               <div className="bg-card rounded-lg border border-border overflow-hidden lg:sticky lg:top-24 shadow-sm">
                 <div className="p-4 border-b border-border bg-muted/50 flex items-center justify-between">
-                  <h2 className="font-semibold">Order Information</h2>
+                  <h2 className="font-semibold">{t("orderInformation")}</h2>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -105,7 +103,7 @@ const CartPage = () => {
                     className="lg:hidden"
                   >
                     <ArrowLeft className="mr-2 h-4 w-4" />
-                    Back to Cart
+                    {t("backToCart")}
                   </Button>
                 </div>
 
@@ -126,9 +124,9 @@ const CartPage = () => {
                 size={64}
                 className="mx-auto mb-4 text-muted-foreground"
               />
-              <h2 className="text-2xl font-medium mb-2">{t("emptyCart")}</h2>
+              <h2 className="text-2xl font-medium mb-2">{t("cartEmpty")}</h2>
               <p className="text-muted-foreground mb-6">
-                You haven't added any products to your cart yet.
+                {t("emptyCartMessage")}
               </p>
               <Button asChild>
                 <Link to="/products">{t("shopNow")}</Link>
