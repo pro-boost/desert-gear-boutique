@@ -9,7 +9,7 @@ import {
 import { useUser } from "@clerk/clerk-react";
 
 // Pages
-import Index from "./pages/Index";
+import HomePage from "./pages/HomePage";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetail from "./pages/ProductDetail";
 import CartPage from "./pages/CartPage";
@@ -57,7 +57,7 @@ const AppRoutes = () => {
     <>
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/products/:id" element={<ProductDetail />} />
         <Route path="/contact" element={<ContactPage />} />

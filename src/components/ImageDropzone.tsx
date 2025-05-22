@@ -23,13 +23,12 @@ interface MultiImageDropzoneProps
 
 type CombinedImageDropzoneProps = ImageDropzoneProps | MultiImageDropzoneProps;
 
-const ImageDropzone = ({
-  onImageUpload,
-  currentImage,
-  onImageRemove,
-  multiple = false,
-  currentImages,
-}: CombinedImageDropzoneProps) => {
+const ImageDropzone = (props: CombinedImageDropzoneProps) => {
+  const { onImageUpload, onImageRemove, multiple = false } = props;
+  const currentImage = "currentImage" in props ? props.currentImage : undefined;
+  const currentImages =
+    "currentImages" in props ? props.currentImages : undefined;
+
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
       if (multiple) {
