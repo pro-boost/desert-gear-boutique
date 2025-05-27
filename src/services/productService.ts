@@ -317,15 +317,99 @@ export const deleteProduct = async (
   }
 };
 
-// Filter products based on criteria
+// Define essential fields for product listings
+const ESSENTIAL_FIELDS = 'id, name, price, discount_price, images, category, in_stock, featured, created_at';
+
+// Get featured products with essential fields
+export const getFeaturedProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select(ESSENTIAL_FIELDS)
+      .eq('featured', true)
+      .order('created_at', { ascending: false })
+      .limit(6);
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching featured products:', error);
+    toast.error('Failed to fetch featured products');
+    return [];
+  }
+};
+
+// Get new arrivals with essential fields
+export const getNewArrivals = async (
+  client: SupabaseClient<Database>,
+  count: number = 6
+): Promise<Product[]> => {
+  try {
+    const { data, error } = await client
+      .from('products')
+      .select(ESSENTIAL_FIELDS)
+      .order('created_at', { ascending: false })
+      .limit(count);
+
+    if (error) throw error;
+
+    return data.map(convertToCamelCase<Product>);
+  } catch (error) {
+    console.error('Error fetching new arrivals:', error);
+    toast.error('Failed to fetch new arrivals');
+    return [];
+  }
+};
+
+// Get products by category with essential fields and pagination
+export const getProductsByCategory = async (
+  client: SupabaseClient<Database>,
+  category: string,
+  page: number = 1,
+  pageSize: number = 12
+): Promise<{ products: Product[]; total: number }> => {
+  try {
+    // Get total count
+    const { count, error: countError } = await client
+      .from('products')
+      .select('*', { count: 'exact', head: true })
+      .eq('category', category);
+
+    if (countError) throw countError;
+
+    // Get paginated products
+    const { data, error } = await client
+      .from('products')
+      .select(ESSENTIAL_FIELDS)
+      .eq('category', category)
+      .order('created_at', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1);
+
+    if (error) throw error;
+
+    return {
+      products: data.map(convertToCamelCase<Product>),
+      total: count || 0
+    };
+  } catch (error) {
+    console.error('Error fetching products by category:', error);
+    toast.error('Failed to fetch products by category');
+    return { products: [], total: 0 };
+  }
+};
+
+// Filter products with essential fields and pagination
 export const filterProducts = async (
   client: SupabaseClient<Database>,
-  filters: ProductFilters
-): Promise<Product[]> => {
+  filters: ProductFilters,
+  page: number = 1,
+  pageSize: number = 12
+): Promise<{ products: Product[]; total: number }> => {
   try {
     let query = client
       .from('products')
-      .select('*');
+      .select(ESSENTIAL_FIELDS, { count: 'exact' });
 
     // Apply category filter
     if (filters.category && filters.category !== 'all') {
@@ -342,77 +426,19 @@ export const filterProducts = async (
       query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
     }
 
-    const { data, error } = await query.order('created_at', { ascending: false });
+    const { data, error, count } = await query
+      .order('created_at', { ascending: false })
+      .range((page - 1) * pageSize, page * pageSize - 1);
 
     if (error) throw error;
 
-    return data.map(convertToCamelCase<Product>);
+    return {
+      products: data.map(convertToCamelCase<Product>),
+      total: count || 0
+    };
   } catch (error) {
     console.error('Error filtering products:', error);
     toast.error('Failed to filter products');
-    return [];
-  }
-};
-
-// Get featured products
-export const getFeaturedProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
-  try {
-    const { data, error } = await client
-      .from('products')
-      .select('*')
-      .eq('featured', true)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(convertToCamelCase<Product>);
-  } catch (error) {
-    console.error('Error fetching featured products:', error);
-    toast.error('Failed to fetch featured products');
-    return [];
-  }
-};
-
-// Get new arrivals (most recent products)
-export const getNewArrivals = async (
-  client: SupabaseClient<Database>,
-  count: number = 4
-): Promise<Product[]> => {
-  try {
-    const { data, error } = await client
-      .from('products')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(count);
-
-    if (error) throw error;
-
-    return data.map(convertToCamelCase<Product>);
-  } catch (error) {
-    console.error('Error fetching new arrivals:', error);
-    toast.error('Failed to fetch new arrivals');
-    return [];
-  }
-};
-
-// Get products by category
-export const getProductsByCategory = async (
-  client: SupabaseClient<Database>,
-  category: string
-): Promise<Product[]> => {
-  try {
-    const { data, error } = await client
-      .from('products')
-      .select('*')
-      .eq('category', category)
-      .order('created_at', { ascending: false });
-
-    if (error) throw error;
-
-    return data.map(convertToCamelCase<Product>);
-  } catch (error) {
-    console.error('Error fetching products by category:', error);
-    toast.error('Failed to fetch products by category');
-    return [];
+    return { products: [], total: 0 };
   }
 };

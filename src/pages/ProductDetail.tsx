@@ -137,10 +137,19 @@ const ProductDetail = () => {
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value > 0) {
+    const value = e.target.value;
+
+    // Allow empty input temporarily
+    if (value === "") {
+      setQuantity(0);
+      return;
+    }
+
+    const numValue = parseInt(value);
+    if (!isNaN(numValue)) {
+      // Ensure value is between 1 and 5
+      const newQuantity = Math.min(5, Math.max(1, numValue));
       const oldQuantity = quantity;
-      const newQuantity = value;
 
       setQuantity(newQuantity);
 
@@ -153,6 +162,44 @@ const ProductDetail = () => {
           // Remove items from the end
           return prev.slice(0, newQuantity);
         }
+      });
+
+      // Show toast if max limit is reached
+      if (numValue > 5) {
+        toast.info(t("maxQuantityReached"));
+      }
+    }
+  };
+
+  // Add a blur handler to ensure value is within limits
+  const handleQuantityBlur = () => {
+    if (quantity < 1) {
+      setQuantity(1);
+    } else if (quantity > 5) {
+      setQuantity(5);
+      toast.info(t("maxQuantityReached"));
+    }
+  };
+
+  // Add increment/decrement handlers
+  const handleIncrement = () => {
+    if (quantity < 5) {
+      setQuantity((prev) => {
+        const newQuantity = prev + 1;
+        setSelectedSizes((prevSizes) => [...prevSizes, ""]);
+        return newQuantity;
+      });
+    } else {
+      toast.info(t("maxQuantityReached"));
+    }
+  };
+
+  const handleDecrement = () => {
+    if (quantity > 1) {
+      setQuantity((prev) => {
+        const newQuantity = prev - 1;
+        setSelectedSizes((prevSizes) => prevSizes.slice(0, newQuantity));
+        return newQuantity;
       });
     }
   };
@@ -440,16 +487,41 @@ const ProductDetail = () => {
                 {product.inStock && (
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      {t("quantity")}
+                      {t("quantity")}{" "}
+                      <span className="text-muted-foreground text-xs">
+                        (max 5)
+                      </span>
                     </label>
-                    <Input
-                      type="number"
-                      min="1"
-                      value={quantity}
-                      onChange={handleQuantityChange}
-                      className="w-32"
-                      disabled={!product.inStock}
-                    />
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleDecrement}
+                        disabled={quantity <= 1 || !product.inStock}
+                        className="h-10 w-10"
+                      >
+                        -
+                      </Button>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="5"
+                        value={quantity || ""}
+                        onChange={handleQuantityChange}
+                        onBlur={handleQuantityBlur}
+                        className="w-20 text-center"
+                        disabled={!product.inStock}
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={handleIncrement}
+                        disabled={quantity >= 5 || !product.inStock}
+                        className="h-10 w-10"
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 )}
 

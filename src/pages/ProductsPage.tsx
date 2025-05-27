@@ -44,6 +44,7 @@ const ProductsPage = () => {
   });
 
   const [products, setProducts] = useState<Product[]>([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [categories, setCategories] = useState<
     { name: string; sizes: string[] }[]
   >([]);
@@ -68,8 +69,12 @@ const ProductsPage = () => {
       try {
         setLoading(true);
         const client = await getClient();
-        const filteredProducts = await filterProducts(client, filters);
+        const { products: filteredProducts, total } = await filterProducts(
+          client,
+          filters
+        );
         setProducts(filteredProducts);
+        setTotalProducts(total);
       } catch (error) {
         console.error("Error loading products:", error);
       } finally {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getFeaturedProducts, getNewArrivals } from "@/services/productService";
@@ -20,6 +20,10 @@ import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
 import MapComponent from "@/components/map/MapComponent";
 import { motion } from "framer-motion";
+import { ProductSkeletonGrid } from "@/components/ui/product-skeleton";
+
+// Lazy load the hero image
+const HeroImage = React.lazy(() => import("../components/ui/HeroImage"));
 
 const HomePage = () => {
   const { t } = useLanguage();
@@ -45,6 +49,7 @@ const HomePage = () => {
       try {
         setLoading(true);
         const client = await getClient();
+        // Fetch featured and new products in parallel
         const [featured, newProducts] = await Promise.all([
           getFeaturedProducts(client),
           getNewArrivals(client),
@@ -65,14 +70,6 @@ const HomePage = () => {
     loadProducts();
   }, [getClient]);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -83,24 +80,11 @@ const HomePage = () => {
           transition={{ duration: 1 }}
           className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30 z-10"
         />
-        <img
-          src="/images/main/soldier-8499582_1280.webp"
-          alt="Desert Gear Boutique"
-          className="absolute inset-0 w-full h-full object-cover"
-          fetchPriority="high"
-          loading="eager"
-          style={{
-            animation: "scaleIn 1.5s ease-out forwards",
-          }}
-        />
-        <style>
-          {`
-            @keyframes scaleIn {
-              from { transform: scale(1.1); }
-              to { transform: scale(1); }
-            }
-          `}
-        </style>
+        <Suspense
+          fallback={<div className="absolute inset-0 bg-muted animate-pulse" />}
+        >
+          <HeroImage />
+        </Suspense>
         <div className="container max-w-5xl mx-auto px-4 relative z-20 py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -148,39 +132,47 @@ const HomePage = () => {
           </motion.div>
 
           <div className="relative max-w-5xl mx-auto">
-            <div className="overflow-hidden" ref={emblaRef}>
-              <div className="flex -ml-6">
-                {products.map((product, index) => (
-                  <motion.div
-                    key={product.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    className="min-w-0 flex-[0_0_calc(100%-1.5rem)] sm:flex-[0_0_calc(50%-1.5rem)] md:flex-[0_0_calc(33.333%-1.5rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] pl-6"
-                  >
-                    <ProductCard product={product} />
-                  </motion.div>
-                ))}
+            {loading ? (
+              <ProductSkeletonGrid count={6} />
+            ) : (
+              <div className="overflow-hidden" ref={emblaRef}>
+                <div className="flex -ml-6">
+                  {products.map((product, index) => (
+                    <motion.div
+                      key={product.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      className="min-w-0 flex-[0_0_calc(100%-1.5rem)] sm:flex-[0_0_calc(50%-1.5rem)] md:flex-[0_0_calc(33.333%-1.5rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] pl-6"
+                    >
+                      <ProductCard product={product} />
+                    </motion.div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
-              onClick={scrollPrev}
-            >
-              <ChevronLeft className="h-6 w-6" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
-              onClick={scrollNext}
-            >
-              <ChevronRight className="h-6 w-6" />
-            </Button>
+            {!loading && (
+              <>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
+                  onClick={scrollPrev}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
+                  onClick={scrollNext}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>

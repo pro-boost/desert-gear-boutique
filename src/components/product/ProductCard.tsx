@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Image } from "@/components/ui/image";
+import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
@@ -26,32 +27,32 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const { addToCart } = useCart();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
   const { isSignedIn } = useUser();
-  const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
-  const handleFavoriteToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (isFavorite(product.id)) {
-      removeFromFavorites(product.id);
-    } else {
-      addToFavorites(product);
-    }
-  };
-
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(`/products/${product.id}`);
-  };
-
-  const favorited = isFavorite(product.id);
   const hasDiscount =
     product.discountPrice && product.discountPrice < product.price;
+
+  const handleAddToCart = () => {
+    if (!isSignedIn) {
+      toast.error(t("pleaseSignIn"));
+      navigate("/sign-in");
+      return;
+    }
+
+    if (!selectedSize && product.sizes && product.sizes.length > 0) {
+      toast.error(t("pleaseSelectSize"));
+      return;
+    }
+
+    addToCart(product, 1, selectedSize);
+    toast.success(t("addedToCart"));
+  };
 
   return (
     <Card
@@ -64,11 +65,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
       <div className="flex flex-col h-full">
         <div className="relative aspect-square">
           <Link to={`/products/${product.id}`} className="block h-full">
-            <Image
+            {isImageLoading && (
+              <div className="absolute inset-0 bg-muted animate-pulse" />
+            )}
+            <img
               src={product.images[0]}
               alt={product.name}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className={cn(
+                "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+                isImageLoading ? "opacity-0" : "opacity-100"
+              )}
               loading="lazy"
+              onLoad={() => setIsImageLoading(false)}
+              onError={() => {
+                setIsImageLoading(false);
+                // You could set a fallback image here
+              }}
             />
           </Link>
 
@@ -100,60 +112,89 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-3 right-3 bg-background/50 backdrop-blur-sm hover:bg-background/70 z-10"
-            onClick={handleFavoriteToggle}
-            type="button"
+            className={cn(
+              "absolute top-3 right-3 z-10 bg-background/80 backdrop-blur-sm hover:bg-background transition-all",
+              isFavorite(product.id) && "text-red-500 hover:text-red-600"
+            )}
+            onClick={(e) => {
+              e.preventDefault();
+              if (!isSignedIn) {
+                toast.error(t("pleaseSignIn"));
+                navigate("/sign-in");
+                return;
+              }
+              if (isFavorite(product.id)) {
+                removeFromFavorites(product.id);
+                toast.success(t("removedFromFavorites"));
+              } else {
+                addToFavorites(product);
+                toast.success(t("addedToFavorites"));
+              }
+            }}
           >
             <Heart
-              size={18}
-              className={`transition-colors ${
-                favorited ? "fill-orange-500 text-orange-500" : ""
-              }`}
+              className={cn(
+                "w-5 h-5 transition-all",
+                isFavorite(product.id) ? "fill-current" : "fill-none"
+              )}
             />
           </Button>
         </div>
 
-        <CardContent className="flex-grow p-4">
-          <Link to={`/products/${product.id}`} className="block">
-            <h3 className="font-heading font-semibold text-lg mb-2 line-clamp-1 transition-colors group-hover:text-orange-600">
+        <CardContent className="p-4 space-y-3">
+          <Link
+            to={`/products/${product.id}`}
+            className="block hover:underline focus:outline-none focus:underline"
+          >
+            <h3 className="font-semibold text-lg line-clamp-2">
               {product.name}
             </h3>
           </Link>
-          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-            {product.description}
-          </p>
 
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-center gap-2">
             {hasDiscount ? (
               <>
-                <span className="font-bold text-lg text-orange-600">
-                  {product.discountPrice.toFixed(2)} Dh
+                <span className="text-lg font-bold text-primary">
+                  ${product.discountPrice}
                 </span>
-                <span className="text-muted-foreground line-through text-sm">
-                  {product.price.toFixed(2)} Dh
+                <span className="text-sm text-muted-foreground line-through">
+                  ${product.price}
                 </span>
               </>
             ) : (
-              <span className="font-bold text-lg">
-                {product.price.toFixed(2)} Dh
-              </span>
+              <span className="text-lg font-bold">${product.price}</span>
             )}
           </div>
+
+          {product.sizes && product.sizes.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {product.sizes.map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "min-w-[2.5rem] h-8 px-2",
+                    selectedSize === size &&
+                      "bg-primary text-primary-foreground"
+                  )}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </Button>
+              ))}
+            </div>
+          )}
         </CardContent>
 
         <CardFooter className="p-4 pt-0">
           <Button
-            variant={product.inStock ? "default" : "outline"}
-            className={`w-full ${
-              isHovered && product.inStock
-                ? "bg-orange-500 shadow-lg shadow-orange-500/20"
-                : "bg-primary"
-            }`}
-            disabled={!product.inStock}
+            className="w-full"
             onClick={handleAddToCart}
+            disabled={!product.inStock}
           >
-            <ShoppingBag className="mr-2 h-4 w-4" />
-            {product.inStock ? t("viewDetails") : t("outOfStock")}
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            {product.inStock ? t("addToCart") : t("outOfStock")}
           </Button>
         </CardFooter>
       </div>
