@@ -1,5 +1,5 @@
-
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -28,81 +28,118 @@ export default {
         heading: ['Montserrat', 'sans-serif'],
       },
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
+        // Theme Colors
+        border: "hsl(var(--dg-border))",
+        input: "hsl(var(--dg-input))",
+        ring: "hsl(var(--dg-ring))",
+        background: "hsl(var(--dg-background))",
+        foreground: "hsl(var(--dg-foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "hsl(var(--dg-primary))",
+          foreground: "hsl(var(--dg-primary-foreground))",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "hsl(var(--dg-secondary))",
+          foreground: "hsl(var(--dg-secondary-foreground))",
         },
         destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+          DEFAULT: "hsl(var(--dg-destructive))",
+          foreground: "hsl(var(--dg-destructive-foreground))",
         },
         muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+          DEFAULT: "hsl(var(--dg-muted))",
+          foreground: "hsl(var(--dg-muted-foreground))",
         },
         accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
+          DEFAULT: "hsl(var(--dg-accent))",
+          foreground: "hsl(var(--dg-accent-foreground))",
         },
         popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
+          DEFAULT: "hsl(var(--dg-popover))",
+          foreground: "hsl(var(--dg-popover-foreground))",
         },
         card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+          DEFAULT: "hsl(var(--dg-card))",
+          foreground: "hsl(var(--dg-card-foreground))",
+          border: "hsl(var(--dg-card-border))",
+          shadow: "hsl(var(--dg-card-shadow))",
         },
-        olive: {
-          light: "#4A5D4C",
-          DEFAULT: "#3A4A3D",
-          dark: "#2A3A2D",
+        section: {
+          DEFAULT: "hsl(var(--dg-section-bg))",
+          border: "hsl(var(--dg-section-border))",
+        },
+
+        // Brand Colors
+        tactical: {
+          light: "hsl(var(--dg-tactical-light))",
+          DEFAULT: "hsl(var(--dg-tactical))",
+          dark: "hsl(var(--dg-tactical-dark))",
         },
         sand: {
-          light: "#E6DCC9",
-          DEFAULT: "#D6CCA9",
-          dark: "#C6BC99",
+          light: "hsl(var(--dg-sand-light))",
+          DEFAULT: "hsl(var(--dg-sand))",
+          dark: "hsl(var(--dg-sand-dark))",
         },
-        tactical: {
-          light: "#FF9C4C", // Brighter orange
-          DEFAULT: "#FF7C1A", // More vibrant base
-          dark: "#FF5500", // More vibrant dark
+        olive: {
+          light: "hsl(var(--dg-olive-light))",
+          DEFAULT: "hsl(var(--dg-olive))",
+          dark: "hsl(var(--dg-olive-dark))",
         },
-        orange: {
-          50: "#FFF8F2",
-          100: "#FFF0E6",
-          200: "#FFE1CC",
-          300: "#FFD1AD",
-          400: "#FFB578",
-          500: "#FF9843",
-          600: "#FF8A4C",
-          700: "#FF6B1A",
-          800: "#FF5500", // More vibrant
-          900: "#D14400", // More vibrant
+
+        // Utility Colors
+        success: {
+          DEFAULT: "hsl(var(--dg-success))",
+          foreground: "hsl(var(--dg-success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--dg-warning))",
+          foreground: "hsl(var(--dg-warning-foreground))",
+        },
+        error: {
+          DEFAULT: "hsl(var(--dg-error))",
+          foreground: "hsl(var(--dg-error-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--dg-info))",
+          foreground: "hsl(var(--dg-info-foreground))",
+        },
+
+        // Neutral Shades
+        neutral: {
+          50: "hsl(var(--dg-neutral-50))",
+          100: "hsl(var(--dg-neutral-100))",
+          200: "hsl(var(--dg-neutral-200))",
+          300: "hsl(var(--dg-neutral-300))",
+          400: "hsl(var(--dg-neutral-400))",
+          500: "hsl(var(--dg-neutral-500))",
+          600: "hsl(var(--dg-neutral-600))",
+          700: "hsl(var(--dg-neutral-700))",
+          800: "hsl(var(--dg-neutral-800))",
+          900: "hsl(var(--dg-neutral-900))",
+          950: "hsl(var(--dg-neutral-950))",
         },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          'primary-foreground': "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          'accent-foreground': "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))"
-        }
+          DEFAULT: "hsl(var(--dg-sidebar-background))",
+          foreground: "hsl(var(--dg-sidebar-foreground))",
+          primary: "hsl(var(--dg-sidebar-primary))",
+          'primary-foreground': "hsl(var(--dg-sidebar-primary-foreground))",
+          accent: "hsl(var(--dg-sidebar-accent))",
+          'accent-foreground': "hsl(var(--dg-sidebar-accent-foreground))",
+          border: "hsl(var(--dg-sidebar-border))",
+          ring: "hsl(var(--dg-sidebar-ring))"
+        },
+        motion: {
+          DEFAULT: "hsl(var(--dg-motion-bg))",
+          border: "hsl(var(--dg-motion-border))",
+          ring: "hsl(var(--dg-motion-ring))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        '3xl': '1.5rem',
+        '4xl': '2rem',
       },
       keyframes: {
         "accordion-down": {
@@ -138,7 +175,16 @@ export default {
         slideRight: 'slideRight 0.5s ease-out',
         cardPop: 'cardPop 0.4s ease-out',
       },
+      boxShadow: {
+        'card': '0 2px 4px 0 hsl(var(--dg-card-shadow)), 0 1px 2px -1px hsl(var(--dg-card-shadow))',
+        'card-hover': '0 8px 12px -2px hsl(var(--dg-card-shadow)), 0 4px 6px -3px hsl(var(--dg-card-shadow))',
+        'card-lg': '0 12px 20px -4px hsl(var(--dg-card-shadow)), 0 6px 8px -5px hsl(var(--dg-card-shadow))',
+        'section': '0 4px 6px -1px hsl(var(--dg-card-shadow)), 0 2px 4px -2px hsl(var(--dg-card-shadow))',
+        'section-hover': '0 10px 15px -3px hsl(var(--dg-card-shadow)), 0 4px 6px -4px hsl(var(--dg-card-shadow))',
+        'motion': '0 4px 8px -2px hsl(var(--dg-motion-shadow)), 0 2px 4px -3px hsl(var(--dg-motion-shadow))',
+        'motion-hover': '0 8px 16px -4px hsl(var(--dg-motion-shadow)), 0 4px 8px -5px hsl(var(--dg-motion-shadow))',
+      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate],
 } satisfies Config;

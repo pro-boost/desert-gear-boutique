@@ -94,7 +94,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             {hasDiscount && (
               <Badge
                 variant="secondary"
-                className="bg-tactical-light text-primary-foreground"
+                className="bg-tactical text-tactical-foreground"
               >
                 -{Math.round((1 - product.discountPrice / product.price) * 100)}
                 %

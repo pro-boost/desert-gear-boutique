@@ -1,0 +1,132 @@
+/**
+ * Desert Gear Boutique Color System
+ * 
+ * This file defines the centralized color system using CSS custom properties.
+ * Colors are organized into the following categories:
+ * 
+ * 1. Brand Colors
+ *    - Tactical: Orange-based colors for primary brand elements
+ *    - Sand: Desert-inspired neutral colors
+ *    - Olive: Military-inspired green tones
+ * 
+ * 2. Theme Colors
+ *    - Light/Dark mode variants for UI elements
+ *    - Semantic colors (primary, secondary, accent, etc.)
+ * 
+ * 3. Utility Colors
+ *    - Status colors (success, warning, error)
+ *    - Neutral shades
+ * 
+ * Usage:
+ * - Use CSS variables in your components: var(--dg-color-name)
+ * - Use Tailwind classes that reference these variables
+ * - For opacity variants, use the /{opacity} syntax: bg-primary/80
+ */
+
+:root {
+  /* Brand Colors - Tactical */
+  --dg-tactical-light: 24 100% 65%;  /* #FF9C4C */
+  --dg-tactical: 24 100% 50%;        /* #FF7C1A */
+  --dg-tactical-dark: 24 100% 40%;   /* #FF5500 */
+
+  /* Brand Colors - Sand */
+  --dg-sand-light: 39 45% 85%;       /* #E6DCC9 */
+  --dg-sand: 39 45% 75%;             /* #D6CCA9 */
+  --dg-sand-dark: 39 45% 65%;        /* #C6BC99 */
+
+  /* Brand Colors - Olive */
+  --dg-olive-light: 120 10% 30%;     /* #4A5D4C */
+  --dg-olive: 120 10% 25%;           /* #3A4A3D */
+  --dg-olive-dark: 120 10% 20%;      /* #2A3A2D */
+
+  /* Theme Colors - Light Mode */
+  --dg-background: 0 0% 100%;        /* #FFFFFF */
+  --dg-foreground: 240 10% 3.9%;     /* #09090B */
+  --dg-card: 0 0% 96%;               /* #F5F5F5 - Increased contrast from background */
+  --dg-card-foreground: 240 10% 3.9%; /* #09090B */
+  --dg-popover: 0 0% 96%;            /* #F5F5F5 - Matching card */
+  --dg-popover-foreground: 240 10% 3.9%; /* #09090B */
+  --dg-primary: var(--dg-tactical);   /* #FF7C1A */
+  --dg-primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --dg-secondary: 240 4.8% 92.9%;    /* #F1F1F3 - Increased contrast */
+  --dg-secondary-foreground: 240 5.9% 10%; /* #18181B */
+  --dg-muted: 240 4.8% 92.9%;        /* #F1F1F3 - Increased contrast */
+  --dg-muted-foreground: 240 3.8% 46.1%; /* #71717A */
+  --dg-accent: 240 4.8% 92.9%;       /* #F1F1F3 - Increased contrast */
+  --dg-accent-foreground: 240 5.9% 10%; /* #18181B */
+  --dg-destructive: 0 84.2% 60.2%;   /* #EF4444 */
+  --dg-destructive-foreground: 0 0% 98%; /* #FAFAFA */
+  --dg-border: 240 5.9% 85%;         /* #D4D4D8 - Increased contrast */
+  --dg-input: 240 5.9% 85%;          /* #D4D4D8 - Increased contrast */
+  --dg-ring: var(--dg-tactical);     /* #FF7C1A */
+
+  /* Card and Section Specific Colors - Light Mode */
+  --dg-card-border: 240 5.9% 85%;    /* #D4D4D8 - Increased contrast */
+  --dg-card-shadow: 240 5.9% 10% / 0.08; /* Stronger shadow */
+  --dg-section-bg: 240 4.8% 94.9%;   /* #F2F2F4 - Increased contrast */
+  --dg-section-border: 240 5.9% 85%; /* #D4D4D8 - Increased contrast */
+
+  /* Utility Colors */
+  --dg-success: 142 76% 36%;         /* #22C55E */
+  --dg-success-foreground: 0 0% 100%; /* #FFFFFF */
+  --dg-warning: 38 92% 50%;          /* #F59E0B */
+  --dg-warning-foreground: 0 0% 100%; /* #FFFFFF */
+  --dg-error: 0 84% 60%;             /* #EF4444 */
+  --dg-error-foreground: 0 0% 100%;  /* #FFFFFF */
+  --dg-info: 200 98% 39%;            /* #0EA5E9 */
+  --dg-info-foreground: 0 0% 100%;   /* #FFFFFF */
+
+  /* Neutral Shades */
+  --dg-neutral-50: 0 0% 98%;         /* #FAFAFA */
+  --dg-neutral-100: 0 0% 96%;        /* #F4F4F5 */
+  --dg-neutral-200: 0 0% 90%;        /* #E4E4E7 */
+  --dg-neutral-300: 0 0% 83%;        /* #D4D4D8 */
+  --dg-neutral-400: 0 0% 64%;        /* #A1A1AA */
+  --dg-neutral-500: 0 0% 45%;        /* #71717A */
+  --dg-neutral-600: 0 0% 32%;        /* #52525B */
+  --dg-neutral-700: 0 0% 25%;        /* #3F3F46 */
+  --dg-neutral-800: 0 0% 15%;        /* #27272A */
+  --dg-neutral-900: 0 0% 9%;         /* #18181B */
+  --dg-neutral-950: 0 0% 3%;         /* #09090B */
+
+  /* Motion Element Colors - Light Mode */
+  --dg-motion-bg: 0 0% 97%;          /* #F7F7F7 - Slightly darker than card */
+  --dg-motion-border: 240 5.9% 80%;  /* #C4C4C8 - Darker border for motion elements */
+  --dg-motion-shadow: 240 5.9% 10% / 0.1; /* Subtle shadow for motion elements */
+  --dg-motion-ring: var(--dg-tactical) / 0.2; /* Subtle ring effect */
+}
+
+/* Dark Mode Theme Colors */
+.dark {
+  --dg-background: 240 10% 3.9%;     /* #09090B */
+  --dg-foreground: 0 0% 98%;         /* #FAFAFA */
+  --dg-card: 240 10% 10.9%;          /* #161618 - Increased contrast from background */
+  --dg-card-foreground: 0 0% 98%;    /* #FAFAFA */
+  --dg-popover: 240 10% 10.9%;       /* #161618 - Matching card */
+  --dg-popover-foreground: 0 0% 98%; /* #FAFAFA */
+  --dg-primary: var(--dg-tactical-light); /* #FF9C4C */
+  --dg-primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --dg-secondary: 240 3.7% 22.9%;    /* #2E2E32 - Increased contrast */
+  --dg-secondary-foreground: 0 0% 98%; /* #FAFAFA */
+  --dg-muted: 240 3.7% 22.9%;        /* #2E2E32 - Increased contrast */
+  --dg-muted-foreground: 240 5% 64.9%; /* #A1A1AA */
+  --dg-accent: 240 3.7% 22.9%;       /* #2E2E32 - Increased contrast */
+  --dg-accent-foreground: 0 0% 98%;  /* #FAFAFA */
+  --dg-destructive: 0 62.8% 30.6%;   /* #7F1D1D */
+  --dg-destructive-foreground: 0 0% 98%; /* #FAFAFA */
+  --dg-border: 240 3.7% 28.9%;       /* #3A3A3F - Increased contrast */
+  --dg-input: 240 3.7% 28.9%;        /* #3A3A3F - Increased contrast */
+  --dg-ring: var(--dg-tactical-light); /* #FF9C4C */
+
+  /* Card and Section Specific Colors - Dark Mode */
+  --dg-card-border: 240 3.7% 30.9%;  /* #424248 - Increased contrast */
+  --dg-card-shadow: 0 0% 0% / 0.4;   /* Stronger shadow in dark mode */
+  --dg-section-bg: 240 10% 9.9%;     /* #131315 - Increased contrast */
+  --dg-section-border: 240 3.7% 30.9%; /* #424248 - Increased contrast */
+
+  /* Motion Element Colors - Dark Mode */
+  --dg-motion-bg: 240 10% 12.9%;     /* #1A1A1D - Slightly lighter than card */
+  --dg-motion-border: 240 3.7% 35.9%; /* #4A4A50 - Brighter border for motion elements */
+  --dg-motion-shadow: 0 0% 0% / 0.5;  /* Stronger shadow for motion elements */
+  --dg-motion-ring: var(--dg-tactical-light) / 0.3; /* Glowing ring effect */
+} 

@@ -82,7 +82,7 @@ const ContactPage = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="bg-card rounded-xl p-8 shadow-lg">
+          <div className="card-contrast p-8 hover:shadow-card-hover transition-all duration-300">
             <h2
               className={`text-2xl font-semibold mb-6 ${
                 isRTL ? "text-right" : "text-left"
@@ -186,7 +186,7 @@ const ContactPage = () => {
 
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="bg-card rounded-xl p-8 shadow-lg">
+            <div className="card-contrast p-8">
               <h2
                 className={`text-2xl font-semibold mb-6 ${
                   isRTL ? "text-right" : "text-left"
@@ -231,11 +231,11 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="bg-card rounded-xl shadow-lg">
+            <div className="card-contrast">
               <MapComponent />
             </div>
 
-            <div className="bg-card rounded-xl p-8 shadow-lg">
+            <div className="card-contrast p-8">
               <h2
                 className={`text-2xl font-semibold mb-6 ${
                   isRTL ? "text-right" : "text-left"

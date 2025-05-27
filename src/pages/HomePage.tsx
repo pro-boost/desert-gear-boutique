@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import MapComponent from "@/components/map/MapComponent";
 import { motion } from "framer-motion";
 import { ProductSkeletonGrid } from "@/components/ui/product-skeleton";
+import { features } from "@/constants/features";
 
 // Lazy load the hero image
 const HeroImage = React.lazy(() => import("../components/ui/HeroImage"));
@@ -190,32 +191,16 @@ const HomePage = () => {
             {t("whyChooseUs")}
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                icon: Shield,
-                title: t("qualityAssurance"),
-                description: t("qualityAssuranceDescription"),
-              },
-              {
-                icon: Truck,
-                title: t("fastShipping"),
-                description: t("fastShippingDescription"),
-              },
-              {
-                icon: Clock,
-                title: t("expertSupport"),
-                description: t("expertSupportDescription"),
-              },
-            ].map((item, index) => (
+            {features.map((item, index) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="flex flex-col h-full text-center p-8 rounded-2xl bg-card shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                className="card-contrast flex flex-col h-full text-center p-8 rounded-3xl hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
               >
-                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
                   <item.icon className="w-12 h-12 text-primary" />
                 </div>
                 <h3 className="text-2xl font-bold mb-4 tracking-tight">

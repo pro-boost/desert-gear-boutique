@@ -4,68 +4,12 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 3.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-
-    --primary: 24 100% 50%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 24 100% 50%;
-
+    /* These variables are now defined in colors.css */
     --radius: 0.5rem;
-    
-    --soft-bg: 30 38% 97%;
-    --soft-accent: 30 84% 96%;
   }
 
   .dark {
-    --background: 240 10% 3.9%;
-    --foreground: 0 0% 98%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 24 100% 60%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 3.7% 15.9%;
-    --input: 240 3.7% 15.9%;
-    --ring: 24 100% 60%;
+    /* Dark mode variables are now defined in colors.css */
   }
 }
 
@@ -74,7 +18,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    background-color: hsl(var(--dg-background));
+    background-image: radial-gradient(hsl(var(--dg-accent)/20) 1px, transparent 1px);
+    background-size: 20px 20px;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   html {
@@ -92,7 +39,7 @@
   }
   
   .card-hover {
-    @apply transition-all duration-300 ease-in-out hover:shadow-md hover:-translate-y-1 hover:scale-[1.02];
+    @apply hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300;
   }
 
   .nav-link {
@@ -117,13 +64,13 @@
   }
   
   .accent-pattern {
-    background-color: hsl(var(--background));
-    background-image: radial-gradient(hsl(var(--accent)/20) 1px, transparent 1px);
+    background-color: hsl(var(--dg-background));
+    background-image: radial-gradient(hsl(var(--dg-accent)/20) 1px, transparent 1px);
     background-size: 20px 20px;
   }
   
   .accent-bg-soft {
-    @apply bg-[hsl(var(--soft-accent))];
+    @apply bg-[hsl(var(--dg-soft-accent))];
   }
   
   .accent-border-subtle {
@@ -166,6 +113,54 @@
   
   .bg-orange-gradient-dark {
     @apply bg-gradient-to-br from-orange-900 to-orange-800;
+  }
+
+  /* Card Styles */
+  .card-base {
+    @apply bg-card border border-card-border shadow-card rounded-xl transition-all duration-300;
+  }
+
+  .card-lg {
+    @apply shadow-card-lg;
+  }
+
+  /* Section Styles */
+  .section-base {
+    @apply bg-section border border-section-border rounded-xl shadow-section;
+  }
+
+  .section-card {
+    @apply bg-card border border-card-border shadow-card rounded-xl p-6;
+  }
+
+  .section-card-hover {
+    @apply hover:shadow-section-hover hover:-translate-y-1 transition-all duration-300;
+  }
+
+  /* Enhanced card styles for better contrast */
+  .card-contrast {
+    @apply bg-card border-2 border-card-border shadow-card-lg;
+  }
+
+  .card-contrast-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-primary/20 transition-all duration-300;
+  }
+
+  .section-contrast {
+    @apply bg-section border-2 border-section-border shadow-section;
+  }
+
+  .section-contrast-hover {
+    @apply hover:shadow-section-hover hover:-translate-y-1 hover:border-primary/20 transition-all duration-300;
+  }
+
+  /* Glass effect with enhanced contrast */
+  .glass-card {
+    @apply backdrop-blur-md bg-card/95 border-2 border-card-border/50 shadow-card-lg;
+  }
+
+  .glass-card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-primary/30 transition-all duration-300;
   }
 }
 
@@ -357,12 +352,12 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--primary) / 0.7);
+    box-shadow: 0 0 0 0 rgba(var(--dg-primary) / 0.7);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(var(--primary) / 0);
+    box-shadow: 0 0 0 10px rgba(var(--dg-primary) / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(var(--primary) / 0);
+    box-shadow: 0 0 0 0 rgba(var(--dg-primary) / 0);
   }
 }

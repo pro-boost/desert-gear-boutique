@@ -391,7 +391,7 @@ const ProductDetail = () => {
                         </span>
                         <Badge
                           variant="secondary"
-                          className="bg-tactical-light text-white"
+                          className="bg-tactical text-tactical-foreground"
                         >
                           -
                           {Math.round(
@@ -570,9 +570,9 @@ const ProductDetail = () => {
                   >
                     <Heart
                       className={`h-6 w-6 ${
-                        isFavorite(product.id)
+                        isFavorite
                           ? "fill-tactical text-tactical"
-                          : ""
+                          : "fill-muted-foreground text-muted-foreground"
                       }`}
                     />
                   </Button>
