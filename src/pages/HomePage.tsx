@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { getFeaturedProducts, getNewArrivals } from "@/services/productService";
 import { Product } from "@/types/product";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import {
   Loader2,
@@ -18,7 +18,7 @@ import {
 import { useSupabase } from "@/hooks/useSupabase";
 import useEmblaCarousel from "embla-carousel-react";
 import { cn } from "@/lib/utils";
-import MapComponent from "@/components/MapComponent";
+import MapComponent from "@/components/map/MapComponent";
 import { motion } from "framer-motion";
 
 const HomePage = () => {

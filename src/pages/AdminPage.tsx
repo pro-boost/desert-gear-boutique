@@ -76,7 +76,7 @@ import {
   Loader2,
   ArrowLeft,
 } from "lucide-react";
-import ImageDropzone from "@/components/ImageDropzone";
+import ImageDropzone from "@/components/upload/ImageDropzone";
 import { useSupabase } from "@/hooks/useSupabase";
 import { useAdmin } from "@/hooks/useAdmin";
 import { Label } from "@/components/ui/label";

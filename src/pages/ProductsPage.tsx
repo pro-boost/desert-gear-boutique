@@ -3,7 +3,7 @@ import { useSearchParams, useLocation } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { filterProducts, getCategories } from "@/services/productService";
 import { ProductFilters, Product } from "@/types/product";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {

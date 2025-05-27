@@ -8,7 +8,7 @@ import {
   SignUp,
 } from "@clerk/clerk-react";
 import { useUser } from "@clerk/clerk-react";
-import BackToTopButton from "./components/BackToTopButton";
+import BackToTopButton from "@/components/ui/BackToTopButton";
 
 // Lazy load all pages
 const HomePage = lazy(() => import("./pages/HomePage"));

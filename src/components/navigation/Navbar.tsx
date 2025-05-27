@@ -260,34 +260,42 @@ const Navbar = () => {
                   </div>
                 </form>
 
-                {/* Mobile Navigation */}
-                <nav className="flex flex-col space-y-1 mb-4">
+                {/* Mobile Navigation Links */}
+                <nav className="flex flex-col gap-4 mb-4">
                   <Link
                     to="/"
-                    className="px-4 py-2 hover:bg-muted rounded-md transition-colors"
+                    className="nav-link-mobile"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t("home")}
                   </Link>
                   <Link
                     to="/products"
-                    className="px-4 py-2 hover:bg-muted rounded-md transition-colors"
+                    className="nav-link-mobile"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t("products")}
                   </Link>
                   <Link
                     to="/contact"
-                    className="px-4 py-2 hover:bg-muted rounded-md transition-colors"
+                    className="nav-link-mobile"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {t("contactUs")}
                   </Link>
+                  {isSignedIn && user?.publicMetadata.isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="nav-link-mobile"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t("admin")}
+                    </Link>
+                  )}
                 </nav>
 
                 {/* Mobile Theme and Language */}
-                <div className="flex items-center gap-2 px-4 py-2 mb-4 border-t border-border pt-4">
-                  {/* Theme Toggle */}
+                <div className="flex items-center gap-4 mb-4">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -297,7 +305,6 @@ const Navbar = () => {
                     {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
                   </Button>
 
-                  {/* Language Dropdown */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -320,38 +327,29 @@ const Navbar = () => {
                 </div>
 
                 {/* Mobile User Menu */}
-                <div className="pt-4 border-t border-border">
+                <div className="flex items-center gap-2">
                   {isSignedIn ? (
-                    <div className="space-y-2">
-                      <div className="px-4 py-2">
-                        <UserButton
-                          afterSignOutUrl="/"
-                          appearance={{
-                            elements: {
-                              userButtonBox: "w-full flex justify-start",
-                              userButtonTrigger: "w-full flex justify-start",
-                              userButtonPopoverCard: "w-[240px]",
-                            },
-                          }}
-                        />
-                      </div>
-                      {user?.publicMetadata.isAdmin && (
-                        <Link
-                          to="/admin"
-                          className="block px-4 py-2 hover:bg-muted rounded-md transition-colors"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {t("admin")}
-                        </Link>
-                      )}
+                    <div className="flex items-center gap-2">
+                      <UserButton
+                        afterSignOutUrl="/"
+                        appearance={{
+                          elements: {
+                            userButtonBox: "flex",
+                            userButtonTrigger: "flex",
+                            userButtonPopoverCard: "w-[240px]",
+                          },
+                        }}
+                      />
+                      <SignOutButton>
+                        <Button variant="ghost" className="w-full">
+                          {t("signOut")}
+                        </Button>
+                      </SignOutButton>
                     </div>
                   ) : (
                     <SignInButton mode="modal">
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start px-4 py-2"
-                      >
-                        {t("login")}
+                      <Button variant="default" className="w-full">
+                        {t("signIn")}
                       </Button>
                     </SignInButton>
                   )}

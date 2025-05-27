@@ -31,7 +31,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { ArrowLeft, Save } from "lucide-react";
-import ImageDropzone from "@/components/ImageDropzone";
+import ImageDropzone from "@/components/upload/ImageDropzone";
 
 const ProductFormPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

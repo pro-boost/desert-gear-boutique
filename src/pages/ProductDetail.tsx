@@ -10,7 +10,7 @@ import {
   getProductsByCategory,
 } from "@/services/productService";
 import { Product } from "@/types/product";
-import ProductCard from "@/components/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {

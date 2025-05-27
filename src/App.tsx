@@ -5,8 +5,8 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import Navbar from "@/components/navigation/Navbar";
+import Footer from "@/components/layouts/Footer";
 import { Toaster } from "@/components/ui/sonner";
 
 // Lazy load Clerk components
