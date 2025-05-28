@@ -34,7 +34,15 @@ const HomePage = () => {
     loop: true,
     align: "start",
     slidesToScroll: 1,
+    breakpoints: {
+      "(min-width: 640px)": { slidesToScroll: 2 },
+      "(min-width: 1024px)": { slidesToScroll: 3 },
+      "(min-width: 1280px)": { slidesToScroll: 4 },
+    },
   });
+
+  // Add state to track if we need navigation
+  const [showNavigation, setShowNavigation] = useState(false);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -42,6 +50,24 @@ const HomePage = () => {
 
   const scrollNext = useCallback(() => {
     if (emblaApi) emblaApi.scrollNext();
+  }, [emblaApi]);
+
+  // Update useEffect to check if we need navigation
+  useEffect(() => {
+    if (emblaApi) {
+      const updateNavigation = () => {
+        const canScrollPrev = emblaApi.canScrollPrev();
+        const canScrollNext = emblaApi.canScrollNext();
+        setShowNavigation(canScrollPrev || canScrollNext);
+      };
+
+      emblaApi.on("select", updateNavigation);
+      updateNavigation();
+
+      return () => {
+        emblaApi.off("select", updateNavigation);
+      };
+    }
   }, [emblaApi]);
 
   useEffect(() => {
@@ -110,68 +136,116 @@ const HomePage = () => {
       </section>
 
       {/* Products Carousel */}
-      <section className="min-h-screen flex items-center bg-gradient-to-br from-background via-primary/5 to-secondary/10">
+      <section className="min-h-screen flex justify-center items-center bg-gradient-to-br from-background via-primary/5 to-secondary/10 max-w-screen">
         <div className="container max-w-6xl mx-auto px-4 h-full py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="flex justify-between items-center mb-16"
+            className="flex justify-center items-center mb-16"
           >
             <h2 className="text-4xl font-bold tracking-tight">
               {t("ourProducts")}
             </h2>
-            <Button
-              asChild
-              variant="ghost"
-              className="text-lg hover:scale-105 transition-all"
-            >
-              <Link to="/products">{t("viewAll")}</Link>
-            </Button>
           </motion.div>
 
-          <div className="relative max-w-5xl mx-auto">
+          <div className="relative w-full max-w-7xl mx-auto">
             {loading ? (
-              <ProductSkeletonGrid count={6} />
+              <ProductSkeletonGrid count={4} />
             ) : (
-              <div className="overflow-hidden" ref={emblaRef}>
-                <div className="flex -ml-6">
-                  {products.map((product, index) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: index * 0.1 }}
-                      className="min-w-0 flex-[0_0_calc(100%-1.5rem)] sm:flex-[0_0_calc(50%-1.5rem)] md:flex-[0_0_calc(33.333%-1.5rem)] lg:flex-[0_0_calc(33.333%-1.5rem)] pl-6"
-                    >
-                      <ProductCard product={product} />
-                    </motion.div>
-                  ))}
+              <div className="relative">
+                <div className="overflow-hidden" ref={emblaRef}>
+                  <div className="flex">
+                    {products.map((product, index) => (
+                      <motion.div
+                        key={product.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] xl:flex-[0_0_25%] px-3"
+                      >
+                        <ProductCard product={product} />
+                      </motion.div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
 
-            {!loading && (
-              <>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
-                  onClick={scrollPrev}
+                {!loading && showNavigation && (
+                  <>
+                    {/* Desktop Navigation Buttons */}
+                    <div className="hidden sm:block">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10 
+                                 bg-background/90 backdrop-blur-sm hover:bg-background 
+                                 hover:scale-105 transition-all w-10 h-10
+                                 shadow-lg border-primary/20 dark:border-primary/30"
+                        onClick={scrollPrev}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 
+                                 bg-background/90 backdrop-blur-sm hover:bg-background 
+                                 hover:scale-105 transition-all w-10 h-10
+                                 shadow-lg border-primary/20 dark:border-primary/30"
+                        onClick={scrollNext}
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </div>
+
+                    {/* Mobile Navigation Buttons */}
+                    <div className="sm:hidden flex justify-center gap-4 mt-6">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-background/90 backdrop-blur-sm hover:bg-background 
+                                 hover:scale-105 transition-all w-10 h-10
+                                 shadow-lg border-primary/20 dark:border-primary/30"
+                        onClick={scrollPrev}
+                      >
+                        <ChevronLeft className="h-5 w-5" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="bg-background/90 backdrop-blur-sm hover:bg-background 
+                                 hover:scale-105 transition-all w-10 h-10
+                                 shadow-lg border-primary/20 dark:border-primary/30"
+                        onClick={scrollNext}
+                      >
+                        <ChevronRight className="h-5 w-5" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+
+                {/* View All Button */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="flex justify-center mt-12"
                 >
-                  <ChevronLeft className="h-6 w-6" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background hover:scale-110 transition-all w-12 h-12"
-                  onClick={scrollNext}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-              </>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="text-lg px-8 py-6 rounded-full border-2 border-primary/20 
+                             hover:border-primary/40 hover:bg-primary/5 
+                             dark:border-primary/30 dark:hover:border-primary/50
+                             transition-all hover:scale-105"
+                  >
+                    <Link to="/products">{t("viewAll")}</Link>
+                  </Button>
+                </motion.div>
+              </div>
             )}
           </div>
         </div>
@@ -231,7 +305,7 @@ const HomePage = () => {
       </section>
 
       {/* Where to Find Us Section */}
-      <section className="py-20 bg-gradient-to-tr from-background via-secondary/5 to-accent/10">
+      <section className=" min-h-screen flex flex-col justify-center items-center py-20 bg-gradient-to-tr from-background via-secondary/5 to-accent/10">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <motion.div
@@ -262,7 +336,7 @@ const HomePage = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="card-section overflow-hidden"
+              className=" overflow-hidden"
             >
               <MapComponent />
             </motion.div>

@@ -7,7 +7,7 @@ const Footer = () => {
   const { t, isRTL } = useLanguage();
 
   return (
-    <footer className="bg-accent/10 dark:bg-accent/5 py-10 px-4">
+    <footer className="bg-accent/10 dark:bg-accent/5 py-10 px-4 border-t border-border">
       <div className="container mx-auto">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

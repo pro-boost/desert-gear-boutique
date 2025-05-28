@@ -231,7 +231,7 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="card-section">
+            <div>
               <MapComponent />
             </div>
 
