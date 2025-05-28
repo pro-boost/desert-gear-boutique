@@ -1005,6 +1005,10 @@ const translations: Translations = {
     fr: "ltr",
     ar: "rtl",
   },
+  seeProduct: {
+    fr: "Voir le produit",
+    ar: "عرض المنتج",
+  },
 };
 
 interface LanguageContextType {

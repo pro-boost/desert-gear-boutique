@@ -101,12 +101,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
                 %
               </Badge>
             )}
-            {product.featured && (
-              <Badge className="bg-primary text-primary-foreground dark:shadow-[0_2px_10px_rgba(255,138,76,0.15)]">
-                <Target className="w-3 h-3 mr-1" />
-                {t("featured")}
-              </Badge>
-            )}
           </div>
 
           {/* Favorite Button */}
@@ -115,8 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             size="icon"
             className={cn(
               "absolute top-3 right-3 z-10 bg-background/80 backdrop-blur-sm hover:bg-background transition-all dark:shadow-[0_2px_10px_rgba(255,138,76,0.1)]",
-              isFavorite(product.id) &&
-                "text-destructive hover:text-destructive/90"
+              isFavorite(product.id) && "text-primary hover:text-primary/90"
             )}
             onClick={(e) => {
               e.preventDefault();
@@ -196,7 +189,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             disabled={!product.inStock}
           >
             <ShoppingBag className="w-4 h-4 mr-2" />
-            {product.inStock ? t("addToCart") : t("outOfStock")}
+            {t("seeProduct")}
           </Button>
         </CardFooter>
       </div>

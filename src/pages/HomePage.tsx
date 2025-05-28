@@ -136,7 +136,7 @@ const HomePage = () => {
       </section>
 
       {/* Products Carousel */}
-      <section className="min-h-screen flex justify-center items-center bg-gradient-to-br from-background via-primary/5 to-secondary/10 max-w-screen">
+      <section className="min-h-screen flex justify-center items-center bg-background max-w-screen">
         <div className="container max-w-6xl mx-auto px-4 h-full py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -252,7 +252,7 @@ const HomePage = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="min-h-screen flex items-center bg-gradient-to-bl from-background via-accent/5 to-primary/10">
+      <section className="min-h-screen flex items-center bg-background">
         <div className="container max-w-6xl mx-auto px-4 h-full py-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -305,7 +305,7 @@ const HomePage = () => {
       </section>
 
       {/* Where to Find Us Section */}
-      <section className=" min-h-screen flex flex-col justify-center items-center py-20 bg-gradient-to-tr from-background via-secondary/5 to-accent/10">
+      <section className="min-h-screen flex flex-col justify-center items-center py-20 bg-background">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <motion.div
