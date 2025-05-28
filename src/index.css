@@ -5,7 +5,22 @@
 @layer base {
   :root {
     /* These variables are now defined in colors.css */
-    --radius: 0.5rem;
+    --radius: 1rem;
+    --primary: 24 100% 65%; /* More vibrant orange for dark mode */
+    --primary-foreground: 0 0% 100%;
+    --card: 0 0% 3%;
+    --card-foreground: 0 0% 98%;
+    --background: 0 0% 2%;
+    --foreground: 0 0% 98%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 24 100% 65%; /* Matching vibrant orange */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 50.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 24 100% 65% / 0.2; /* Orange-tinted border */
+    --input: 24 100% 65% / 0.1; /* Orange-tinted input */
+    --ring: 24 100% 65% / 0.3; /* Orange-tinted ring */
   }
 
   .dark {
@@ -20,8 +35,11 @@
   body {
     @apply bg-background text-foreground antialiased;
     background-color: hsl(var(--dg-background));
-    background-image: radial-gradient(hsl(var(--dg-accent)/20) 1px, transparent 1px);
-    background-size: 20px 20px;
+    background-image: linear-gradient(
+      to bottom,
+      hsl(var(--dg-background)),
+      hsl(var(--dg-background) / 0.95)
+    );
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   html {
@@ -31,7 +49,13 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:scale-105 active:scale-95;
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 
+           dark:bg-primary dark:hover:bg-primary/80
+           dark:shadow-[0_2px_10px_rgba(255,138,76,0.2)]
+           dark:hover:shadow-[0_2px_15px_rgba(255,138,76,0.3)]
+           inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium 
+           transition-colors focus-visible:outline-none focus-visible:ring-2 
+           focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
   }
   
   .btn-secondary {
@@ -39,7 +63,7 @@
   }
   
   .card-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300;
+    @apply card-base hover:-translate-y-1;
   }
 
   .nav-link {
@@ -54,113 +78,182 @@
     @apply bg-gradient-to-br from-background to-secondary/20;
   }
 
-  /* New accent components for white mode */
-  .accent-card {
-    @apply bg-white border border-border shadow-sm hover:shadow-md transition-all duration-300 rounded-lg overflow-hidden;
-  }
-  
-  .accent-border {
-    @apply border border-accent/50 rounded-lg p-4;
-  }
-  
-  .accent-pattern {
-    background-color: hsl(var(--dg-background));
-    background-image: radial-gradient(hsl(var(--dg-accent)/20) 1px, transparent 1px);
-    background-size: 20px 20px;
-  }
-  
-  .accent-bg-soft {
-    @apply bg-[hsl(var(--dg-soft-accent))];
-  }
-  
-  .accent-border-subtle {
-    @apply border border-secondary/50;
-  }
-  
-  .accent-glass {
-    @apply backdrop-blur-sm bg-white/70 border border-white/20 shadow-sm;
-  }
-  
-  /* Enhanced card animations */
-  .card-animated {
-    @apply transition-all duration-500 hover:shadow-xl border border-transparent hover:border-primary/20 hover:-translate-y-2 hover:scale-[1.03] relative overflow-hidden;
-  }
-  
-  .card-animated::before {
-    content: '';
-    @apply absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 -translate-x-full;
-    transition: transform 0.8s ease;
-  }
-  
-  .card-animated:hover::before {
-    @apply translate-x-full;
-  }
-  
-  .card-glow {
-    @apply relative overflow-hidden;
-    box-shadow: 0 0 15px -5px rgba(255, 153, 51, 0.2);
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .card-glow:hover {
-    box-shadow: 0 0 30px -5px rgba(255, 153, 51, 0.4);
-  }
-  
-  /* Orange gradient backgrounds */
-  .bg-orange-gradient {
-    @apply bg-gradient-to-br from-orange-100 to-orange-50;
-  }
-  
-  .bg-orange-gradient-dark {
-    @apply bg-gradient-to-br from-orange-900 to-orange-800;
-  }
-
-  /* Card Styles */
+  /* Base card styles with orange-tinted transitions */
   .card-base {
-    @apply bg-card border border-card-border shadow-card rounded-xl transition-all duration-300;
+    @apply bg-gradient-to-br from-background/95 via-primary/5 to-background/95 
+           border-2 border-border/80 dark:border-primary/30
+           shadow-[0_4px_20px_rgb(0,0,0,0.08)] dark:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           transition-all duration-300 ease-in-out
+           hover:shadow-[0_4px_20px_rgb(0,0,0,0.12)] dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.2)]
+           hover:border-primary/50 dark:hover:border-primary/40
+           dark:ring-1 dark:ring-primary/20
+           dark:bg-gradient-to-br dark:from-background/95 dark:via-primary/10 dark:to-background/95;
   }
 
   .card-lg {
     @apply shadow-card-lg;
   }
 
-  /* Section Styles */
+  /* Section Styles with warmer colors */
   .section-base {
-    @apply bg-section border border-section-border rounded-xl shadow-section;
+    @apply bg-section/95 border border-border/30 rounded-2xl shadow-section;
   }
 
   .section-card {
-    @apply bg-card border border-card-border shadow-card rounded-xl p-6;
+    @apply bg-card/95 border border-border/30 shadow-card rounded-2xl p-6;
   }
 
   .section-card-hover {
     @apply hover:shadow-section-hover hover:-translate-y-1 transition-all duration-300;
   }
 
-  /* Enhanced card styles for better contrast */
-  .card-contrast {
-    @apply bg-card border-2 border-card-border shadow-card-lg;
+  /* Update other card variants with orange-tinted transitions */
+  .card-glass {
+    @apply card-base backdrop-blur-sm bg-background/80
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.15)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.25)]
+           dark:bg-gradient-to-br dark:from-background/90 dark:via-primary/15 dark:to-background/90;
   }
 
+  .card-form {
+    @apply card-base p-6 space-y-6
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.2)]
+           dark:bg-gradient-to-br dark:from-background/95 dark:via-primary/10 dark:to-background/95;
+  }
+
+  .card-product {
+    @apply card-base overflow-hidden
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.2)]
+           dark:bg-gradient-to-br dark:from-background/95 dark:via-primary/10 dark:to-background/95;
+  }
+
+  .card-section {
+    @apply card-base p-8
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.2)]
+           dark:bg-gradient-to-br dark:from-background/95 dark:via-primary/10 dark:to-background/95;
+  }
+
+  /* Update accent card with more vibrant orange */
+  .accent-card {
+    @apply card-base rounded-2xl overflow-hidden
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.15)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.25)]
+           dark:bg-gradient-to-br dark:from-background/90 dark:via-primary/15 dark:to-background/90;
+  }
+  
+  .accent-card:hover {
+    @apply dark:shadow-[0_4px_20px_rgba(255,138,76,0.3)];
+  }
+
+  .card-contrast {
+    @apply card-base rounded-2xl
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.08)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.12)];
+  }
+  
   .card-contrast-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-primary/20 transition-all duration-300;
+    @apply card-hover rounded-2xl
+           dark:shadow-[0_4px_20px_rgba(255,138,76,0.08)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.12)];
+  }
+
+  .glass-card {
+    @apply backdrop-blur-md bg-card/90 border border-border/20 dark:border-primary/30
+           shadow-card-lg dark:shadow-[0_4px_20px_rgba(255,138,76,0.15)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.25)]
+           rounded-2xl
+           dark:bg-gradient-to-br dark:from-background/90 dark:via-primary/15 dark:to-background/90;
+  }
+  
+  .glass-card-hover {
+    @apply hover:shadow-card-hover hover:-translate-y-1
+           hover:border-primary/20 dark:hover:border-primary/30
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.15)]
+           transition-all duration-300;
+  }
+
+  /* Enhanced card styles with warmer colors and dark mode effects */
+  .card-contrast {
+    @apply bg-card/95 border border-border/30 dark:border-primary/20
+           shadow-card-lg dark:shadow-[0_4px_20px_rgba(255,138,76,0.08)]
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           rounded-2xl;
+  }
+  
+  .section-contrast {
+    @apply bg-section/95 border border-border/30 dark:border-primary/20
+           rounded-2xl shadow-section dark:shadow-[0_4px_20px_rgba(255,138,76,0.08)];
+  }
+  
+  .section-contrast-hover {
+    @apply hover:shadow-section-hover hover:-translate-y-1
+           dark:hover:shadow-[0_4px_20px_rgba(255,138,76,0.12)]
+           hover:border-primary/20 dark:hover:border-primary/30
+           transition-all duration-300;
+  }
+  
+  /* Theme-based gradient backgrounds */
+  .bg-orange-gradient {
+    @apply bg-gradient-to-br from-primary/10 via-primary/5 to-background
+           dark:from-primary/20 dark:via-primary/15 dark:to-background;
+  }
+  
+  .bg-orange-gradient-dark {
+    @apply bg-gradient-to-br from-primary/20 via-primary/15 to-background
+           dark:from-primary/30 dark:via-primary/25 dark:to-background;
+  }
+
+  /* Card Styles with warmer colors */
+  .card-base {
+    @apply bg-card/95 border border-border/30 shadow-card rounded-2xl transition-all duration-300;
+  }
+
+  .card-lg {
+    @apply shadow-card-lg;
+  }
+
+  /* Section Styles with warmer colors */
+  .section-base {
+    @apply bg-section/95 border border-border/30 rounded-2xl shadow-section;
+  }
+
+  .section-card {
+    @apply bg-card/95 border border-border/30 shadow-card rounded-2xl p-6;
+  }
+
+  .section-card-hover {
+    @apply hover:shadow-section-hover hover:-translate-y-1 transition-all duration-300;
+  }
+
+  /* Enhanced card styles with warmer colors */
+  .card-contrast {
+    @apply bg-card/95 border border-border/30 shadow-card-lg rounded-2xl;
   }
 
   .section-contrast {
-    @apply bg-section border-2 border-section-border shadow-section;
+    @apply bg-section/95 border border-border/30 rounded-2xl shadow-section;
   }
 
   .section-contrast-hover {
     @apply hover:shadow-section-hover hover:-translate-y-1 hover:border-primary/20 transition-all duration-300;
   }
 
-  /* Glass effect with enhanced contrast */
+  /* Glass effect with warmer colors */
   .glass-card {
-    @apply backdrop-blur-md bg-card/95 border-2 border-card-border/50 shadow-card-lg;
+    @apply backdrop-blur-md bg-card/90 border border-border/20 shadow-card-lg rounded-2xl;
+    background: linear-gradient(
+      135deg,
+      hsl(var(--dg-card) / 0.3) 0%,
+      hsl(var(--dg-card) / 0.3) 50%,
+      hsl(var(--dg-card) / 0.3) 100%
+    );
   }
 
   .glass-card-hover {
-    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-primary/30 transition-all duration-300;
+    @apply hover:shadow-card-hover hover:-translate-y-1 hover:border-primary/20 transition-all duration-300;
   }
 }
 
@@ -352,12 +445,24 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(var(--dg-primary) / 0.7);
+    box-shadow: 0 0 0 0 hsl(var(--dg-primary) / 0.4);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(var(--dg-primary) / 0);
+    box-shadow: 0 0 0 10px hsl(var(--dg-primary) / 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(var(--dg-primary) / 0);
+    box-shadow: 0 0 0 0 hsl(var(--dg-primary) / 0);
+  }
+}
+
+@keyframes ring {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--dg-primary) / 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px hsl(var(--dg-primary) / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 hsl(var(--dg-primary) / 0);
   }
 }

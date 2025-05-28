@@ -17,7 +17,7 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+    <div className="card-section rounded-lg border border-border overflow-hidden">
       <div className="p-4 border-b border-border bg-muted/50">
         <h2 className="font-semibold">
           {items.length} {items.length === 1 ? t("item") : t("items")}

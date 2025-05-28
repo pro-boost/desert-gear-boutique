@@ -1,15 +1,10 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
-
-interface ImageDropzoneProps {
-  onImageUpload: (image: string) => void;
-  currentImage?: string;
-  onImageRemove?: () => void;
-  multiple?: boolean;
-}
+import { cn } from "@/lib/utils";
+import { ImageDropzoneProps } from "@/lib/constants";
 
 interface MultiImageDropzoneProps
   extends Omit<

@@ -28,12 +28,13 @@ export default {
         heading: ['Montserrat', 'sans-serif'],
       },
       colors: {
-        // Theme Colors
-        border: "hsl(var(--dg-border))",
-        input: "hsl(var(--dg-input))",
-        ring: "hsl(var(--dg-ring))",
+        // Base Theme Colors
         background: "hsl(var(--dg-background))",
         foreground: "hsl(var(--dg-foreground))",
+        card: {
+          DEFAULT: "hsl(var(--dg-card))",
+          foreground: "hsl(var(--dg-card-foreground))",
+        },
         primary: {
           DEFAULT: "hsl(var(--dg-primary))",
           foreground: "hsl(var(--dg-primary-foreground))",
@@ -42,14 +43,18 @@ export default {
           DEFAULT: "hsl(var(--dg-secondary))",
           foreground: "hsl(var(--dg-secondary-foreground))",
         },
-        destructive: {
-          DEFAULT: "hsl(var(--dg-destructive))",
-          foreground: "hsl(var(--dg-destructive-foreground))",
-        },
         muted: {
           DEFAULT: "hsl(var(--dg-muted))",
           foreground: "hsl(var(--dg-muted-foreground))",
         },
+        border: "hsl(var(--dg-border))",
+        input: "hsl(var(--dg-input))",
+        destructive: {
+          DEFAULT: "hsl(var(--dg-destructive))",
+          foreground: "hsl(var(--dg-destructive-foreground))",
+        },
+
+        // Additional Theme Colors
         accent: {
           DEFAULT: "hsl(var(--dg-accent))",
           foreground: "hsl(var(--dg-accent-foreground))",
@@ -58,16 +63,7 @@ export default {
           DEFAULT: "hsl(var(--dg-popover))",
           foreground: "hsl(var(--dg-popover-foreground))",
         },
-        card: {
-          DEFAULT: "hsl(var(--dg-card))",
-          foreground: "hsl(var(--dg-card-foreground))",
-          border: "hsl(var(--dg-card-border))",
-          shadow: "hsl(var(--dg-card-shadow))",
-        },
-        section: {
-          DEFAULT: "hsl(var(--dg-section-bg))",
-          border: "hsl(var(--dg-section-border))",
-        },
+        ring: "hsl(var(--dg-ring))",
 
         // Brand Colors
         tactical: {
@@ -127,19 +123,12 @@ export default {
           'accent-foreground': "hsl(var(--dg-sidebar-accent-foreground))",
           border: "hsl(var(--dg-sidebar-border))",
           ring: "hsl(var(--dg-sidebar-ring))"
-        },
-        motion: {
-          DEFAULT: "hsl(var(--dg-motion-bg))",
-          border: "hsl(var(--dg-motion-border))",
-          ring: "hsl(var(--dg-motion-ring))",
-        },
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
-        '3xl': '1.5rem',
-        '4xl': '2rem',
       },
       keyframes: {
         "accordion-down": {
@@ -181,8 +170,6 @@ export default {
         'card-lg': '0 12px 20px -4px hsl(var(--dg-card-shadow)), 0 6px 8px -5px hsl(var(--dg-card-shadow))',
         'section': '0 4px 6px -1px hsl(var(--dg-card-shadow)), 0 2px 4px -2px hsl(var(--dg-card-shadow))',
         'section-hover': '0 10px 15px -3px hsl(var(--dg-card-shadow)), 0 4px 6px -4px hsl(var(--dg-card-shadow))',
-        'motion': '0 4px 8px -2px hsl(var(--dg-motion-shadow)), 0 2px 4px -3px hsl(var(--dg-motion-shadow))',
-        'motion-hover': '0 8px 16px -4px hsl(var(--dg-motion-shadow)), 0 4px 8px -5px hsl(var(--dg-motion-shadow))',
       },
     },
   },

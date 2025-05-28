@@ -226,7 +226,7 @@ const ProductFormPage: React.FC = () => {
           </h1>
         </div>
 
-        <Card>
+        <Card className="card-section">
           <CardHeader>
             <CardTitle>
               {isEditing ? t("editProductDetails") : t("addProductDetails")}
@@ -317,7 +317,7 @@ const ProductFormPage: React.FC = () => {
 
               <div className="space-y-2">
                 <Label>{t("images")}</Label>
-                <div className="border rounded-lg p-4 bg-card">
+                <div className="card-section p-4">
                   <ImageDropzone
                     onImageUpload={handleImageUpload}
                     currentImages={formData.images || []}
@@ -329,7 +329,7 @@ const ProductFormPage: React.FC = () => {
 
               <div className="space-y-2">
                 <Label>{t("sizes")}</Label>
-                <div className="border rounded-lg p-4 bg-card">
+                <div className="card-section p-4">
                   <div className="flex flex-wrap gap-4">
                     {availableSizes.map((size) => (
                       <div key={size} className="flex items-center space-x-2">
@@ -347,7 +347,7 @@ const ProductFormPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center space-x-6 p-4 border rounded-lg bg-card">
+              <div className="flex items-center space-x-6 card-section p-4">
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="inStock"

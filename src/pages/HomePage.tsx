@@ -21,7 +21,6 @@ import { cn } from "@/lib/utils";
 import MapComponent from "@/components/map/MapComponent";
 import { motion } from "framer-motion";
 import { ProductSkeletonGrid } from "@/components/ui/product-skeleton";
-import { features } from "@/constants/features";
 
 // Lazy load the hero image
 const HeroImage = React.lazy(() => import("../components/ui/HeroImage"));
@@ -79,7 +78,7 @@ const HomePage = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/30 z-10"
+          className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/70 to-black/50 z-10"
         />
         <Suspense
           fallback={<div className="absolute inset-0 bg-muted animate-pulse" />}
@@ -93,7 +92,7 @@ const HomePage = () => {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="text-center text-white max-w-3xl mx-auto"
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-white">
               {t("welcomeToDesertGear")}
             </h1>
             <p className="text-xl md:text-2xl mb-10 text-white/90 font-light">
@@ -111,7 +110,7 @@ const HomePage = () => {
       </section>
 
       {/* Products Carousel */}
-      <section className="min-h-screen flex items-center bg-gradient-to-b from-background to-muted/30">
+      <section className="min-h-screen flex items-center bg-gradient-to-br from-background via-primary/5 to-secondary/10">
         <div className="container max-w-6xl mx-auto px-4 h-full py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -179,7 +178,7 @@ const HomePage = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="min-h-screen flex items-center bg-gradient-to-b from-muted/30 to-background">
+      <section className="min-h-screen flex items-center bg-gradient-to-bl from-background via-accent/5 to-primary/10">
         <div className="container max-w-6xl mx-auto px-4 h-full py-20">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -191,19 +190,35 @@ const HomePage = () => {
             {t("whyChooseUs")}
           </motion.h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {features.map((item, index) => (
+            {[
+              {
+                icon: Shield,
+                title: t("qualityAssurance"),
+                description: t("qualityAssuranceDescription"),
+              },
+              {
+                icon: Truck,
+                title: t("fastShipping"),
+                description: t("fastShippingDescription"),
+              },
+              {
+                icon: Clock,
+                title: t("expertSupport"),
+                description: t("expertSupportDescription"),
+              },
+            ].map((item, index) => (
               <motion.div
                 key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="card-contrast flex flex-col h-full text-center p-8 rounded-3xl hover:shadow-card-hover transition-all duration-300 hover:-translate-y-1"
+                className="card-section"
               >
-                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center ring-2 ring-primary/20">
+                <div className="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-primary/10 via-primary/20 to-primary/10 border-2 border-primary/30 dark:border-primary/40 flex items-center justify-center">
                   <item.icon className="w-12 h-12 text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-4 tracking-tight">
+                <h3 className="text-2xl font-bold mb-4 tracking-tight text-foreground">
                   {item.title}
                 </h3>
                 <p className="text-muted-foreground text-lg flex-grow">
@@ -216,7 +231,7 @@ const HomePage = () => {
       </section>
 
       {/* Where to Find Us Section */}
-      <section className="py-20 bg-gradient-to-b from-background to-muted/30">
+      <section className="py-20 bg-gradient-to-tr from-background via-secondary/5 to-accent/10">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
             <motion.div
@@ -247,7 +262,7 @@ const HomePage = () => {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="h-full rounded-2xl overflow-hidden shadow-xl"
+              className="card-section overflow-hidden"
             >
               <MapComponent />
             </motion.div>

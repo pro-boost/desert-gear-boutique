@@ -296,7 +296,7 @@ const ProductDetail = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
             {/* Product Images */}
-            <div className="bg-card rounded-xl overflow-hidden shadow-lg p-4">
+            <div className="card-product rounded-xl overflow-hidden p-4">
               <div className="relative">
                 {/* Main Image Slider */}
                 <div className="aspect-square w-full overflow-hidden relative">
@@ -375,7 +375,7 @@ const ProductDetail = () => {
             </div>
 
             {/* Product Info */}
-            <div className="bg-card rounded-xl p-8 shadow-lg">
+            <div className="card-section rounded-xl p-8 shadow-lg">
               <div className="space-y-8">
                 {/* Product Title and Price */}
                 <div>

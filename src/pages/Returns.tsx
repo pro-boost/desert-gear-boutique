@@ -11,19 +11,19 @@ const Returns = () => {
         <h1 className="text-4xl font-heading font-bold mb-8">{t("returns")}</h1>
 
         <div className="grid gap-8 md:grid-cols-3 mb-12">
-          <div className="p-6 rounded-lg bg-card">
+          <div className="card-section p-6">
             <RotateCcw className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">{t("daysGuarantee")}</h3>
             <p className="text-muted-foreground">{t("forReturning")}</p>
           </div>
 
-          <div className="p-6 rounded-lg bg-card">
+          <div className="card-section p-6">
             <ShieldCheck className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">{t("warranty")}</h3>
             <p className="text-muted-foreground">{t("yearWarranty")}</p>
           </div>
 
-          <div className="p-6 rounded-lg bg-card">
+          <div className="card-section p-6">
             <MessageCircle className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">{t("support")}</h3>
             <p className="text-muted-foreground">{t("dedicatedSupport")}</p>

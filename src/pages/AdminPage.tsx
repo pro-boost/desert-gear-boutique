@@ -461,7 +461,7 @@ const AdminPage: React.FC = () => {
           </TabsList>
 
           <TabsContent value="products" className="space-y-8">
-            <Card>
+            <Card className="card-section">
               <CardHeader>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
@@ -479,7 +479,7 @@ const AdminPage: React.FC = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="rounded-md border">
+                <div className="card-section rounded-md">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -597,7 +597,7 @@ const AdminPage: React.FC = () => {
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-8">
-            <Card>
+            <Card className="card-section">
               <CardHeader>
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
@@ -622,7 +622,7 @@ const AdminPage: React.FC = () => {
               <CardContent>
                 <div className="space-y-6">
                   {/* Category Form */}
-                  <Card>
+                  <Card className="card-section">
                     <CardHeader>
                       <CardTitle>
                         {editingCategory ? t("editCategory") : t("addCategory")}
@@ -679,7 +679,7 @@ const AdminPage: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap gap-2 p-4 border rounded-lg bg-card">
+                          <div className="flex flex-wrap gap-2 card-section p-4">
                             {newCategorySizes.map((size) => (
                               <Badge
                                 key={size}
@@ -728,7 +728,7 @@ const AdminPage: React.FC = () => {
                   {/* Categories List */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {categories.map((category) => (
-                      <Card key={category.name}>
+                      <Card key={category.name} className="card-section">
                         <CardHeader>
                           <div className="flex justify-between items-start">
                             <div>

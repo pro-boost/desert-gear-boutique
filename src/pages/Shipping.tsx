@@ -13,7 +13,7 @@ const Shipping = () => {
         </h1>
 
         <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2 mb-12">
-          <div className="p-6 rounded-lg bg-card">
+          <div className="card-section p-6">
             <Truck className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">
               {t("standardDelivery")}
@@ -22,7 +22,7 @@ const Shipping = () => {
             <p className="text-muted-foreground">{t("freeForOrders")}</p>
           </div>
 
-          <div className="p-6 rounded-lg bg-card">
+          <div className="card-section p-6">
             <PackageCheck className="w-12 h-12 text-primary mb-4" />
             <h3 className="text-xl font-semibold mb-2">{t("orderTracking")}</h3>
             <p className="text-muted-foreground">{t("realTimeTracking")}</p>

@@ -56,9 +56,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
 
   return (
     <Card
-      className={`group relative overflow-hidden transition-all duration-300 hover:shadow-lg ${
+      className={cn(
+        "card-product group relative transition-all duration-300",
         delay ? `animate-fade-in [animation-delay:${delay}ms]` : ""
-      }`}
+      )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -94,14 +95,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             {hasDiscount && (
               <Badge
                 variant="secondary"
-                className="bg-tactical text-tactical-foreground"
+                className="bg-tactical text-tactical-foreground dark:shadow-[0_2px_10px_rgba(255,138,76,0.15)]"
               >
                 -{Math.round((1 - product.discountPrice / product.price) * 100)}
                 %
               </Badge>
             )}
             {product.featured && (
-              <Badge className="bg-orange-500 text-white">
+              <Badge className="bg-primary text-primary-foreground dark:shadow-[0_2px_10px_rgba(255,138,76,0.15)]">
                 <Target className="w-3 h-3 mr-1" />
                 {t("featured")}
               </Badge>
@@ -113,8 +114,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             variant="ghost"
             size="icon"
             className={cn(
-              "absolute top-3 right-3 z-10 bg-background/80 backdrop-blur-sm hover:bg-background transition-all",
-              isFavorite(product.id) && "text-red-500 hover:text-red-600"
+              "absolute top-3 right-3 z-10 bg-background/80 backdrop-blur-sm hover:bg-background transition-all dark:shadow-[0_2px_10px_rgba(255,138,76,0.1)]",
+              isFavorite(product.id) &&
+                "text-destructive hover:text-destructive/90"
             )}
             onClick={(e) => {
               e.preventDefault();

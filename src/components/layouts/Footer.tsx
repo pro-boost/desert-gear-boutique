@@ -7,13 +7,13 @@ const Footer = () => {
   const { t, isRTL } = useLanguage();
 
   return (
-    <footer className="bg-orange-100 dark:bg-orange-900/20 py-10 px-4">
+    <footer className="bg-accent/10 dark:bg-accent/5 py-10 px-4">
       <div className="container mx-auto">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand Column */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-orange-800 dark:text-orange-300">
+            <h3 className="text-lg font-bold mb-4 text-primary">
               {t("siteTitle")}
             </h3>
             <p className="text-muted-foreground mb-4">
@@ -43,7 +43,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-orange-800 dark:text-orange-300">
+            <h3 className="text-lg font-bold mb-4 text-primary">
               {t("exploreProducts")}
             </h3>
             <ul className="space-y-2">
@@ -84,7 +84,7 @@ const Footer = () => {
 
           {/* Support Column */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-orange-800 dark:text-orange-300">
+            <h3 className="text-lg font-bold mb-4 text-primary">
               {t("aboutUs")}
             </h3>
             <ul className="space-y-2">
@@ -125,7 +125,7 @@ const Footer = () => {
 
           {/* Contact Column */}
           <div>
-            <h3 className="text-lg font-bold mb-4 text-orange-800 dark:text-orange-300">
+            <h3 className="text-lg font-bold mb-4 text-primary">
               {t("contactUs")}
             </h3>
             <div className="space-y-3">
@@ -167,7 +167,7 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="mt-10 pt-6 border-t border-orange-200 dark:border-orange-800/30 text-center text-sm text-muted-foreground">
+        <div className="mt-10 pt-6 border-t border-border/30 text-center text-sm text-muted-foreground">
           <p>
             © {new Date().getFullYear()} Nidal Boots. {t("allRights")}
           </p>

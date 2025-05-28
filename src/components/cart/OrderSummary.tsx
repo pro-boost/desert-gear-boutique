@@ -14,7 +14,7 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="bg-card rounded-lg border border-border overflow-hidden shadow-sm mt-4">
+    <div className="card-section rounded-lg border border-border overflow-hidden mt-4">
       <div className="p-4 border-b border-border bg-muted/50">
         <h2 className="font-semibold">{t("total")}</h2>
       </div>

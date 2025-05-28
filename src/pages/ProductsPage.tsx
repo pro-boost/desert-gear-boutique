@@ -137,7 +137,7 @@ const ProductsPage = () => {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col gap-8">
           {/* Filters Section */}
-          <Card>
+          <Card className="card-section">
             <CardHeader>
               <CardTitle>{t("filterProducts")}</CardTitle>
               <CardDescription>
@@ -206,7 +206,7 @@ const ProductsPage = () => {
 
           {/* Empty State */}
           {products.length === 0 && !loading && (
-            <Card>
+            <Card className="card-section">
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <p className="text-lg text-muted-foreground">
                   {t("noProductsFound")}

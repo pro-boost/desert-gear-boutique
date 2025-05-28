@@ -14,7 +14,10 @@
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em hsl(var(--dg-info) / 0.7));
+}
+.logo.vite:hover {
+  filter: drop-shadow(0 0 2em hsl(var(--dg-primary) / 0.6));
 }
 
 @keyframes logo-spin {
@@ -34,10 +37,12 @@
 
 .card {
   padding: 2em;
+  box-shadow: 0 10px 25px -5px hsl(var(--dg-primary) / 0.1),
+    0 8px 10px -6px hsl(var(--dg-primary) / 0.1);
 }
 
 .read-the-docs {
-  color: #888;
+  color: hsl(var(--dg-muted-foreground));
 }
 
 ::-webkit-scrollbar {
@@ -193,5 +198,20 @@
 }
 
 .card-hover {
-  box-shadow: 0 10px 25px -5px rgba(var(--dg-primary) / 0.1), 0 8px 10px -6px rgba(var(--dg-primary) / 0.1);
+  box-shadow: 0 10px 25px -5px hsl(var(--dg-primary) / 0.1),
+    0 8px 10px -6px hsl(var(--dg-primary) / 0.1);
+}
+
+.glass-effect {
+  background: linear-gradient(
+    to right,
+    transparent,
+    hsl(var(--dg-background) / 0.1),
+    transparent
+  );
+}
+
+.hover-card {
+  box-shadow: 0 0 20px hsl(var(--dg-primary) / 0.15);
+  border-color: hsl(var(--dg-primary) / 0.3);
 }

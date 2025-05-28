@@ -82,7 +82,7 @@ const ContactPage = () => {
 
         <div className="grid lg:grid-cols-2 gap-12">
           {/* Contact Form */}
-          <div className="card-contrast p-8 hover:shadow-card-hover transition-all duration-300">
+          <div className="card-section p-8 hover:shadow-card-hover transition-all duration-300">
             <h2
               className={`text-2xl font-semibold mb-6 ${
                 isRTL ? "text-right" : "text-left"
@@ -136,14 +136,14 @@ const ContactPage = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder={t("enterPhone")}
-                  className={`w-full ${phoneError ? "border-red-500" : ""}`}
+                  className={`w-full ${phoneError ? "border-destructive" : ""}`}
                   dir={isRTL ? "rtl" : "ltr"}
                   minLength={10}
                   pattern="[0-9\s\-+()]{10,}"
                   title={t("phoneNumberFormat")}
                 />
                 {phoneError && (
-                  <p className="text-sm text-red-500 mt-1">{phoneError}</p>
+                  <p className="text-sm text-destructive mt-1">{phoneError}</p>
                 )}
               </div>
 
@@ -186,7 +186,7 @@ const ContactPage = () => {
 
           {/* Contact Information */}
           <div className="space-y-8">
-            <div className="card-contrast p-8">
+            <div className="card-section p-8">
               <h2
                 className={`text-2xl font-semibold mb-6 ${
                   isRTL ? "text-right" : "text-left"
@@ -231,11 +231,11 @@ const ContactPage = () => {
               </div>
             </div>
 
-            <div className="card-contrast">
+            <div className="card-section">
               <MapComponent />
             </div>
 
-            <div className="card-contrast p-8">
+            <div className="card-section p-8">
               <h2
                 className={`text-2xl font-semibold mb-6 ${
                   isRTL ? "text-right" : "text-left"
