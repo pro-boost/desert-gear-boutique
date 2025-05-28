@@ -34,6 +34,7 @@ import { Label } from "@/components/ui/label";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import ImageViewer from "@/components/ui/image-viewer";
 
 interface CartItem {
   size: string;
@@ -56,6 +57,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -294,7 +296,10 @@ const ProductDetail = () => {
             <div className="card-product rounded-xl overflow-hidden p-4">
               <div className="relative">
                 {/* Main Image Slider */}
-                <div className="aspect-square w-full overflow-hidden relative">
+                <div
+                  className="aspect-square w-full overflow-hidden relative cursor-zoom-in"
+                  onClick={() => setIsImageViewerOpen(true)}
+                >
                   <div
                     className="flex transition-transform duration-500 ease-in-out"
                     style={{ transform: `translateX(-${activeImage * 100}%)` }}
@@ -314,21 +319,23 @@ const ProductDetail = () => {
                   {product.images.length > 1 && (
                     <>
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setActiveImage((prev) =>
                             prev === 0 ? product.images.length - 1 : prev - 1
-                          )
-                        }
+                          );
+                        }}
                         className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-background/50 text-foreground p-2 rounded-full hover:bg-background/70 transition-colors z-10"
                       >
                         <ArrowLeft className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setActiveImage((prev) =>
                             prev === product.images.length - 1 ? 0 : prev + 1
-                          )
-                        }
+                          );
+                        }}
                         className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-background/50 text-foreground p-2 rounded-full hover:bg-background/70 transition-colors z-10"
                       >
                         <ArrowRight className="h-5 w-5" />
@@ -341,13 +348,15 @@ const ProductDetail = () => {
                 {product.images.length > 1 && (
                   <div className="mt-4 overflow-x-auto">
                     <div className="flex space-x-3 pb-2">
-                      {/* No need for dummy images here, just map actual images */}
                       {product.images.map((img, index) => (
                         <button
                           key={index}
-                          onClick={() => setActiveImage(index)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveImage(index);
+                          }}
                           className={`
-                            w-16 h-16 border rounded-lg overflow-hidden transition-all flex-shrink-0
+                            w-16 h-16 border rounded-lg overflow-hidden transition-all flex-shrink-0 cursor-pointer
                             ${
                               activeImage === index
                                 ? "border-primary ring-2 ring-primary/20"
@@ -520,6 +529,14 @@ const ProductDetail = () => {
           )}
         </div>
       </div>
+
+      {/* Add ImageViewer component */}
+      <ImageViewer
+        isOpen={isImageViewerOpen}
+        onClose={() => setIsImageViewerOpen(false)}
+        images={product.images}
+        initialIndex={activeImage}
+      />
     </main>
   );
 };
