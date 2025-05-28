@@ -46,7 +46,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
     }
 
     if (!selectedSize && product.sizes && product.sizes.length > 0) {
-      toast.error(t("pleaseSelectSize"));
+      toast.error(t("selectSizeFirst"));
       return;
     }
 
@@ -185,7 +185,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
         <CardFooter className="p-4 pt-0">
           <Button
             className="w-full"
-            onClick={handleAddToCart}
+            onClick={() => navigate(`/products/${product.id}`)}
             disabled={!product.inStock}
           >
             <ShoppingBag className="w-4 h-4 mr-2" />

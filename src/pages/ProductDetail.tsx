@@ -32,6 +32,8 @@ import { toast } from "@/components/ui/sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Image } from "@/components/ui/image";
+import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CartItem {
   size: string;
@@ -80,7 +82,7 @@ const ProductDetail = () => {
 
         if (mounted) {
           setProduct(foundProduct);
-          setSelectedSizes(Array(foundProduct.sizes?.length || 0).fill(""));
+          setSelectedSizes([]);
         }
 
         // Get related products
@@ -215,22 +217,18 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product || !product.inStock) return;
 
-    // Check if all items have a size selected
-    const hasAllSizesSelected = selectedSizes
-      .slice(0, quantity)
-      .every((size) => size !== "");
-    if (!hasAllSizesSelected) {
-      toast.error(t("selectSizeForAllItems"));
+    // Check if any sizes are selected
+    if (selectedSizes.length === 0) {
+      toast.error(t("selectSizeFirst"));
       return;
     }
 
-    // Add each item to cart with its selected size
-    selectedSizes.slice(0, quantity).forEach((size) => {
+    // Add each selected size to cart
+    selectedSizes.forEach((size) => {
       addToCart(product, 1, size);
     });
 
     // Reset the form
-    setQuantity(1);
     setSelectedSizes([]);
     toast.success(t("addedToCart"));
   };
@@ -238,17 +236,14 @@ const ProductDetail = () => {
   const handleBuyNow = () => {
     if (!product || !product.inStock) return;
 
-    // Check if all items have a size selected
-    const hasAllSizesSelected = selectedSizes
-      .slice(0, quantity)
-      .every((size) => size !== "");
-    if (!hasAllSizesSelected) {
-      toast.error(t("selectSizeForAllItems"));
+    // Check if any sizes are selected
+    if (selectedSizes.length === 0) {
+      toast.error(t("selectSizeFirst"));
       return;
     }
 
-    // Add each item to cart with its selected size
-    selectedSizes.slice(0, quantity).forEach((size) => {
+    // Add each selected size to cart
+    selectedSizes.forEach((size) => {
       addToCart(product, 1, size);
     });
 
@@ -379,19 +374,21 @@ const ProductDetail = () => {
               <div className="space-y-8">
                 {/* Product Title and Price */}
                 <div>
-                  <h1 className="text-3xl font-bold mb-3">{product.name}</h1>
-                  <div className="flex items-center space-x-4 mb-6">
+                  <h1 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3">
+                    {product.name}
+                  </h1>
+                  <div className="flex flex-wrap justify-between items-end gap-2 sm:gap-4 mb-4 sm:mb-6">
                     {hasDiscount ? (
                       <>
-                        <span className="text-2xl font-bold">
+                        <span className="text-xl sm:text-2xl font-bold text-primary">
                           {product.discountPrice?.toFixed(2)} Dh
                         </span>
-                        <span className="text-muted-foreground line-through">
+                        <span className="text-base sm:text-lg text-muted-foreground line-through">
                           {product.price.toFixed(2)} Dh
                         </span>
                         <Badge
                           variant="secondary"
-                          className="bg-tactical text-tactical-foreground"
+                          className="bg-tactical text-tactical-foreground text-xs sm:text-sm"
                         >
                           -
                           {Math.round(
@@ -401,15 +398,15 @@ const ProductDetail = () => {
                         </Badge>
                       </>
                     ) : (
-                      <span className="text-2xl font-bold">
+                      <span className="text-xl sm:text-2xl font-bold">
                         {product.price.toFixed(2)} Dh
                       </span>
                     )}
                   </div>
-                  <div className="mb-6">
+                  <div className="mb-4 sm:mb-6">
                     <Badge
                       variant={product.inStock ? "outline" : "destructive"}
-                      className="text-sm px-3 py-1"
+                      className="text-xs sm:text-sm px-2 sm:px-3 py-1 bg-tactical text-tactical-foreground"
                     >
                       {product.inStock ? t("inStock") : t("outOfStock")}
                     </Badge>
@@ -417,113 +414,50 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Size Selection */}
-                {product.inStock && (
-                  <div className="space-y-4">
-                    <h4 className="text-sm font-medium">{t("selectSizes")}</h4>
-                    <div className="grid gap-3">
-                      {Array.from({ length: quantity }).map((_, index) => (
-                        <div
-                          key={index}
-                          className={`
-                            relative flex items-center gap-4 p-4 rounded-lg border
-                            ${
-                              selectedSizes[index]
-                                ? "border-primary/50 bg-primary/5"
-                                : "border-border"
-                            }
-                            transition-colors duration-200
-                          `}
-                        >
-                          {/* Item Number Badge */}
-                          <div className="absolute -left-2 -top-2">
-                            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-medium">
-                              {index + 1}
-                            </div>
-                          </div>
-
-                          {/* Size Selection */}
-                          <div className="flex-1">
-                            <Select
-                              value={selectedSizes[index] || ""}
-                              onValueChange={(value) =>
-                                handleSizeChange(index, value)
-                              }
-                              disabled={
-                                !product.inStock || !product.sizes?.length
-                              }
+                {product.inStock &&
+                  product.sizes &&
+                  product.sizes.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-medium text-muted-foreground">
+                        {t("selectSizes")}
+                      </h4>
+                      <div className="card-section p-3 bg-muted/50">
+                        <div className="flex flex-wrap gap-3">
+                          {product.sizes.map((size) => (
+                            <div
+                              key={size}
+                              className="flex items-center space-x-2"
                             >
-                              <SelectTrigger className="w-full">
-                                <SelectValue
-                                  placeholder={
-                                    product.sizes?.length
-                                      ? t("selectSize")
-                                      : t("noSizesAvailable")
+                              <Checkbox
+                                id={`size-${size}`}
+                                checked={selectedSizes.includes(size)}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setSelectedSizes([...selectedSizes, size]);
+                                  } else {
+                                    setSelectedSizes(
+                                      selectedSizes.filter((s) => s !== size)
+                                    );
                                   }
-                                />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {product.sizes?.map((size) => (
-                                  <SelectItem key={size} value={size}>
-                                    {size}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-
-                          {/* Selected Size Badge */}
-                          {selectedSizes[index] && (
-                            <Badge variant="secondary" className="ml-2">
-                              {selectedSizes[index]}
-                            </Badge>
-                          )}
+                                }}
+                              />
+                              <Label
+                                htmlFor={`size-${size}`}
+                                className="text-sm text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
+                              >
+                                {size}
+                              </Label>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                      {selectedSizes.length > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          {t("selectedSizes")}: {selectedSizes.join(", ")}
+                        </p>
+                      )}
                     </div>
-                  </div>
-                )}
-
-                {/* Quantity Selection */}
-                {product.inStock && (
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
-                      {t("quantity")}{" "}
-                      <span className="text-muted-foreground text-xs">
-                        (max 5)
-                      </span>
-                    </label>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleDecrement}
-                        disabled={quantity <= 1 || !product.inStock}
-                        className="h-10 w-10"
-                      >
-                        -
-                      </Button>
-                      <Input
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={quantity || ""}
-                        onChange={handleQuantityChange}
-                        onBlur={handleQuantityBlur}
-                        className="w-20 text-center"
-                        disabled={!product.inStock}
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={handleIncrement}
-                        disabled={quantity >= 5 || !product.inStock}
-                        className="h-10 w-10"
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Description */}
                 <div className="space-y-2">
@@ -532,50 +466,40 @@ const ProductDetail = () => {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-3 pt-4">
+                <div className="flex flex-wrap gap-3 pt-4">
                   <Button
-                    className="flex-1 py-6 text-lg"
-                    disabled={
-                      !product?.inStock ||
-                      quantity === 0 ||
-                      selectedSizes
-                        .slice(0, quantity)
-                        .some((size) => size === "")
-                    }
+                    className="flex-1 min-w-[120px] sm:min-w-[200px] py-6 text-lg whitespace-normal break-words"
+                    disabled={!product?.inStock || selectedSizes.length === 0}
                     onClick={handleBuyNow}
                   >
-                    <ArrowRight className="mr-2 h-5 w-5" />
+                    <ArrowRight className="mr-2 h-5 w-5 flex-shrink-0" />
                     {t("buyNow")}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-14 h-14"
-                    disabled={
-                      !product?.inStock ||
-                      quantity === 0 ||
-                      selectedSizes
-                        .slice(0, quantity)
-                        .some((size) => size === "")
-                    }
-                    onClick={handleAddToCart}
-                  >
-                    <ShoppingCart className="h-6 w-6" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="w-14 h-14"
-                    onClick={handleFavoriteToggle}
-                  >
-                    <Heart
-                      className={`h-6 w-6 ${
-                        isFavorite
-                          ? "fill-tactical text-tactical"
-                          : "fill-muted-foreground text-muted-foreground"
-                      }`}
-                    />
-                  </Button>
+                  <div className="flex gap-3 w-full sm:w-auto">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="flex-1 sm:w-14 h-14"
+                      disabled={!product?.inStock || selectedSizes.length === 0}
+                      onClick={handleAddToCart}
+                    >
+                      <ShoppingCart className="h-6 w-6" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="flex-1 sm:w-14 h-14"
+                      onClick={handleFavoriteToggle}
+                    >
+                      <Heart
+                        className={`h-6 w-6 ${
+                          isFavorite(product?.id)
+                            ? "fill-tactical text-tactical"
+                            : "text-muted-foreground"
+                        }`}
+                      />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

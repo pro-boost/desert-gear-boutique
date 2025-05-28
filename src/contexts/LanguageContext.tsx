@@ -1009,6 +1009,26 @@ const translations: Translations = {
     fr: "Voir le produit",
     ar: "عرض المنتج",
   },
+  maxSizesSelected: {
+    fr: "Vous ne pouvez sélectionner que 5 tailles maximum",
+    ar: "يمكنك اختيار 5 مقاسات كحد أقصى",
+  },
+  selectedSizes: {
+    fr: "Tailles sélectionnées",
+    ar: "المقاسات المختارة",
+  },
+  maxSizesNote: {
+    fr: "Maximum 5 tailles par commande",
+    ar: "الحد الأقصى 5 مقاسات لكل طلب",
+  },
+  addedToFavorites: {
+    fr: "Produit ajouté aux favoris",
+    ar: "تمت إضافة المنتج إلى المفضلة",
+  },
+  removedFromFavorites: {
+    fr: "Produit retiré des favoris",
+    ar: "تمت إزالة المنتج من المفضلة",
+  },
 };
 
 interface LanguageContextType {
