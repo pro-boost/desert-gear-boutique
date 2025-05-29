@@ -135,7 +135,7 @@ const ProductsPage = () => {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="flex flex-col gap-8">
         {/* Filters Section */}
         <Card className="card-section">
