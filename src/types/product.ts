@@ -14,7 +14,7 @@ export interface Product {
 
 export interface ProductFilters {
   category?: string;
-  inStock?: boolean;
+  size?: string;
   search?: string;
 }
 

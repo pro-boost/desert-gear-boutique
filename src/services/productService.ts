@@ -416,9 +416,9 @@ export const filterProducts = async (
       query = query.eq('category', filters.category);
     }
 
-    // Apply stock status filter
-    if (filters.inStock !== undefined) {
-      query = query.eq('in_stock', filters.inStock);
+    // Apply size filter
+    if (filters.size && filters.size !== 'all') {
+      query = query.contains('sizes', [filters.size]);
     }
 
     // Apply search filter

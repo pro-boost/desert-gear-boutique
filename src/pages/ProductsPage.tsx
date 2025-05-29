@@ -41,14 +41,12 @@ const ProductsPage = () => {
 
   // Initialize the filters from the URL query parameters
   const initialCategory = searchParams.get("category") || "all";
-  const stockParam = searchParams.get("inStock");
-  const initialInStock =
-    stockParam === "true" ? true : stockParam === "false" ? false : undefined;
+  const initialSize = searchParams.get("size") || "all";
   const initialSearch = searchParams.get("search") || "";
 
   const [filters, setFilters] = useState<ProductFilters>({
     category: initialCategory,
-    inStock: initialInStock,
+    size: initialSize,
     search: initialSearch,
   });
 
@@ -157,15 +155,13 @@ const ProductsPage = () => {
     });
   };
 
-  const handleStockChange = (value: string) => {
-    const inStock =
-      value === "true" ? true : value === "false" ? false : undefined;
-    setFilters((prev) => ({ ...prev, inStock }));
+  const handleSizeChange = (value: string) => {
+    setFilters((prev) => ({ ...prev, size: value }));
     setSearchParams((prev) => {
-      if (inStock !== undefined) {
-        prev.set("inStock", String(inStock));
+      if (value && value !== "all") {
+        prev.set("size", value);
       } else {
-        prev.delete("inStock");
+        prev.delete("size");
       }
       return prev;
     });
@@ -219,21 +215,19 @@ const ProductsPage = () => {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select
-                  value={
-                    filters.inStock === undefined
-                      ? "all"
-                      : String(filters.inStock)
-                  }
-                  onValueChange={handleStockChange}
-                >
+                <Select value={filters.size} onValueChange={handleSizeChange}>
                   <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder={t("stockStatus")} />
+                    <SelectValue placeholder={t("selectSize")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t("allProducts")}</SelectItem>
-                    <SelectItem value="true">{t("inStock")}</SelectItem>
-                    <SelectItem value="false">{t("outOfStock")}</SelectItem>
+                    <SelectItem value="all">{t("allSizes")}</SelectItem>
+                    {categories
+                      .find((cat) => cat.name === filters.category)
+                      ?.sizes.map((size) => (
+                        <SelectItem key={size} value={size}>
+                          {size}
+                        </SelectItem>
+                      ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -259,12 +253,12 @@ const ProductsPage = () => {
                 onClick={() => {
                   setFilters({
                     category: "all",
-                    inStock: undefined,
+                    size: "all",
                     search: "",
                   });
                   setSearchParams((prev) => {
                     prev.delete("category");
-                    prev.delete("inStock");
+                    prev.delete("size");
                     prev.delete("search");
                     return prev;
                   });

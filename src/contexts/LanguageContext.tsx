@@ -1029,6 +1029,18 @@ const translations: Translations = {
     fr: "Produit retiré des favoris",
     ar: "تمت إزالة المنتج من المفضلة",
   },
+  allSizes: {
+    fr: "Toutes les tailles",
+    ar: "جميع المقاسات",
+  },
+  resetFilters: {
+    fr: "Réinitialiser les filtres",
+    ar: "إعادة تعيين الفلاتر",
+  },
+  tryDifferentFilters: {
+    fr: "Essayez des filtres différents",
+    ar: "جرب فلاتر مختلفة",
+  },
 };
 
 interface LanguageContextType {
