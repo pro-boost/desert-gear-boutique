@@ -56,7 +56,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
           </div>
           {/* Mobile Price and Controls */}
           <div className="sm:hidden mt-2 space-y-2">
-            <div className="text-sm font-medium">{price.toFixed(2)} Dh</div>
+            <div className="text-sm font-medium">{Math.round(price)} Dh</div>
             <div className="flex items-center justify-between">
               <div className="flex items-center border border-border rounded-md bg-background">
                 <Button
@@ -95,7 +95,9 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
 
       {/* Desktop Price - 2 columns */}
       <div className="hidden sm:block sm:col-span-2 text-right">
-        <div className="font-medium">{price.toFixed(2)} Dh</div>
+        <div className="font-medium whitespace-nowrap">
+          {Math.round(price)} Dh
+        </div>
       </div>
 
       {/* Quantity Controls - 3 columns */}
@@ -122,27 +124,28 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
         </div>
       </div>
 
-      {/* Desktop Total - 2 columns */}
-      <div className="hidden sm:block sm:col-span-2 text-right">
-        <div className="font-semibold">{totalPrice.toFixed(2)} Dh</div>
-      </div>
-
-      {/* Desktop Delete Button */}
-      <div className="hidden sm:block sm:col-span-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleRemove}
-          className="text-muted-foreground hover:text-destructive mx-auto"
-        >
-          <Trash size={18} />
-        </Button>
+      {/* Desktop Total and Delete Button - 2 columns */}
+      <div className="hidden sm:flex sm:col-span-2 items-center justify-end gap-2">
+        <div className="font-semibold whitespace-nowrap min-w-[80px] text-right">
+          {Math.round(totalPrice)} Dh
+        </div>
+        <div className="w-8 flex justify-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleRemove}
+            className="text-muted-foreground hover:text-destructive h-8 w-8"
+            title={t("remove")}
+          >
+            <Trash size={16} />
+          </Button>
+        </div>
       </div>
 
       {/* Mobile Total */}
       <div className="col-span-12 sm:hidden flex justify-between items-center mt-2 pt-2 border-t border-border/50">
         <div className="text-sm font-semibold">
-          {t("total")}: {totalPrice.toFixed(2)} Dh
+          {t("total")}: {Math.round(totalPrice)} Dh
         </div>
       </div>
     </div>

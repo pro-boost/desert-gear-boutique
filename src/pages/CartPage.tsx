@@ -48,16 +48,18 @@ Subtotal: ${item.subtotal.toFixed(2)} Dh
       })
       .join("\n\n");
 
-    const message = `*New Order from Desert Gear Boutique* 🛍️
-
-*Order Items:*
-${itemsList}
-
-*Order Summary:*
-Total Items: ${items.reduce((sum, item) => sum + item.quantity, 0)}
-Total Amount: ${totalPrice.toFixed(2)} Dh
-
-Please provide your delivery details in the chat.`;
+    const message = [
+      `*${t("newOrder")}* 🛍️`,
+      "",
+      `*${t("orderItems")}:*`,
+      itemsList,
+      "",
+      `*${t("orderSummary")}:*`,
+      `${t("total")}: ${items.reduce((sum, item) => sum + item.quantity, 0)}`,
+      `${t("total")}: ${Math.round(totalPrice)} Dh`,
+      "",
+      t("provideDeliveryDetails"),
+    ].join("\n");
 
     // Encode the message for WhatsApp URL
     const encodedMessage = encodeURIComponent(message);
@@ -110,7 +112,7 @@ Please provide your delivery details in the chat.`;
                           {t("subtotal")}:
                         </span>
                         <span className="font-medium">
-                          {totalPrice.toFixed(2)} Dh
+                          {Math.round(totalPrice)} Dh
                         </span>
                       </div>
 
@@ -124,7 +126,7 @@ Please provide your delivery details in the chat.`;
                       <div className="flex justify-between py-3 text-lg font-semibold">
                         <span>{t("total")}:</span>
                         <span className="text-primary text-xl">
-                          {totalPrice.toFixed(2)} Dh
+                          {Math.round(totalPrice)} Dh
                         </span>
                       </div>
                     </div>

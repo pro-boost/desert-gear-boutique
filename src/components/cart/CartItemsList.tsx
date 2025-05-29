@@ -21,7 +21,10 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
         <div className="col-span-5">{t("product")}</div>
         <div className="col-span-2 text-right">{t("price")}</div>
         <div className="col-span-3 text-center">{t("quantity")}</div>
-        <div className="col-span-2 text-right">{t("total")}</div>
+        <div className="col-span-2 text-right flex items-center justify-end gap-2">
+          <span>{t("total")}</span>
+          <span className="w-8 text-center"></span>
+        </div>
       </div>
 
       {/* Cart Items */}

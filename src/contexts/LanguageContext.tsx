@@ -796,6 +796,10 @@ const translations: Translations = {
     fr: "Sous-total",
     ar: "المجموع الفرعي",
   },
+  orderSummary: {
+    fr: "Récapitulatif de la commande",
+    ar: "ملخص الطلب",
+  },
   free: {
     fr: "Gratuit",
     ar: "مجاني",
@@ -803,6 +807,18 @@ const translations: Translations = {
   proceedToCheckout: {
     fr: "Passer à la commande",
     ar: "المتابعة إلى الدفع",
+  },
+  newOrder: {
+    fr: "Nouvelle commande de Desert Gear Boutique",
+    ar: "طلب جديد من ديزرت جير بوتيك",
+  },
+  orderItems: {
+    fr: "Articles commandés",
+    ar: "المنتجات المطلوبة",
+  },
+  provideDeliveryDetails: {
+    fr: "Veuillez fournir vos coordonnées de livraison dans le chat",
+    ar: "يرجى تقديم تفاصيل التوصيل في المحادثة",
   },
   payAfterReceiving: {
     fr: "Paiement à la réception de votre commande",
