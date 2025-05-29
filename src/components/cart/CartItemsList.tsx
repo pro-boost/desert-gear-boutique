@@ -1,9 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { CartItemRow } from "./CartItemRow";
 
 interface CartItemsListProps {
@@ -17,54 +15,35 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
   const { t } = useLanguage();
 
   return (
-    <div className="card-section rounded-lg border border-border overflow-hidden">
-      <div className="p-4 border-b border-border bg-muted/50">
-        <h2 className="font-semibold">
-          {items.length} {items.length === 1 ? t("item") : t("items")}
-        </h2>
+    <div className="p-4">
+      {/* Headers on larger screens */}
+      <div className="hidden sm:grid grid-cols-12 gap-4 text-sm text-muted-foreground mb-2 px-4">
+        <div className="col-span-5">{t("product")}</div>
+        <div className="col-span-2 text-right">{t("price")}</div>
+        <div className="col-span-3 text-center">{t("quantity")}</div>
+        <div className="col-span-2 text-right">{t("total")}</div>
       </div>
 
-      <div className="p-4">
-        {/* Headers on larger screens */}
-        <div className="hidden sm:grid grid-cols-12 gap-4 text-sm text-muted-foreground mb-2 px-4">
-          <div className="col-span-5">{t("product")}</div>
-          <div className="col-span-2 text-right">{t("price")}</div>
-          <div className="col-span-3 text-center">{t("quantity")}</div>
-          <div className="col-span-2 text-right">{t("total")}</div>
-        </div>
+      {/* Cart Items */}
+      <div className="space-y-2">
+        {items.map((item) => (
+          <CartItemRow
+            key={`${item.product.id}-${item.selectedSize}`}
+            item={item}
+          />
+        ))}
+      </div>
 
-        {/* Cart Items */}
-        <div className="space-y-2">
-          {items.map((item) => (
-            <CartItemRow
-              key={`${item.product.id}-${item.selectedSize}`}
-              item={item}
-            />
-          ))}
-        </div>
-
-        {/* Actions */}
-        <div className="mt-6 flex flex-col sm:flex-row sm:justify-between gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={clearCart}
-            className="w-full sm:w-auto"
-          >
-            {t("clearCart")}
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="w-full sm:w-auto"
-          >
-            <Link to="/products">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("continueShop")}
-            </Link>
-          </Button>
-        </div>
+      {/* Clear Cart Button */}
+      <div className="mt-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={clearCart}
+          className="w-full sm:w-auto"
+        >
+          {t("clearCart")}
+        </Button>
       </div>
     </div>
   );
