@@ -44,11 +44,21 @@ export const CartItemsList: React.FC<CartItemsListProps> = ({
         </div>
 
         {/* Actions */}
-        <div className="mt-6 flex justify-between">
-          <Button variant="outline" size="sm" onClick={clearCart}>
+        <div className="mt-6 flex flex-col sm:flex-row sm:justify-between gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={clearCart}
+            className="w-full sm:w-auto"
+          >
             {t("clearCart")}
           </Button>
-          <Button asChild variant="outline" size="sm">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto"
+          >
             <Link to="/products">
               <ArrowLeft className="mr-2 h-4 w-4" />
               {t("continueShop")}

@@ -27,7 +27,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
   return (
     <div className="grid grid-cols-12 gap-4 items-start sm:items-center py-4 border-b border-border">
       {/* Product Image and Info - 5 columns on desktop */}
-      <div className="col-span-8 sm:col-span-5 flex items-start gap-3">
+      <div className="col-span-12 sm:col-span-5 flex items-start gap-3">
         <Link
           to={`/products/${item.product.id}`}
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-sm"
@@ -43,7 +43,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
             <div className="flex-grow min-w-0">
               <Link
                 to={`/products/${item.product.id}`}
-                className="font-medium hover:text-primary text-sm block mb-1 truncate"
+                className="font-medium hover:text-primary text-sm block mb-1 break-words"
               >
                 {item.product.name}
               </Link>
@@ -53,19 +53,42 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
                 </div>
               )}
             </div>
-            {/* Mobile Delete Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleRemove}
-              className="text-muted-foreground hover:text-destructive sm:hidden -mt-1 -mr-2"
-            >
-              <Trash size={16} />
-            </Button>
           </div>
-          {/* Mobile Price */}
-          <div className="sm:hidden mt-2">
+          {/* Mobile Price and Controls */}
+          <div className="sm:hidden mt-2 space-y-2">
             <div className="text-sm font-medium">{price.toFixed(2)} Dh</div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center border border-border rounded-md bg-background">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-muted"
+                  onClick={() => handleQuantityChange(item.quantity - 1)}
+                  disabled={item.quantity <= 1}
+                >
+                  <Minus size={12} />
+                </Button>
+                <span className="w-6 text-center text-sm font-medium">
+                  {item.quantity}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 hover:bg-muted"
+                  onClick={() => handleQuantityChange(item.quantity + 1)}
+                >
+                  <Plus size={12} />
+                </Button>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleRemove}
+                className="text-muted-foreground hover:text-destructive h-7 w-7"
+              >
+                <Trash size={14} />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -76,7 +99,7 @@ export const CartItemRow: React.FC<CartItemRowProps> = ({ item }) => {
       </div>
 
       {/* Quantity Controls - 3 columns */}
-      <div className="col-span-4 sm:col-span-3 flex items-center justify-end sm:justify-center">
+      <div className="hidden sm:flex sm:col-span-3 items-center justify-center">
         <div className="flex items-center border border-border rounded-md bg-background">
           <Button
             variant="ghost"

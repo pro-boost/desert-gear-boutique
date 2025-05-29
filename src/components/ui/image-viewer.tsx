@@ -1,7 +1,40 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { X, ZoomIn, ZoomOut, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "./button";
-import { cn } from "@/lib/utils";
+
+// Button component
+const Button = ({
+  variant = "default",
+  size = "default",
+  className = "",
+  children,
+  ...props
+}) => {
+  const baseClasses =
+    "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background";
+
+  const variants = {
+    default: "bg-primary text-primary-foreground hover:bg-primary/90",
+    ghost: "hover:bg-accent hover:text-accent-foreground",
+  };
+
+  const sizes = {
+    default: "h-10 py-2 px-4",
+    icon: "h-10 w-10",
+  };
+
+  const classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`;
+
+  return (
+    <button className={classes} {...props}>
+      {children}
+    </button>
+  );
+};
+
+// cn utility function
+const cn = (...classes) => {
+  return classes.filter(Boolean).join(" ");
+};
 
 interface ImageViewerProps {
   isOpen: boolean;
@@ -25,12 +58,12 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
+  // Reset states when image changes or modal opens
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = "hidden";
       setCurrentIndex(initialIndex);
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
+      resetZoom();
     } else {
       document.body.style.overflow = "unset";
     }
@@ -38,6 +71,44 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
       document.body.style.overflow = "unset";
     };
   }, [isOpen, initialIndex]);
+
+  // Reset zoom when image changes
+  useEffect(() => {
+    resetZoom();
+  }, [currentIndex]);
+
+  const resetZoom = useCallback(() => {
+    setScale(1);
+    setPosition({ x: 0, y: 0 });
+  }, []);
+
+  // Calculate zoom boundaries
+  const getZoomBounds = useCallback(() => {
+    if (!containerRef.current || !imageRef.current) return { maxX: 0, maxY: 0 };
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const imageRect = imageRef.current.getBoundingClientRect();
+
+    const scaledWidth = imageRect.width * scale;
+    const scaledHeight = imageRect.height * scale;
+
+    const maxX = Math.max(0, (scaledWidth - containerRect.width) / 2);
+    const maxY = Math.max(0, (scaledHeight - containerRect.height) / 2);
+
+    return { maxX, maxY };
+  }, [scale]);
+
+  // Constrain position within bounds
+  const constrainPosition = useCallback(
+    (x: number, y: number) => {
+      const { maxX, maxY } = getZoomBounds();
+      return {
+        x: Math.max(-maxX, Math.min(maxX, x)),
+        y: Math.max(-maxY, Math.min(maxY, y)),
+      };
+    },
+    [getZoomBounds]
+  );
 
   // Handle keyboard events
   useEffect(() => {
@@ -68,132 +139,190 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen]);
 
-  const handleZoomIn = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (scale < 3) {
-      const newScale = scale + 0.5;
+  const handleZoomIn = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (scale >= 3) return;
+
+      const newScale = Math.min(3, scale + 0.5);
       setScale(newScale);
 
-      // Calculate zoom center based on click position or image center
-      if (e && imageRef.current) {
-        const rect = imageRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
+      // Calculate zoom center
+      if (e && imageRef.current && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const imageRect = imageRef.current.getBoundingClientRect();
 
-        setPosition({
-          x: position.x - ((x - centerX) * (newScale - scale)) / scale,
-          y: position.y - ((y - centerY) * (newScale - scale)) / scale,
-        });
+        // Get click position relative to the image
+        const clickX = e.clientX - imageRect.left;
+        const clickY = e.clientY - imageRect.top;
+
+        // Calculate the center of the image
+        const imageCenterX = imageRect.width / 2;
+        const imageCenterY = imageRect.height / 2;
+
+        // Calculate offset from center
+        const offsetX = clickX - imageCenterX;
+        const offsetY = clickY - imageCenterY;
+
+        // Calculate new position to zoom into the clicked point
+        const scaleRatio = newScale / scale;
+        const newX = position.x - offsetX * (scaleRatio - 1);
+        const newY = position.y - offsetY * (scaleRatio - 1);
+
+        setPosition(constrainPosition(newX, newY));
       }
-    }
-  };
+    },
+    [scale, position, constrainPosition]
+  );
 
-  const handleZoomOut = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (scale > 1) {
-      const newScale = scale - 0.5;
+  const handleZoomOut = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (scale <= 1) return;
+
+      const newScale = Math.max(1, scale - 0.5);
       setScale(newScale);
 
-      // Reset position when zooming out to 1x
       if (newScale === 1) {
         setPosition({ x: 0, y: 0 });
-      } else if (e && imageRef.current) {
-        const rect = imageRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-
-        setPosition({
-          x: position.x - ((x - centerX) * (newScale - scale)) / scale,
-          y: position.y - ((y - centerY) * (newScale - scale)) / scale,
-        });
+      } else {
+        // Adjust position proportionally when zooming out
+        const scaleRatio = newScale / scale;
+        const newX = position.x * scaleRatio;
+        const newY = position.y * scaleRatio;
+        setPosition(constrainPosition(newX, newY));
       }
-    }
-  };
+    },
+    [scale, position, constrainPosition]
+  );
 
-  const handleImageClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (scale === 1) {
-      handleZoomIn(e);
-    } else {
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
-    }
-  };
+  const handleImageClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (scale === 1) {
+        handleZoomIn(e);
+      } else {
+        resetZoom();
+      }
+    },
+    [scale, handleZoomIn, resetZoom]
+  );
 
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    if (e.deltaY < 0) {
-      handleZoomIn(e);
-    } else {
-      handleZoomOut(e);
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (scale > 1) {
+  const handleWheel = useCallback(
+    (e: React.WheelEvent) => {
       e.preventDefault();
+      e.stopPropagation();
+
+      if (e.deltaY < 0) {
+        handleZoomIn(e);
+      } else {
+        handleZoomOut(e);
+      }
+    },
+    [handleZoomIn, handleZoomOut]
+  );
+
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (scale <= 1) return;
+
+      e.preventDefault();
+      e.stopPropagation();
       setIsDragging(true);
       setDragStart({
         x: e.clientX - position.x,
         y: e.clientY - position.y,
       });
-    }
-  };
+    },
+    [scale, position]
+  );
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && scale > 1) {
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!isDragging || scale <= 1) return;
+
       e.preventDefault();
+      e.stopPropagation();
+
       const newX = e.clientX - dragStart.x;
       const newY = e.clientY - dragStart.y;
 
-      if (containerRef.current && imageRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        const imageRect = imageRef.current.getBoundingClientRect();
-        const maxX = (imageRect.width * scale - rect.width) / 2;
-        const maxY = (imageRect.height * scale - rect.height) / 2;
+      setPosition(constrainPosition(newX, newY));
+    },
+    [isDragging, scale, dragStart, constrainPosition]
+  );
 
-        setPosition({
-          x: Math.max(-maxX, Math.min(maxX, newX)),
-          y: Math.max(-maxY, Math.min(maxY, newY)),
-        });
-      }
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleNext = (e?: React.MouseEvent) => {
+  const handleMouseUp = useCallback((e?: React.MouseEvent) => {
     e?.stopPropagation();
-    if (!isTransitioning) {
+    setIsDragging(false);
+  }, []);
+
+  const handleNext = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (isTransitioning) return;
+
       setIsTransitioning(true);
       setCurrentIndex((prev) => (prev + 1) % images.length);
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
       setTimeout(() => setIsTransitioning(false), 300);
-    }
-  };
+    },
+    [isTransitioning, images.length]
+  );
 
-  const handlePrev = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (!isTransitioning) {
+  const handlePrev = useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (isTransitioning) return;
+
       setIsTransitioning(true);
       setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-      setScale(1);
-      setPosition({ x: 0, y: 0 });
       setTimeout(() => setIsTransitioning(false), 300);
-    }
-  };
+    },
+    [isTransitioning, images.length]
+  );
 
-  const handleClose = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onClose();
-  };
+  const handleClose = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      onClose();
+    },
+    [onClose]
+  );
+
+  // Handle touch events for mobile
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (scale <= 1 || e.touches.length > 1) return;
+
+      e.preventDefault();
+      const touch = e.touches[0];
+      setIsDragging(true);
+      setDragStart({
+        x: touch.clientX - position.x,
+        y: touch.clientY - position.y,
+      });
+    },
+    [scale, position]
+  );
+
+  const handleTouchMove = useCallback(
+    (e: React.TouchEvent) => {
+      if (!isDragging || scale <= 1 || e.touches.length > 1) return;
+
+      e.preventDefault();
+      const touch = e.touches[0];
+      const newX = touch.clientX - dragStart.x;
+      const newY = touch.clientY - dragStart.y;
+
+      setPosition(constrainPosition(newX, newY));
+    },
+    [isDragging, scale, dragStart, constrainPosition]
+  );
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -226,7 +355,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
         >
           <ZoomOut className="h-5 w-5" />
         </Button>
-        <span className="text-white px-2 flex items-center">
+        <span className="text-white px-2 flex items-center min-w-[60px] justify-center">
           {Math.round(scale * 100)}%
         </span>
         <Button
@@ -246,7 +375,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute left-4 z-[101] text-white hover:bg-white/10"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-[101] text-white hover:bg-white/10"
             onClick={handlePrev}
             disabled={isTransitioning}
           >
@@ -255,7 +384,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute right-4 z-[101] text-white hover:bg-white/10"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-[101] text-white hover:bg-white/10"
             onClick={handleNext}
             disabled={isTransitioning}
           >
@@ -273,36 +402,44 @@ const ImageViewer: React.FC<ImageViewerProps> = ({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onClick={(e) => e.stopPropagation()}
+        style={{ touchAction: "none" }}
       >
         <div className="relative w-full h-full flex items-center justify-center">
-          {images.map((src, index) => (
-            <img
-              key={src}
-              ref={index === currentIndex ? imageRef : null}
-              src={src}
-              alt={`Product image ${index + 1}`}
-              className={cn(
-                "absolute max-w-full max-h-full object-contain transition-all duration-300",
-                isDragging
-                  ? "cursor-grabbing"
-                  : scale > 1
-                  ? "cursor-grab"
-                  : "cursor-zoom-in",
-                index === currentIndex ? "opacity-100" : "opacity-0",
-                isTransitioning && "transition-transform duration-300"
-              )}
-              style={{
-                transform:
-                  index === currentIndex
-                    ? `scale(${scale}) translate(${position.x}px, ${position.y}px)`
-                    : "scale(1) translate(0, 0)",
-                touchAction: "none",
-              }}
-              onClick={handleImageClick}
-              draggable={false}
-            />
-          ))}
+          <img
+            ref={imageRef}
+            src={images[currentIndex]}
+            alt={`Product image ${currentIndex + 1}`}
+            className={cn(
+              "max-w-full max-h-full object-contain select-none transition-opacity duration-300",
+              isDragging
+                ? "cursor-grabbing"
+                : scale > 1
+                ? "cursor-grab"
+                : "cursor-zoom-in",
+              !isTransitioning && "opacity-100"
+            )}
+            style={{
+              transform: `scale(${scale}) translate(${position.x / scale}px, ${
+                position.y / scale
+              }px)`,
+              transformOrigin: "center center",
+              transition: isTransitioning
+                ? "opacity 300ms ease-in-out"
+                : "none",
+            }}
+            onClick={handleImageClick}
+            onLoad={() => {
+              // Reset zoom when new image loads
+              if (scale !== 1 || position.x !== 0 || position.y !== 0) {
+                resetZoom();
+              }
+            }}
+            draggable={false}
+          />
         </div>
       </div>
 

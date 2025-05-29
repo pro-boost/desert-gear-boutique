@@ -30,9 +30,9 @@ export const OrderSummary: React.FC<OrderSummaryProps> = ({
           <span>{t("free")}</span>
         </div>
 
-        <div className="flex justify-between py-2 text-lg font-semibold">
+        <div className="flex flex-col sm:flex-row sm:justify-between py-2 text-lg font-semibold items-center gap-1">
           <span>{t("total")}:</span>
-          <span>{totalPrice.toFixed(2)} Dh</span>
+          <span className="text-primary">{totalPrice.toFixed(2)} Dh</span>
         </div>
 
         <Button className="w-full lg:hidden" onClick={onProceedToCheckout}>
