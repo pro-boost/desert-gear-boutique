@@ -55,9 +55,6 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             <CategoryCard
               key={category.nameFr}
               category={category}
-              onEdit={() =>
-                navigate(`/admin/categories/${category.nameFr}/edit`)
-              }
               onDelete={onDeleteCategory}
             />
           ))}

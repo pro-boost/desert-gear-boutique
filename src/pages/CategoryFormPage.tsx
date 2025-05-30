@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSupabase } from "@/hooks/useSupabase";
+import { useAdmin } from "@/hooks/useAdmin";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import CategoryForm from "@/components/admin/CategoryForm";
@@ -10,6 +11,7 @@ import {
   addCategory,
   updateCategory,
   ensureCategoriesTable,
+  getCategories,
 } from "@/services/productService";
 
 interface Category {
@@ -21,48 +23,93 @@ interface Category {
 const CategoryFormPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { categoryNameFr } = useParams();
+  const { categoryName } = useParams();
   const { getClient } = useSupabase();
-  const [category, setCategory] = useState<Category | null>(null);
+  const { isAdmin, isLoaded } = useAdmin();
+  const isEditing = !!categoryName;
+
+  console.log("CategoryFormPage render:", {
+    categoryName,
+    isEditing,
+    isAdmin,
+    isLoaded,
+  });
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [formData, setFormData] = useState<Category>({
+    nameFr: "",
+    nameAr: "",
+    sizes: [],
+  });
+
+  console.log("Current formData state:", formData);
 
   useEffect(() => {
-    const loadCategory = async () => {
-      if (!categoryNameFr) {
-        setLoading(false);
-        return;
-      }
+    console.log("Admin check effect:", { isLoaded, isAdmin });
+    if (isLoaded && !isAdmin) {
+      toast.error(t("unauthorizedAccess"));
+      navigate("/admin");
+    }
+  }, [isLoaded, isAdmin, navigate, t]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      console.log("loadData called:", { isAdmin, isEditing, categoryName });
+      if (!isAdmin) return;
 
       try {
+        setLoading(true);
         const client = await getClient();
-        const { data: categories } = await client
-          .from("categories")
-          .select("*")
-          .eq("name_fr", categoryNameFr)
-          .single();
 
-        if (categories) {
-          setCategory({
-            nameFr: categories.name_fr,
-            nameAr: categories.name_ar,
-            sizes: categories.sizes,
-          });
+        // If editing, load category data
+        if (isEditing && categoryName) {
+          console.log(
+            "Fetching category data for:",
+            decodeURIComponent(categoryName)
+          );
+          const { data, error } = await client
+            .from("categories")
+            .select("*")
+            .eq("name_fr", decodeURIComponent(categoryName))
+            .single();
+
+          console.log("Category fetch result:", { data, error });
+
+          if (error) {
+            throw error;
+          }
+
+          if (data) {
+            const newFormData = {
+              nameFr: data.name_fr,
+              nameAr: data.name_ar,
+              sizes: data.sizes || [],
+            };
+            console.log("Setting new form data:", newFormData);
+            setFormData(newFormData);
+          } else {
+            console.log("Category not found, redirecting to admin");
+            toast.error(t("categoryNotFound"));
+            navigate("/admin");
+          }
         }
       } catch (error) {
-        console.error("Error loading category:", error);
-        toast.error(t("errorLoadingCategory"));
+        console.error("Error loading data:", error);
+        toast.error(t("errorLoadingData"));
+        navigate("/admin");
       } finally {
         setLoading(false);
       }
     };
 
-    loadCategory();
-  }, [categoryNameFr, getClient, t]);
+    loadData();
+  }, [getClient, isAdmin, isEditing, categoryName, navigate, t]);
 
   const handleSubmit = async (
     categoryData: Omit<Category, "createdAt" | "updatedAt">
   ) => {
+    console.log("handleSubmit called with:", categoryData);
     try {
       setSaving(true);
       const client = await getClient();
@@ -76,7 +123,7 @@ const CategoryFormPage: React.FC = () => {
 
       let savedCategory;
 
-      if (categoryNameFr) {
+      if (isEditing) {
         // Update existing category
         savedCategory = await updateCategory(client, categoryData);
         if (savedCategory) {
@@ -107,12 +154,16 @@ const CategoryFormPage: React.FC = () => {
     navigate("/admin");
   };
 
-  if (loading) {
+  if (!isLoaded || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  if (!isAdmin) {
+    return null;
   }
 
   return (
@@ -129,7 +180,7 @@ const CategoryFormPage: React.FC = () => {
         </div>
 
         <CategoryForm
-          editingCategory={category}
+          editingCategory={isEditing ? formData : null}
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           isSubmitting={saving}

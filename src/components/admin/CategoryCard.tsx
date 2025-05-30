@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,16 +31,12 @@ interface Category {
 
 interface CategoryCardProps {
   category: Category;
-  onEdit: (category: Category) => void;
   onDelete: (categoryNameFr: string) => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({
-  category,
-  onEdit,
-  onDelete,
-}) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({ category, onDelete }) => {
   const { t, language } = useLanguage();
+  const navigate = useNavigate();
 
   const getCategoryName = () => {
     switch (language) {
@@ -70,10 +67,18 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           <div className="flex gap-2">
             <Button
               variant="outline"
-              size="icon"
-              onClick={() => onEdit(category)}
+              size="sm"
+              onClick={() =>
+                navigate(
+                  `/admin/categories/${encodeURIComponent(
+                    category.nameFr
+                  )}/edit`
+                )
+              }
+              className="flex-1 p-1 min-w-[120px]"
             >
-              <Edit className="h-4 w-4" />
+              <Edit className="h-4 w-4 mr-2 shrink-0" />
+              <span className="truncate">{t("edit")}</span>
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>

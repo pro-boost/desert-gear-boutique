@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,16 +35,22 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   isSubmitting = false,
 }) => {
   const { t } = useLanguage();
-  const [newCategoryNameFr, setNewCategoryNameFr] = useState(
-    editingCategory?.nameFr || ""
-  );
-  const [newCategoryNameAr, setNewCategoryNameAr] = useState(
-    editingCategory?.nameAr || ""
-  );
-  const [newCategorySizes, setNewCategorySizes] = useState<string[]>(
-    editingCategory?.sizes || []
-  );
+  const [newCategoryNameFr, setNewCategoryNameFr] = useState("");
+  const [newCategoryNameAr, setNewCategoryNameAr] = useState("");
+  const [newCategorySizes, setNewCategorySizes] = useState<string[]>([]);
   const [newSize, setNewSize] = useState("");
+
+  useEffect(() => {
+    if (editingCategory) {
+      setNewCategoryNameFr(editingCategory.nameFr);
+      setNewCategoryNameAr(editingCategory.nameAr);
+      setNewCategorySizes(editingCategory.sizes);
+    } else {
+      setNewCategoryNameFr("");
+      setNewCategoryNameAr("");
+      setNewCategorySizes([]);
+    }
+  }, [editingCategory]);
 
   const handleAddSize = () => {
     if (newSize.trim() && !newCategorySizes.includes(newSize.trim())) {
