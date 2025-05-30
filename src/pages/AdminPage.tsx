@@ -5,8 +5,6 @@ import {
   getProducts,
   deleteProduct,
   getCategories,
-  addCategory,
-  updateCategory,
   deleteCategory,
 } from "@/services/productService";
 import { Product } from "@/types/product";
@@ -20,7 +18,8 @@ import ProductsSection from "@/components/admin/ProductsSection";
 import CategoriesSection from "@/components/admin/CategoriesSection";
 
 interface Category {
-  name: string;
+  nameFr: string;
+  nameAr: string;
   sizes: string[];
 }
 
@@ -82,49 +81,15 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleAddCategory = async (
-    category: Omit<Category, "createdAt" | "updatedAt">
-  ) => {
+  const handleDeleteCategory = async (categoryNameFr: string) => {
     try {
       const client = await getClient();
-      const savedCategory = await addCategory(client, category);
-      if (savedCategory) {
-        setCategories((prev) => [...prev, savedCategory]);
-        toast.success(`Category "${savedCategory.name}" added successfully`);
-      }
-    } catch (error) {
-      console.error("Error saving category:", error);
-      toast.error("Failed to save category");
-    }
-  };
-
-  const handleUpdateCategory = async (
-    category: Omit<Category, "createdAt" | "updatedAt">
-  ) => {
-    try {
-      const client = await getClient();
-      const savedCategory = await updateCategory(client, category);
-      if (savedCategory) {
-        setCategories((prev) =>
-          prev.map((cat) => (cat.name === category.name ? savedCategory : cat))
-        );
-        toast.success(`Category "${savedCategory.name}" updated successfully`);
-      }
-    } catch (error) {
-      console.error("Error updating category:", error);
-      toast.error("Failed to update category");
-    }
-  };
-
-  const handleDeleteCategory = async (categoryName: string) => {
-    try {
-      const client = await getClient();
-      const success = await deleteCategory(client, categoryName);
+      const success = await deleteCategory(client, categoryNameFr);
       if (success) {
         setCategories((prev) =>
-          prev.filter((cat) => cat.name !== categoryName)
+          prev.filter((cat) => cat.nameFr !== categoryNameFr)
         );
-        toast.success(`Category "${categoryName}" deleted successfully`);
+        toast.success(`Category "${categoryNameFr}" deleted successfully`);
       }
     } catch (error) {
       console.error("Error deleting category:", error);
@@ -180,18 +145,16 @@ const AdminPage: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="products" className="space-y-8 px-0">
+              <TabsContent value="products" className="space-y-8">
                 <ProductsSection
                   products={products}
                   onDeleteProduct={handleDeleteProduct}
                 />
               </TabsContent>
 
-              <TabsContent value="categories" className="space-y-8 px-0">
+              <TabsContent value="categories" className="space-y-8">
                 <CategoriesSection
                   categories={categories}
-                  onAddCategory={handleAddCategory}
-                  onUpdateCategory={handleUpdateCategory}
                   onDeleteCategory={handleDeleteCategory}
                 />
               </TabsContent>

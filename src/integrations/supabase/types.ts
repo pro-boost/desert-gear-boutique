@@ -166,19 +166,22 @@ export type Database = {
       }
       categories: {
         Row: {
-          name: string
+          name_fr: string
+          name_ar: string
           sizes: string[]
           created_at: string
           updated_at: string
         }
         Insert: {
-          name: string
+          name_fr: string
+          name_ar: string
           sizes: string[]
           created_at?: string
           updated_at?: string
         }
         Update: {
-          name?: string
+          name_fr?: string
+          name_ar?: string
           sizes?: string[]
           created_at?: string
           updated_at?: string

@@ -23,14 +23,15 @@ import {
 import { Edit, Trash } from "lucide-react";
 
 interface Category {
-  name: string;
+  nameFr: string;
+  nameAr: string;
   sizes: string[];
 }
 
 interface CategoryCardProps {
   category: Category;
   onEdit: (category: Category) => void;
-  onDelete: (categoryName: string) => void;
+  onDelete: (categoryNameFr: string) => void;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
@@ -38,15 +39,29 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const getCategoryName = () => {
+    switch (language) {
+      case "fr":
+        return category.nameFr;
+      case "ar":
+        return category.nameAr;
+      default:
+        return category.nameFr;
+    }
+  };
 
   return (
     <Card className="card-section h-full">
       <CardHeader>
         <div className="flex justify-between items-start">
           <div>
-            <CardTitle className="text-lg capitalize">
-              {category.name}
+            <CardTitle
+              className="text-lg capitalize"
+              dir={language === "ar" ? "rtl" : "ltr"}
+            >
+              {getCategoryName()}
             </CardTitle>
             <CardDescription>
               {t("sizes")}: {category.sizes.length}
@@ -65,7 +80,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => onDelete(category.name)}
+                  onClick={() => onDelete(category.nameFr)}
                 >
                   <Trash className="h-4 w-4" />
                 </Button>
@@ -79,7 +94,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(category.name)}>
+                  <AlertDialogAction onClick={() => onDelete(category.nameFr)}>
                     {t("delete")}
                   </AlertDialogAction>
                 </AlertDialogFooter>

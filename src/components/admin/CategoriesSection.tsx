@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,44 +10,25 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { PlusCircle } from "lucide-react";
-import CategoryForm from "./CategoryForm";
 import CategoryCard from "./CategoryCard";
 
 interface Category {
-  name: string;
+  nameFr: string;
+  nameAr: string;
   sizes: string[];
 }
 
 interface CategoriesSectionProps {
   categories: Category[];
-  onAddCategory: (
-    category: Omit<Category, "createdAt" | "updatedAt">
-  ) => Promise<void>;
-  onUpdateCategory: (
-    category: Omit<Category, "createdAt" | "updatedAt">
-  ) => Promise<void>;
-  onDeleteCategory: (categoryName: string) => Promise<void>;
+  onDeleteCategory: (categoryNameFr: string) => Promise<void>;
 }
 
 const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   categories,
-  onAddCategory,
-  onUpdateCategory,
   onDeleteCategory,
 }) => {
   const { t } = useLanguage();
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-
-  const handleSubmit = async (
-    category: Omit<Category, "createdAt" | "updatedAt">
-  ) => {
-    if (editingCategory) {
-      await onUpdateCategory(category);
-    } else {
-      await onAddCategory(category);
-    }
-    setEditingCategory(null);
-  };
+  const navigate = useNavigate();
 
   return (
     <Card className="card-section">
@@ -59,7 +41,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
             </CardDescription>
           </div>
           <Button
-            onClick={() => setEditingCategory(null)}
+            onClick={() => navigate("/admin/categories/new")}
             className="w-full md:w-auto"
           >
             <PlusCircle className="mr-2 h-4 w-4" />
@@ -68,23 +50,17 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
         </div>
       </CardHeader>
       <CardContent className="px-0">
-        <div className="space-y-6">
-          <CategoryForm
-            editingCategory={editingCategory}
-            onSubmit={handleSubmit}
-            onCancel={() => setEditingCategory(null)}
-          />
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {categories.map((category) => (
-              <CategoryCard
-                key={category.name}
-                category={category}
-                onEdit={setEditingCategory}
-                onDelete={onDeleteCategory}
-              />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {categories.map((category) => (
+            <CategoryCard
+              key={category.nameFr}
+              category={category}
+              onEdit={() =>
+                navigate(`/admin/categories/${category.nameFr}/edit`)
+              }
+              onDelete={onDeleteCategory}
+            />
+          ))}
         </div>
       </CardContent>
     </Card>

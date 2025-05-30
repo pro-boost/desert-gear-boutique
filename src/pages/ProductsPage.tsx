@@ -16,6 +16,12 @@ import { ProductSearch } from "@/components/products/ProductSearch";
 import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductGrid } from "@/components/products/ProductGrid";
 
+interface Category {
+  nameFr: string;
+  nameAr: string;
+  sizes: string[];
+}
+
 const ProductsPage = () => {
   const { t } = useLanguage();
   const { getClient } = useSupabase();
@@ -35,9 +41,7 @@ const ProductsPage = () => {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [totalProducts, setTotalProducts] = useState(0);
-  const [categories, setCategories] = useState<
-    { name: string; sizes: string[] }[]
-  >([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Load categories
   useEffect(() => {

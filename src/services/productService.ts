@@ -47,44 +47,39 @@ export const saveCategories = (categories: string[]): void => {
 
 // Add interfaces for category management
 interface Category {
-  name: string;
+  nameFr: string;
+  nameAr: string;
   sizes: string[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-// Check if categories table exists and create it if it doesn't
+// Check if categories table exists
 export const ensureCategoriesTable = async (
   client: SupabaseClient<Database>
 ): Promise<boolean> => {
   try {
-    // First check if the table exists
-    const { data: tableExists, error: checkError } = await client
+    // Use a simple count query like the authentication test
+    const { data, error } = await client
       .from('categories')
       .select('count')
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
-    if (checkError) {
-      // If the error is about the table not existing, create it
-      if (checkError.message.includes('does not exist')) {
-        // Create the table using a stored procedure
-        const { error: createError } = await client.rpc('create_categories_table');
-        
-        if (createError) {
-          console.error('Error creating categories table:', createError);
-          return false;
-        }
-      } else {
-        console.error('Error checking categories table:', checkError);
-        return false;
+    if (error) {
+      // If the error is about the table not existing, we'll handle that in the addCategory function
+      if (error.message.includes('does not exist')) {
+        console.log('Categories table does not exist yet');
+        return true; // Return true to allow the addCategory function to create it
       }
+      console.error('Error accessing categories table:', error);
+      toast.error('Failed to access categories table');
+        return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error ensuring categories table:', error);
-    toast.error('Failed to create categories table');
+    console.error('Error checking categories table:', error);
+    toast.error('Failed to check categories table');
     return false;
   }
 };
@@ -94,18 +89,18 @@ export const getCategories = async (
   client: SupabaseClient<Database>
 ): Promise<Category[]> => {
   try {
-    // First, ensure the categories table exists
     await ensureCategoriesTable(client);
 
     const { data, error } = await client
       .from('categories')
       .select('*')
-      .order('name');
+      .order('name_fr');
 
     if (error) throw error;
 
     return data.map(category => ({
-      name: category.name,
+      nameFr: category.name_fr,
+      nameAr: category.name_ar,
       sizes: category.sizes,
       createdAt: category.created_at,
       updatedAt: category.updated_at
@@ -124,10 +119,12 @@ export const addCategory = async (
 ): Promise<Category | null> => {
   try {
     const now = new Date().toISOString();
+    
     const { data, error } = await client
       .from('categories')
       .insert({
-        name: category.name,
+        name_fr: category.nameFr,
+        name_ar: category.nameAr,
         sizes: category.sizes,
         created_at: now,
         updated_at: now
@@ -135,10 +132,43 @@ export const addCategory = async (
       .select()
       .single();
 
+    if (error?.message?.includes('does not exist')) {
+      console.log('Creating categories table...');
+      const { error: createError } = await client.rpc('create_categories_table');
+      
+      if (createError) {
+        console.error('Error creating categories table:', createError);
+        toast.error('Failed to create categories table');
+        return null;
+      }
+
+      const { data: retryData, error: retryError } = await client
+        .from('categories')
+        .insert({
+          name_fr: category.nameFr,
+          name_ar: category.nameAr,
+          sizes: category.sizes,
+          created_at: now,
+          updated_at: now
+        })
+        .select()
+        .single();
+
+      if (retryError) throw retryError;
+      return {
+        nameFr: retryData.name_fr,
+        nameAr: retryData.name_ar,
+        sizes: retryData.sizes,
+        createdAt: retryData.created_at,
+        updatedAt: retryData.updated_at
+      };
+    }
+
     if (error) throw error;
 
     return {
-      name: data.name,
+      nameFr: data.name_fr,
+      nameAr: data.name_ar,
       sizes: data.sizes,
       createdAt: data.created_at,
       updatedAt: data.updated_at
@@ -160,17 +190,19 @@ export const updateCategory = async (
     const { data, error } = await client
       .from('categories')
       .update({
+        name_ar: category.nameAr,
         sizes: category.sizes,
         updated_at: now
       })
-      .eq('name', category.name)
+      .eq('name_fr', category.nameFr)
       .select()
       .single();
 
     if (error) throw error;
 
     return {
-      name: data.name,
+      nameFr: data.name_fr,
+      nameAr: data.name_ar,
       sizes: data.sizes,
       createdAt: data.created_at,
       updatedAt: data.updated_at
@@ -185,13 +217,13 @@ export const updateCategory = async (
 // Delete a category
 export const deleteCategory = async (
   client: SupabaseClient<Database>,
-  categoryName: string
+  categoryNameFr: string
 ): Promise<boolean> => {
   try {
     const { error } = await client
       .from('categories')
       .delete()
-      .eq('name', categoryName);
+      .eq('name_fr', categoryNameFr);
 
     if (error) throw error;
 

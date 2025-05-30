@@ -1057,6 +1057,15 @@ const translations: Translations = {
     fr: "Essayez des filtres différents",
     ar: "جرب فلاتر مختلفة",
   },
+  // Add missing translations for admin actions
+  delete: {
+    fr: "Supprimer",
+    ar: "حذف",
+  },
+  edit: {
+    fr: "Modifier",
+    ar: "تعديل",
+  },
 };
 
 interface LanguageContextType {

@@ -9,9 +9,15 @@ import {
 } from "@/components/ui/select";
 import { ProductFilters as Filters } from "@/types/product";
 
+interface Category {
+  nameFr: string;
+  nameAr: string;
+  sizes: string[];
+}
+
 interface ProductFiltersProps {
   filters: Filters;
-  categories: { name: string; sizes: string[] }[];
+  categories: Category[];
   onCategoryChange: (value: string) => void;
   onSizeChange: (value: string) => void;
 }
@@ -22,7 +28,18 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
   onCategoryChange,
   onSizeChange,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  const getCategoryName = (category: Category) => {
+    switch (language) {
+      case "fr":
+        return category.nameFr;
+      case "ar":
+        return category.nameAr;
+      default:
+        return category.nameFr; // Default to French name
+    }
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-4">
@@ -33,8 +50,8 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <SelectContent>
           <SelectItem value="all">{t("allCategories")}</SelectItem>
           {categories.map((category) => (
-            <SelectItem key={category.name} value={category.name}>
-              {t(category.name)}
+            <SelectItem key={category.nameFr} value={category.nameFr}>
+              {getCategoryName(category)}
             </SelectItem>
           ))}
         </SelectContent>
@@ -47,7 +64,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <SelectContent>
           <SelectItem value="all">{t("allSizes")}</SelectItem>
           {categories
-            .find((cat) => cat.name === filters.category)
+            .find((cat) => cat.nameFr === filters.category)
             ?.sizes.map((size) => (
               <SelectItem key={size} value={size}>
                 {size}

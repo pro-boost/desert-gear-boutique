@@ -14,7 +14,8 @@ import {
 import { Save, X } from "lucide-react";
 
 interface Category {
-  name: string;
+  nameFr: string;
+  nameAr: string;
   sizes: string[];
 }
 
@@ -24,16 +25,21 @@ interface CategoryFormProps {
     category: Omit<Category, "createdAt" | "updatedAt">
   ) => Promise<void>;
   onCancel: () => void;
+  isSubmitting?: boolean;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
   editingCategory,
   onSubmit,
   onCancel,
+  isSubmitting = false,
 }) => {
   const { t } = useLanguage();
-  const [newCategoryName, setNewCategoryName] = useState(
-    editingCategory?.name || ""
+  const [newCategoryNameFr, setNewCategoryNameFr] = useState(
+    editingCategory?.nameFr || ""
+  );
+  const [newCategoryNameAr, setNewCategoryNameAr] = useState(
+    editingCategory?.nameAr || ""
   );
   const [newCategorySizes, setNewCategorySizes] = useState<string[]>(
     editingCategory?.sizes || []
@@ -53,10 +59,11 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCategoryName.trim()) return;
+    if (!newCategoryNameFr.trim()) return;
 
     await onSubmit({
-      name: newCategoryName.trim().toLowerCase(),
+      nameFr: newCategoryNameFr.trim(),
+      nameAr: newCategoryNameAr.trim(),
       sizes: newCategorySizes,
     });
   };
@@ -77,13 +84,31 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="categoryName">{t("categoryName")}</Label>
+              <Label htmlFor="categoryNameFr">
+                {t("categoryName")} (Français)
+              </Label>
               <Input
-                id="categoryName"
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
+                id="categoryNameFr"
+                value={newCategoryNameFr}
+                onChange={(e) => setNewCategoryNameFr(e.target.value)}
                 placeholder={t("enterCategoryName")}
                 className="w-full"
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="categoryNameAr">
+                {t("categoryName")} (العربية)
+              </Label>
+              <Input
+                id="categoryNameAr"
+                value={newCategoryNameAr}
+                onChange={(e) => setNewCategoryNameAr(e.target.value)}
+                placeholder={t("enterCategoryName")}
+                className="w-full"
+                dir="rtl"
+                disabled={isSubmitting}
               />
             </div>
 
@@ -101,18 +126,20 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                     }
                   }}
                   className="flex-1"
+                  disabled={isSubmitting}
                 />
                 <Button
                   onClick={handleAddSize}
                   type="button"
                   className="w-full sm:w-auto"
+                  disabled={isSubmitting}
                 >
                   {t("addSize")}
                 </Button>
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 card-section p-4">
+            <div className="flex flex-wrap gap-2">
               {newCategorySizes.map((size) => (
                 <Badge
                   key={size}
@@ -125,6 +152,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                     size="icon"
                     className="h-4 w-4 p-0 hover:bg-transparent"
                     onClick={() => handleRemoveSize(size)}
+                    disabled={isSubmitting}
                   >
                     <X className="h-3 w-3" />
                   </Button>
@@ -133,14 +161,23 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             </div>
 
             <div className="flex justify-end gap-2">
-              {editingCategory && (
-                <Button type="button" variant="outline" onClick={onCancel}>
-                  {t("cancel")}
-                </Button>
-              )}
-              <Button type="submit" className="gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onCancel}
+                disabled={isSubmitting}
+              >
+                {t("cancel")}
+              </Button>
+              <Button type="submit" className="gap-2" disabled={isSubmitting}>
                 <Save className="h-4 w-4" />
-                {editingCategory ? t("saveChanges") : t("addCategory")}
+                {isSubmitting ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
+                ) : editingCategory ? (
+                  t("saveChanges")
+                ) : (
+                  t("addCategory")
+                )}
               </Button>
             </div>
           </div>

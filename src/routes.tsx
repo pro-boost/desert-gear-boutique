@@ -23,6 +23,7 @@ const AboutUs = lazy(() => import("./pages/AboutUs"));
 const Shipping = lazy(() => import("./pages/Shipping"));
 const Returns = lazy(() => import("./pages/Returns"));
 const ProductFormPage = lazy(() => import("./pages/ProductFormPage"));
+const CategoryFormPage = lazy(() => import("./pages/CategoryFormPage"));
 
 // Loading component for routes
 const RouteLoadingFallback = () => (
@@ -128,6 +129,22 @@ const AppRoutes = () => {
             element={
               <ProtectedRoute adminOnly>
                 <ProductFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/categories/new"
+            element={
+              <ProtectedRoute adminOnly>
+                <CategoryFormPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/categories/:categoryName/edit"
+            element={
+              <ProtectedRoute adminOnly>
+                <CategoryFormPage />
               </ProtectedRoute>
             }
           />
