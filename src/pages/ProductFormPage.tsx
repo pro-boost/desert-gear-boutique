@@ -29,7 +29,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Save } from "lucide-react";
+import { Save, ArrowLeft } from "lucide-react";
 import ImageDropzone from "@/components/upload/ImageDropzone";
 
 interface Category {
@@ -216,12 +216,24 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   return (
     <Card className="card-section">
       <CardHeader>
-        <CardTitle>
-          {isEditing ? t("editProductDetails") : t("addProductDetails")}
-        </CardTitle>
-        <CardDescription>
-          {isEditing ? t("editProductDescription") : t("addProductDescription")}
-        </CardDescription>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-4 text-center md:text-start w-full">
+            <CardTitle>
+              {isEditing ? t("editProductDetails") : t("addProductDetails")}
+            </CardTitle>
+            <CardDescription>
+              {isEditing
+                ? t("editProductDescription")
+                : t("addProductDescription")}
+            </CardDescription>
+          </div>
+          <div className="p-6 pb-0">
+            <Button variant="ghost" onClick={onClose} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("backToProducts")}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">

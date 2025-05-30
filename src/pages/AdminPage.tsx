@@ -202,35 +202,18 @@ const AdminPage: React.FC = () => {
 
               <TabsContent value="categories" className="space-y-8">
                 {showCategoryForm ? (
-                  <div className="relative">
-                    <Button
-                      variant="ghost"
-                      onClick={handleCategoryFormClose}
-                      className="mb-4"
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      {t("backToCategories")}
-                    </Button>
-                    <CategoryFormPage
-                      categoryName={editingCategory}
-                      onClose={handleCategoryFormClose}
-                    />
-                  </div>
+                  <CategoryFormPage
+                    categoryName={editingCategory}
+                    onClose={handleCategoryFormClose}
+                  />
                 ) : (
-                  <>
-                    <div className="flex justify-end mb-4">
-                      <Button onClick={handleAddCategory} className="gap-2">
-                        <Plus className="h-4 w-4" />
-                        {t("addCategory")}
-                      </Button>
-                    </div>
-                    <CategoriesSection
-                      categories={categories}
-                      onDeleteCategory={handleDeleteCategory}
-                      onEditCategory={handleEditCategory}
-                      onRefresh={loadData}
-                    />
-                  </>
+                  <CategoriesSection
+                    categories={categories}
+                    onDeleteCategory={handleDeleteCategory}
+                    onEditCategory={handleEditCategory}
+                    onRefresh={loadData}
+                    onAddCategory={handleAddCategory}
+                  />
                 )}
               </TabsContent>
             </Tabs>

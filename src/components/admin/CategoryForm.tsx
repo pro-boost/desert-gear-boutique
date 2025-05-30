@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Save, X } from "lucide-react";
+import { Save, X, ArrowLeft } from "lucide-react";
 
 interface Category {
   nameFr: string;
@@ -77,14 +77,24 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   return (
     <Card className="card-section">
       <CardHeader>
-        <CardTitle>
-          {editingCategory ? t("editCategory") : t("addCategory")}
-        </CardTitle>
-        <CardDescription>
-          {editingCategory
-            ? t("editCategoryDescription")
-            : t("addCategoryDescription")}
-        </CardDescription>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-4 text-center md:text-start w-full">
+            <CardTitle>
+              {editingCategory ? t("editCategory") : t("addCategory")}
+            </CardTitle>
+            <CardDescription>
+              {editingCategory
+                ? t("editCategoryDescription")
+                : t("addCategoryDescription")}
+            </CardDescription>
+          </div>
+          <div className="p-6 pb-0">
+            <Button variant="ghost" onClick={onCancel} className="mb-4">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              {t("backToCategories")}
+            </Button>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">

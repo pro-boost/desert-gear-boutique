@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { PlusCircle } from "lucide-react";
+import { Plus } from "lucide-react";
 import CategoryCard from "./CategoryCard";
 
 interface Category {
@@ -19,9 +19,10 @@ interface Category {
 
 interface CategoriesSectionProps {
   categories: Category[];
-  onDeleteCategory: (categoryNameFr: string) => Promise<void>;
+  onDeleteCategory: (categoryNameFr: string) => void;
   onEditCategory: (categoryName: string) => void;
   onRefresh: () => Promise<void>;
+  onAddCategory: () => void;
 }
 
 const CategoriesSection: React.FC<CategoriesSectionProps> = ({
@@ -29,6 +30,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   onDeleteCategory,
   onEditCategory,
   onRefresh,
+  onAddCategory,
 }) => {
   const { t } = useLanguage();
 
@@ -42,6 +44,10 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               {t("manageCategoriesDescription")}
             </CardDescription>
           </div>
+          <Button onClick={onAddCategory} className="gap-2">
+            <Plus className="h-4 w-4" />
+            {t("addCategory")}
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="px-0">

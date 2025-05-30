@@ -406,6 +406,10 @@ const translations: Translations = {
     fr: "Retour aux produits",
     ar: "العودة إلى المنتجات",
   },
+  backToCategories: {
+    fr: "Retour aux catégories",
+    ar: "العودة إلى الفئات",
+  },
   relatedProducts: {
     fr: "Produits connexes",
     ar: "منتجات ذات صلة",
