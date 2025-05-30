@@ -28,7 +28,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     <Card className="card-section">
       <CardHeader>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
+          <div className="space-y-4 text-center">
             <CardTitle>{t("manageProducts")}</CardTitle>
             <CardDescription>{t("manageProductsDescription")}</CardDescription>
           </div>
@@ -40,8 +40,8 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           </Link>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="card-section rounded-md">
+      <CardContent className="px-0">
+        <div className="rounded-md">
           <ProductTable products={products} onDelete={onDeleteProduct} />
         </div>
       </CardContent>

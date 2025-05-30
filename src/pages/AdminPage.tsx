@@ -146,18 +146,12 @@ const AdminPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-4 mb-8">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/")}
-              className="gap-2"
-            >
-              <ArrowLeft size={16} />
-              {t("backToHome")}
-            </Button>
-            <h1 className="text-3xl font-bold">{t("adminDashboard")}</h1>
+          <div className="flex flex-col items-center gap-4 mb-8">
+            <h1 className="text-3xl font-bold text-center">
+              {t("adminDashboard")}
+            </h1>
           </div>
 
           {loading ? (
@@ -171,23 +165,29 @@ const AdminPage: React.FC = () => {
               onValueChange={setActiveTab}
               className="space-y-8"
             >
-              <TabsList className="w-full justify-start">
-                <TabsTrigger value="products" className="flex-1 md:flex-none">
+              <TabsList className="w-full justify-between">
+                <TabsTrigger
+                  value="products"
+                  className="flex-1 w-1/2 md:flex-none"
+                >
                   {t("products")}
                 </TabsTrigger>
-                <TabsTrigger value="categories" className="flex-1 md:flex-none">
+                <TabsTrigger
+                  value="categories"
+                  className="flex-1 w-1/2 md:flex-none"
+                >
                   {t("categories")}
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="products" className="space-y-8">
+              <TabsContent value="products" className="space-y-8 px-0">
                 <ProductsSection
                   products={products}
                   onDeleteProduct={handleDeleteProduct}
                 />
               </TabsContent>
 
-              <TabsContent value="categories" className="space-y-8">
+              <TabsContent value="categories" className="space-y-8 px-0">
                 <CategoriesSection
                   categories={categories}
                   onAddCategory={handleAddCategory}

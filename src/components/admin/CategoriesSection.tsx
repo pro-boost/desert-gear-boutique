@@ -67,7 +67,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
           </Button>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="px-0">
         <div className="space-y-6">
           <CategoryForm
             editingCategory={editingCategory}

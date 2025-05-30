@@ -45,11 +45,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
   const ProductCard = ({ product }: { product: Product }) => (
     <Card className="w-full">
       <CardHeader className="p-4">
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-20 h-20 object-cover rounded self-start"
+            className="w-3/4 h-auto md:w-20 md:h-20 md:self-start  object-cover rounded self-center"
           />
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg break-words">
@@ -62,8 +62,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-          <div className="flex flex-wrap items-baseline gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center md:justify-between gap-2">
+          <div className="flex flex-wrap justify-between items-baseline gap-2">
             {product.discountPrice ? (
               <>
                 <span className="text-lg font-semibold whitespace-nowrap">
@@ -93,7 +93,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
             variant="outline"
             size="sm"
             onClick={() => navigate(`/admin/products/${product.id}/edit`)}
-            className="flex-1 min-w-[120px]"
+            className="flex-1 p-1 min-w-[120px]"
           >
             <Edit className="h-4 w-4 mr-2 shrink-0" />
             <span className="truncate">{t("edit")}</span>
@@ -104,7 +104,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => onDelete(product.id)}
-                className="flex-1 min-w-[120px]"
+                className="flex-1 p-1 min-w-[120px]"
               >
                 <Trash className="h-4 w-4 mr-2 shrink-0" />
                 <span className="truncate">{t("delete")}</span>
