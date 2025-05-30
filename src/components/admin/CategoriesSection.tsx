@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,14 +20,17 @@ interface Category {
 interface CategoriesSectionProps {
   categories: Category[];
   onDeleteCategory: (categoryNameFr: string) => Promise<void>;
+  onEditCategory: (categoryName: string) => void;
+  onRefresh: () => Promise<void>;
 }
 
 const CategoriesSection: React.FC<CategoriesSectionProps> = ({
   categories,
   onDeleteCategory,
+  onEditCategory,
+  onRefresh,
 }) => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
 
   return (
     <Card className="card-section">
@@ -40,13 +42,6 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               {t("manageCategoriesDescription")}
             </CardDescription>
           </div>
-          <Button
-            onClick={() => navigate("/admin/categories/new")}
-            className="w-full md:w-auto"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" />
-            {t("addCategory")}
-          </Button>
         </div>
       </CardHeader>
       <CardContent className="px-0">
@@ -56,6 +51,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               key={category.nameFr}
               category={category}
               onDelete={onDeleteCategory}
+              onEdit={onEditCategory}
             />
           ))}
         </div>

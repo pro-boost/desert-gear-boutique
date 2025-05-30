@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { toast } from '@/components/ui/sonner';
 import { defaultClient, createAuthenticatedClient } from '@/lib/supabaseClient';
@@ -38,85 +38,62 @@ const validateToken = (token: string) => {
 export const useSupabase = () => {
   const { getToken, isSignedIn, userId } = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const clientRef = useRef<SupabaseClient<Database> | null>(null);
+  const tokenRef = useRef<string | null>(null);
+  const lastTokenRefreshRef = useRef<number>(0);
+  const TOKEN_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   const getClient = useCallback(async (): Promise<SupabaseClient<Database>> => {
     try {
-      // Log authentication state
-      console.log('Auth state:', { isSignedIn, userId });
-
       // If user is not signed in, return the default client
       if (!isSignedIn) {
-        console.log('User is not signed in, using default client');
+        clientRef.current = defaultClient;
         return defaultClient;
       }
 
-      // Get the Clerk JWT token for Supabase
-      console.log('Requesting Supabase token from Clerk...');
-      const token = await getToken({ template: 'supabase' });
-      
-      if (!token) {
-        console.error('No Supabase token received from Clerk');
-        toast.error('Authentication failed: No token received');
-        return defaultClient;
-      }
+      const now = Date.now();
+      const shouldRefreshToken = !tokenRef.current || 
+        !lastTokenRefreshRef.current || 
+        (now - lastTokenRefreshRef.current) > TOKEN_REFRESH_INTERVAL;
 
-      // Validate token format and contents
-      const validation = validateToken(token);
-      if (!validation.isValid) {
-        console.error('Token validation failed:', validation.error);
-        toast.error(`Authentication failed: ${validation.error}`);
-        return defaultClient;
-      }
-
-      // Log token details (without exposing the full token)
-      console.log('Token validation successful:', {
-        length: token.length,
-        prefix: token.substring(0, 20) + '...',
-        header: validation.header,
-        payload: validation.payload
-      });
-
-      console.log('Creating authenticated client...');
-      const client = createAuthenticatedClient(token);
-
-      // Test the authentication with a simple query
-      console.log('Testing authentication with Supabase...');
-      const { data, error } = await client.from('products').select('count').limit(1);
-      
-      if (error) {
-        console.error('Authentication test failed:', {
-          error,
-          errorMessage: error.message,
-          errorDetails: error.details,
-          errorHint: error.hint,
-          // Log the specific JWT error if present
-          jwtError: error.message.includes('JWT') ? {
-            message: error.message,
-            details: error.details,
-            hint: error.hint
-          } : null,
-          // Include token validation info
-          tokenValidation: validation
-        });
+      // Get a new token if needed
+      if (shouldRefreshToken) {
+        console.log('Refreshing Supabase token...');
+        const token = await getToken({ template: 'supabase' });
         
-        // Provide more specific error message
-        if (error.message.includes('JWT')) {
-          toast.error('Authentication failed: Invalid JWT token. Please check Clerk JWT template settings and try signing out and back in.');
-        } else {
-          toast.error(`Authentication failed: ${error.message}`);
+        if (!token) {
+          console.error('No Supabase token received from Clerk');
+          toast.error('Authentication failed: No token received');
+          return defaultClient;
         }
-        return defaultClient;
+
+        // Validate token
+        const validation = validateToken(token);
+        if (!validation.isValid) {
+          console.error('Token validation failed:', validation.error);
+          toast.error(`Authentication failed: ${validation.error}`);
+          return defaultClient;
+        }
+
+        tokenRef.current = token;
+        lastTokenRefreshRef.current = now;
+        clientRef.current = createAuthenticatedClient(token);
       }
 
-      console.log('Authentication successful!');
-      setIsAuthenticated(true);
-      return client;
+      // If we have a cached client, return it
+      if (clientRef.current) {
+        return clientRef.current;
+      }
+
+      // This should not happen, but just in case
+      console.error('No client available');
+      return defaultClient;
     } catch (error) {
       console.error('Error in getClient:', error);
       toast.error('Failed to authenticate with Supabase');
       return defaultClient;
     }
-  }, [getToken, isSignedIn, userId]);
+  }, [getToken, isSignedIn]);
 
   return { getClient, isAuthenticated };
 }; 

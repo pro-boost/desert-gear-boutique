@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,11 +32,15 @@ interface Category {
 interface CategoryCardProps {
   category: Category;
   onDelete: (categoryNameFr: string) => void;
+  onEdit: (categoryName: string) => void;
 }
 
-const CategoryCard: React.FC<CategoryCardProps> = ({ category, onDelete }) => {
+const CategoryCard: React.FC<CategoryCardProps> = ({
+  category,
+  onDelete,
+  onEdit,
+}) => {
   const { t, language } = useLanguage();
-  const navigate = useNavigate();
 
   const getCategoryName = () => {
     switch (language) {
@@ -53,7 +56,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onDelete }) => {
   return (
     <Card className="w-full flex flex-col justify-between">
       <CardHeader className="p-4">
-        <div className="flex flex-col  md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 min-w-0">
             <CardTitle
               className="text-lg break-words"
@@ -81,11 +84,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onDelete }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() =>
-              navigate(
-                `/admin/categories/${encodeURIComponent(category.nameFr)}/edit`
-              )
-            }
+            onClick={() => onEdit(category.nameFr)}
             className="flex-1 p-1 min-w-[120px]"
           >
             <Edit className="h-4 w-4 mr-2 shrink-0" />

@@ -1,5 +1,4 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -35,12 +34,18 @@ import { Edit, Trash } from "lucide-react";
 
 interface ProductTableProps {
   products: Product[];
+  onEdit: (productId: string) => void;
   onDelete: (productId: string) => void;
+  onRefresh: () => Promise<void>;
 }
 
-const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
+const ProductTable: React.FC<ProductTableProps> = ({
+  products,
+  onEdit,
+  onDelete,
+  onRefresh,
+}) => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
 
   const ProductCard = ({ product }: { product: Product }) => (
     <Card className="w-full">
@@ -49,7 +54,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-3/4 h-auto md:w-20 md:h-20 md:self-start  object-cover rounded self-center"
+            className="w-3/4 h-auto md:w-20 md:h-20 md:self-start object-cover rounded self-center"
           />
           <div className="flex-1 min-w-0">
             <CardTitle className="text-lg break-words">
@@ -61,7 +66,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row sm:items-center md:justify-between gap-2">
           <div className="flex flex-wrap justify-between items-baseline gap-2">
             {product.discountPrice ? (
@@ -92,7 +97,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`/admin/products/${product.id}/edit`)}
+            onClick={() => onEdit(product.id)}
             className="flex-1 p-1 min-w-[120px]"
           >
             <Edit className="h-4 w-4 mr-2 shrink-0" />
@@ -103,7 +108,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onDelete(product.id)}
                 className="flex-1 p-1 min-w-[120px]"
               >
                 <Trash className="h-4 w-4 mr-2 shrink-0" />
@@ -193,19 +197,13 @@ const ProductTable: React.FC<ProductTableProps> = ({ products, onDelete }) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() =>
-                        navigate(`/admin/products/${product.id}/edit`)
-                      }
+                      onClick={() => onEdit(product.id)}
                     >
                       <Edit className="h-4 w-4" />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => onDelete(product.id)}
-                        >
+                        <Button variant="outline" size="icon">
                           <Trash className="h-4 w-4" />
                         </Button>
                       </AlertDialogTrigger>

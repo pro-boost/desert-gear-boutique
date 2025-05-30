@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {
@@ -11,11 +11,13 @@ import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/sonner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { useSupabase } from "@/hooks/useSupabase";
 import { useAdmin } from "@/hooks/useAdmin";
 import ProductsSection from "@/components/admin/ProductsSection";
 import CategoriesSection from "@/components/admin/CategoriesSection";
+import CategoryFormPage from "./CategoryFormPage";
+import ProductFormPage from "./ProductFormPage";
 
 interface Category {
   nameFr: string;
@@ -33,6 +35,30 @@ const AdminPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("products");
+  const [showCategoryForm, setShowCategoryForm] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<string | null>(null);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    if (!isAdmin) return;
+
+    try {
+      setLoading(true);
+      const client = await getClient();
+      const [productsData, categoriesData] = await Promise.all([
+        getProducts(client),
+        getCategories(client),
+      ]);
+      setProducts(productsData);
+      setCategories(categoriesData);
+    } catch (error) {
+      console.error("Error loading data:", error);
+      toast.error("Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  }, [getClient, isAdmin]);
 
   useEffect(() => {
     if (isLoaded && !isAdmin) {
@@ -42,28 +68,8 @@ const AdminPage: React.FC = () => {
   }, [isLoaded, isAdmin, navigate, t]);
 
   useEffect(() => {
-    const loadData = async () => {
-      if (!isAdmin) return;
-
-      try {
-        setLoading(true);
-        const client = await getClient();
-        const [productsData, categoriesData] = await Promise.all([
-          getProducts(client),
-          getCategories(client),
-        ]);
-        setProducts(productsData);
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error("Error loading data:", error);
-        toast.error("Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadData();
-  }, [getClient, isAdmin]);
+  }, [getClient, isAdmin, loadData]);
 
   const handleDeleteProduct = async (productId: string) => {
     try {
@@ -95,6 +101,38 @@ const AdminPage: React.FC = () => {
       console.error("Error deleting category:", error);
       toast.error("Failed to delete category");
     }
+  };
+
+  const handleAddCategory = () => {
+    setEditingCategory(null);
+    setShowCategoryForm(true);
+  };
+
+  const handleEditCategory = (categoryName: string) => {
+    setEditingCategory(categoryName);
+    setShowCategoryForm(true);
+  };
+
+  const handleCategoryFormClose = () => {
+    setShowCategoryForm(false);
+    setEditingCategory(null);
+    loadData();
+  };
+
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setShowProductForm(true);
+  };
+
+  const handleEditProduct = (productId: string) => {
+    setEditingProduct(productId);
+    setShowProductForm(true);
+  };
+
+  const handleProductFormClose = () => {
+    setShowProductForm(false);
+    setEditingProduct(null);
+    loadData();
   };
 
   if (!isLoaded) {
@@ -145,18 +183,55 @@ const AdminPage: React.FC = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="products" className="space-y-8">
-                <ProductsSection
-                  products={products}
-                  onDeleteProduct={handleDeleteProduct}
-                />
+              <TabsContent value="products" className="space-y-6">
+                {showProductForm ? (
+                  <ProductFormPage
+                    productId={editingProduct || undefined}
+                    onClose={handleProductFormClose}
+                  />
+                ) : (
+                  <ProductsSection
+                    products={products}
+                    onAddProduct={handleAddProduct}
+                    onEditProduct={handleEditProduct}
+                    onDeleteProduct={handleDeleteProduct}
+                    onRefresh={loadData}
+                  />
+                )}
               </TabsContent>
 
               <TabsContent value="categories" className="space-y-8">
-                <CategoriesSection
-                  categories={categories}
-                  onDeleteCategory={handleDeleteCategory}
-                />
+                {showCategoryForm ? (
+                  <div className="relative">
+                    <Button
+                      variant="ghost"
+                      onClick={handleCategoryFormClose}
+                      className="mb-4"
+                    >
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      {t("backToCategories")}
+                    </Button>
+                    <CategoryFormPage
+                      categoryName={editingCategory}
+                      onClose={handleCategoryFormClose}
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex justify-end mb-4">
+                      <Button onClick={handleAddCategory} className="gap-2">
+                        <Plus className="h-4 w-4" />
+                        {t("addCategory")}
+                      </Button>
+                    </div>
+                    <CategoriesSection
+                      categories={categories}
+                      onDeleteCategory={handleDeleteCategory}
+                      onEditCategory={handleEditCategory}
+                      onRefresh={loadData}
+                    />
+                  </>
+                )}
               </TabsContent>
             </Tabs>
           )}

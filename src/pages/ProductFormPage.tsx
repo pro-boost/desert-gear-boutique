@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useSupabase } from "@/hooks/useSupabase";
 import { useAdmin } from "@/hooks/useAdmin";
@@ -30,16 +29,28 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import ImageDropzone from "@/components/upload/ImageDropzone";
 
-const ProductFormPage: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+interface Category {
+  nameFr: string;
+  nameAr: string;
+  sizes: string[];
+}
+
+interface ProductFormPageProps {
+  productId?: string;
+  onClose: () => void;
+}
+
+const ProductFormPage: React.FC<ProductFormPageProps> = ({
+  productId,
+  onClose,
+}) => {
   const { t } = useLanguage();
-  const navigate = useNavigate();
   const { getClient } = useSupabase();
   const { isAdmin, isLoaded } = useAdmin();
-  const isEditing = !!id;
+  const isEditing = !!productId;
 
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<Partial<Product>>({
@@ -53,17 +64,8 @@ const ProductFormPage: React.FC = () => {
     featured: false,
     sizes: [],
   });
-  const [categories, setCategories] = useState<
-    { name: string; sizes: string[] }[]
-  >([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (isLoaded && !isAdmin) {
-      toast.error(t("unauthorizedAccess"));
-      navigate("/admin");
-    }
-  }, [isLoaded, isAdmin, navigate, t]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -81,27 +83,27 @@ const ProductFormPage: React.FC = () => {
         setCategories(categoriesData);
 
         // If editing, load product data
-        if (id) {
-          const product = await getProductById(client, id);
+        if (productId) {
+          const product = await getProductById(client, productId);
           if (product) {
             setFormData(product);
             setSelectedSizes(product.sizes);
           } else {
             toast.error(t("productNotFound"));
-            navigate("/admin");
+            onClose();
           }
         }
       } catch (error) {
         console.error("Error loading data:", error);
         toast.error(t("errorLoadingData"));
-        navigate("/admin");
+        onClose();
       } finally {
         setLoading(false);
       }
     };
 
     loadData();
-  }, [getClient, isAdmin, id, navigate, t]);
+  }, [getClient, isAdmin, productId, onClose, t]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -125,7 +127,7 @@ const ProductFormPage: React.FC = () => {
 
   const handleSelectChange = (name: string, value: string) => {
     if (name === "category") {
-      const category = categories.find((c) => c.name === value);
+      const category = categories.find((c) => c.nameFr === value);
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -175,10 +177,10 @@ const ProductFormPage: React.FC = () => {
       } as Product;
 
       let updatedProduct: Product | null;
-      if (isEditing && id) {
+      if (isEditing && productId) {
         updatedProduct = await updateProduct(client, {
           ...productData,
-          id,
+          id: productId,
         });
       } else {
         updatedProduct = await addProduct(client, productData);
@@ -186,7 +188,7 @@ const ProductFormPage: React.FC = () => {
 
       if (updatedProduct) {
         toast.success(isEditing ? t("productUpdated") : t("productAdded"));
-        navigate("/admin");
+        onClose();
       }
     } catch (error) {
       console.error("Error saving product:", error);
@@ -196,7 +198,7 @@ const ProductFormPage: React.FC = () => {
 
   if (!isLoaded || loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -206,189 +208,165 @@ const ProductFormPage: React.FC = () => {
     return null;
   }
 
-  const currentCategory = categories.find((c) => c.name === formData.category);
+  const currentCategory = categories.find(
+    (c) => c.nameFr === formData.category
+  );
   const availableSizes = currentCategory?.sizes || [];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin")}
-            className="gap-2"
-          >
-            <ArrowLeft size={16} />
-            {t("backToAdmin")}
-          </Button>
-          <h1 className="text-3xl font-bold">
-            {isEditing ? t("editProduct") : t("addProduct")}
-          </h1>
-        </div>
+    <Card className="card-section">
+      <CardHeader>
+        <CardTitle>
+          {isEditing ? t("editProductDetails") : t("addProductDetails")}
+        </CardTitle>
+        <CardDescription>
+          {isEditing ? t("editProductDescription") : t("addProductDescription")}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">{t("productName")}</Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                required
+                className="w-full"
+              />
+            </div>
 
-        <Card className="card-section">
-          <CardHeader>
-            <CardTitle>
-              {isEditing ? t("editProductDetails") : t("addProductDetails")}
-            </CardTitle>
-            <CardDescription>
-              {isEditing
-                ? t("editProductDescription")
-                : t("addProductDescription")}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="name">{t("productName")}</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">{t("category")}</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) => handleSelectChange("category", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder={t("selectCategory")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem key={category.nameFr} value={category.nameFr}>
+                      {t(category.nameFr)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="category">{t("category")}</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) =>
-                      handleSelectChange("category", value)
-                    }
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={t("selectCategory")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.name} value={category.name}>
-                          {t(category.name)}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="price">{t("price")}</Label>
+              <Input
+                id="price"
+                name="price"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.price}
+                onChange={handleInputChange}
+                required
+                className="w-full"
+              />
+            </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="price">{t("price")}</Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    required
-                    className="w-full"
-                  />
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="discountPrice">{t("discountPrice")}</Label>
+              <Input
+                id="discountPrice"
+                name="discountPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.discountPrice || ""}
+                onChange={handleInputChange}
+                className="w-full"
+              />
+            </div>
+          </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="discountPrice">{t("discountPrice")}</Label>
-                  <Input
-                    id="discountPrice"
-                    name="discountPrice"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={formData.discountPrice || ""}
-                    onChange={handleInputChange}
-                    className="w-full"
-                  />
-                </div>
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="description">{t("description")}</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              required
+              className="min-h-[100px]"
+            />
+          </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="description">{t("description")}</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  required
-                  className="min-h-[100px]"
-                />
-              </div>
+          <div className="space-y-2">
+            <Label>{t("images")}</Label>
+            <div className="card-section p-4">
+              <ImageDropzone
+                onImageUpload={handleImageUpload}
+                currentImages={formData.images || []}
+                onImageRemove={handleImageRemove}
+                multiple={true}
+              />
+            </div>
+          </div>
 
-              <div className="space-y-2">
-                <Label>{t("images")}</Label>
-                <div className="card-section p-4">
-                  <ImageDropzone
-                    onImageUpload={handleImageUpload}
-                    currentImages={formData.images || []}
-                    onImageRemove={handleImageRemove}
-                    multiple={true}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t("sizes")}</Label>
-                <div className="card-section p-4">
-                  <div className="flex flex-wrap gap-4">
-                    {availableSizes.map((size) => (
-                      <div key={size} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`size-${size}`}
-                          checked={selectedSizes.includes(size)}
-                          onCheckedChange={(checked) =>
-                            handleSizeChange(size, checked as boolean)
-                          }
-                        />
-                        <Label htmlFor={`size-${size}`}>{size}</Label>
-                      </div>
-                    ))}
+          <div className="space-y-2">
+            <Label>{t("sizes")}</Label>
+            <div className="card-section p-4">
+              <div className="flex flex-wrap gap-4">
+                {availableSizes.map((size) => (
+                  <div key={size} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`size-${size}`}
+                      checked={selectedSizes.includes(size)}
+                      onCheckedChange={(checked) =>
+                        handleSizeChange(size, checked as boolean)
+                      }
+                    />
+                    <Label htmlFor={`size-${size}`}>{size}</Label>
                   </div>
-                </div>
+                ))}
               </div>
+            </div>
+          </div>
 
-              <div className="flex items-center space-x-6 card-section p-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="inStock"
-                    checked={formData.inStock}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange("inStock", checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="inStock">{t("inStock")}</Label>
-                </div>
+          <div className="flex items-center space-x-6 card-section p-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="inStock"
+                checked={formData.inStock}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("inStock", checked as boolean)
+                }
+              />
+              <Label htmlFor="inStock">{t("inStock")}</Label>
+            </div>
 
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="featured"
-                    checked={formData.featured}
-                    onCheckedChange={(checked) =>
-                      handleCheckboxChange("featured", checked as boolean)
-                    }
-                  />
-                  <Label htmlFor="featured">{t("featured")}</Label>
-                </div>
-              </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={(checked) =>
+                  handleCheckboxChange("featured", checked as boolean)
+                }
+              />
+              <Label htmlFor="featured">{t("featured")}</Label>
+            </div>
+          </div>
 
-              <div className="flex justify-end gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate("/admin")}
-                >
-                  {t("cancel")}
-                </Button>
-                <Button type="submit" className="gap-2">
-                  <Save size={16} />
-                  {isEditing ? t("saveChanges") : t("addProduct")}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
+          <div className="flex justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onClose}>
+              {t("cancel")}
+            </Button>
+            <Button type="submit" className="gap-2">
+              <Save size={16} />
+              {isEditing ? t("saveChanges") : t("addProduct")}
+            </Button>
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 };
 
