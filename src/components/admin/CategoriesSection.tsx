@@ -34,7 +34,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
     <Card className="card-section">
       <CardHeader>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
+          <div className="space-y-4 text-center md:text-start w-full">
             <CardTitle>{t("manageCategories")}</CardTitle>
             <CardDescription>
               {t("manageCategoriesDescription")}

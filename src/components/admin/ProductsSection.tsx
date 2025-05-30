@@ -28,7 +28,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     <Card className="card-section">
       <CardHeader>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="space-y-4 text-center">
+          <div className="space-y-4 text-center md:text-start w-full">
             <CardTitle>{t("manageProducts")}</CardTitle>
             <CardDescription>{t("manageProductsDescription")}</CardDescription>
           </div>

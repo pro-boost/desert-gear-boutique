@@ -7,6 +7,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -50,73 +51,74 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ category, onDelete }) => {
   };
 
   return (
-    <Card className="card-section h-full">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div>
+    <Card className="w-full flex flex-col justify-between">
+      <CardHeader className="p-4">
+        <div className="flex flex-col  md:flex-row gap-4">
+          <div className="flex-1 min-w-0">
             <CardTitle
-              className="text-lg capitalize"
+              className="text-lg break-words"
               dir={language === "ar" ? "rtl" : "ltr"}
             >
               {getCategoryName()}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="mt-1">
               {t("sizes")}: {category.sizes.length}
             </CardDescription>
           </div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() =>
-                navigate(
-                  `/admin/categories/${encodeURIComponent(
-                    category.nameFr
-                  )}/edit`
-                )
-              }
-              className="flex-1 p-1 min-w-[120px]"
-            >
-              <Edit className="h-4 w-4 mr-2 shrink-0" />
-              <span className="truncate">{t("edit")}</span>
-            </Button>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => onDelete(category.nameFr)}
-                >
-                  <Trash className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>{t("deleteCategory")}</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    {t("deleteCategoryConfirmation")}
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => onDelete(category.nameFr)}>
-                    {t("delete")}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 pt-0">
         <div className="flex flex-wrap gap-2">
           {category.sizes.map((size) => (
-            <Badge key={size} variant="secondary">
+            <Badge key={size} variant="secondary" className="whitespace-nowrap">
               {size}
             </Badge>
           ))}
         </div>
       </CardContent>
+      <CardFooter className="p-4 pt-0">
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              navigate(
+                `/admin/categories/${encodeURIComponent(category.nameFr)}/edit`
+              )
+            }
+            className="flex-1 p-1 min-w-[120px]"
+          >
+            <Edit className="h-4 w-4 mr-2 shrink-0" />
+            <span className="truncate">{t("edit")}</span>
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1 p-1 min-w-[120px]"
+              >
+                <Trash className="h-4 w-4 mr-2 shrink-0" />
+                <span className="truncate">{t("delete")}</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t("deleteCategory")}</AlertDialogTitle>
+                <AlertDialogDescription>
+                  {t("deleteCategoryConfirmation")}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onDelete(category.nameFr)}>
+                  {t("delete")}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </CardFooter>
     </Card>
   );
 };
