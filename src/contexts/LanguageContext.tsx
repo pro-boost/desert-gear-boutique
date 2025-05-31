@@ -1070,6 +1070,66 @@ const translations: Translations = {
     fr: "Modifier",
     ar: "تعديل",
   },
+  browseFiles: {
+    fr: "Parcourir les fichiers",
+    ar: "تصفح الملفات",
+  },
+  addMoreImages: {
+    fr: "Ajouter plus d'images",
+    ar: "إضافة المزيد من الصور",
+  },
+  pleaseFillAllRequiredFields: {
+    fr: "Veuillez remplir tous les champs obligatoires",
+    ar: "يرجى ملء جميع الحقول المطلوبة",
+  },
+  errorAddingProduct: {
+    fr: "Une erreur s'est produite lors de l'ajout du produit",
+    ar: "حدث خطأ أثناء إضافة المنتج",
+  },
+  errorUpdatingProduct: {
+    fr: "Une erreur s'est produite lors de la mise à jour du produit",
+    ar: "حدث خطأ أثناء تحديث المنتج",
+  },
+  errorLoadingCategories: {
+    fr: "Une erreur s'est produite lors du chargement des catégories",
+    ar: "حدث خطأ أثناء تحميل الفئات",
+  },
+  errorLoadingProduct: {
+    fr: "Une erreur s'est produite lors du chargement du produit",
+    ar: "حدث خطأ أثناء تحميل المنتج",
+  },
+  errorUploadingImage: {
+    fr: "Une erreur s'est produite lors du téléchargement de l'image",
+    ar: "حدث خطأ أثناء تحميل الصورة",
+  },
+  errorRemovingImage: {
+    fr: "Une erreur s'est produite lors de la suppression de l'image",
+    ar: "حدث خطأ أثناء حذف الصورة",
+  },
+  errorReorderingImages: {
+    fr: "Une erreur s'est produite lors du réarrangement des images",
+    ar: "حدث خطأ أثناء إعادة ترتيب الصور",
+  },
+  maxImagesReached: {
+    fr: "Vous avez atteint la limite maximale d'images (5)",
+    ar: "لقد وصلت إلى الحد الأقصى للصور (5)",
+  },
+  invalidImageFormat: {
+    fr: "Format d'image non valide. Formats acceptés : JPEG, JPG, PNG, WEBP",
+    ar: "تنسيق صورة غير صالح. التنسيقات المقبولة: JPEG، JPG، PNG، WEBP",
+  },
+  imageTooLarge: {
+    fr: "L'image est trop volumineuse. Taille maximale : 5MB",
+    ar: "الصورة كبيرة جدًا. الحجم الأقصى: 5 ميجابايت",
+  },
+  descriptionFr: {
+    fr: "Description (Français)",
+    ar: "الوصف (بالفرنسية)",
+  },
+  descriptionAr: {
+    fr: "Description (Arabe)",
+    ar: "الوصف (بالعربية)",
+  },
 };
 
 interface LanguageContextType {

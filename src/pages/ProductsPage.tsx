@@ -24,7 +24,11 @@ interface Category {
 
 const ProductsPage = () => {
   const { t } = useLanguage();
-  const { getClient } = useSupabase();
+  const {
+    getClient,
+    isLoading: isSupabaseLoading,
+    isInitialized,
+  } = useSupabase();
   const [searchParams, setSearchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
 
@@ -46,21 +50,27 @@ const ProductsPage = () => {
   // Load categories
   useEffect(() => {
     const loadCategories = async () => {
+      if (!isInitialized) return;
+
       try {
         const client = await getClient();
         const categoriesData = await getCategories(client);
-        setCategories(categoriesData);
+        if (categoriesData) {
+          setCategories(categoriesData);
+        }
       } catch (error) {
         console.error("Error loading categories:", error);
       }
     };
 
     loadCategories();
-  }, [getClient]);
+  }, [getClient, isInitialized]);
 
   // Load products
   useEffect(() => {
     const loadProducts = async () => {
+      if (!isInitialized) return;
+
       try {
         setLoading(true);
         const client = await getClient();
@@ -78,7 +88,7 @@ const ProductsPage = () => {
     };
 
     loadProducts();
-  }, [filters, getClient]);
+  }, [filters, getClient, isInitialized]);
 
   const handleSearch = (value: string) => {
     setFilters((prev) => ({ ...prev, search: value }));
@@ -130,10 +140,10 @@ const ProductsPage = () => {
     });
   };
 
-  if (loading) {
+  if (isSupabaseLoading || !isInitialized) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin" />
+      <div className="flex items-center justify-center min-h-[200px]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }

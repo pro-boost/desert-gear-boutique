@@ -1,15 +1,15 @@
 export interface Product {
   id: string;
   name: string;
-  description: string;
+  descriptionFr: string;
+  descriptionAr: string;
   price: number;
   discountPrice?: number;
   category: string;
   images: string[];
-  inStock: boolean;
-  featured: boolean;
-  createdAt: number;
-  sizes: string[]; // Available sizes for the product
+  sizes: string[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductFilters {

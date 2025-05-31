@@ -16,8 +16,8 @@ import { useSupabase } from "@/hooks/useSupabase";
 import { useAdmin } from "@/hooks/useAdmin";
 import ProductsSection from "@/components/admin/ProductsSection";
 import CategoriesSection from "@/components/admin/CategoriesSection";
-import CategoryFormPage from "./CategoryFormPage";
-import ProductFormPage from "./ProductFormPage";
+import CategoryFormPage from "@/pages/CategoryFormPage";
+import ProductFormPage from "@/pages/ProductFormPage";
 
 interface Category {
   nameFr: string;
@@ -28,8 +28,8 @@ interface Category {
 const AdminPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { getClient } = useSupabase();
-  const { isAdmin, isLoaded } = useAdmin();
+  const { getClient, isLoading: isSupabaseLoading } = useSupabase();
+  const { isAdmin, isLoaded: isAdminLoaded } = useAdmin();
 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -46,6 +46,14 @@ const AdminPage: React.FC = () => {
     try {
       setLoading(true);
       const client = await getClient();
+
+      // Only proceed if we have an authenticated client
+      if (!client.auth.getSession()) {
+        toast.error(t("authenticationRequired"));
+        navigate("/");
+        return;
+      }
+
       const [productsData, categoriesData] = await Promise.all([
         getProducts(client),
         getCategories(client),
@@ -54,22 +62,29 @@ const AdminPage: React.FC = () => {
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error loading data:", error);
-      toast.error("Failed to load data");
+      if (error instanceof Error && error.message === "No active session") {
+        toast.error(t("sessionExpired"));
+        navigate("/");
+      } else {
+        toast.error(t("errorLoadingData"));
+      }
     } finally {
       setLoading(false);
     }
-  }, [getClient, isAdmin]);
+  }, [getClient, isAdmin, navigate, t]);
 
   useEffect(() => {
-    if (isLoaded && !isAdmin) {
+    if (isAdminLoaded && !isAdmin) {
       toast.error(t("unauthorizedAccess"));
       navigate("/");
     }
-  }, [isLoaded, isAdmin, navigate, t]);
+  }, [isAdminLoaded, isAdmin, navigate, t]);
 
   useEffect(() => {
-    loadData();
-  }, [getClient, isAdmin, loadData]);
+    if (!isSupabaseLoading && isAdminLoaded) {
+      loadData();
+    }
+  }, [isSupabaseLoading, isAdminLoaded, loadData]);
 
   const handleDeleteProduct = async (productId: string) => {
     try {
@@ -135,7 +150,7 @@ const AdminPage: React.FC = () => {
     loadData();
   };
 
-  if (!isLoaded) {
+  if (isSupabaseLoading || !isAdminLoaded) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

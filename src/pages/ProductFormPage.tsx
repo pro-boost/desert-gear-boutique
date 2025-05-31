@@ -9,6 +9,7 @@ import {
   getCategories,
 } from "@/services/productService";
 import { Product } from "@/types/product";
+import type { Database } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,12 +30,29 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, GripVertical, X } from "lucide-react";
 import ImageDropzone from "@/components/upload/ImageDropzone";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DropResult,
+} from "@hello-pangea/dnd";
 
 interface Category {
   nameFr: string;
   nameAr: string;
+  sizes: string[];
+}
+
+interface ProductFormData {
+  name: string;
+  descriptionFr: string;
+  descriptionAr: string;
+  price: number;
+  discountPrice: number | null;
+  category: string;
+  images: string[];
   sizes: string[];
 }
 
@@ -43,25 +61,59 @@ interface ProductFormPageProps {
   onClose: () => void;
 }
 
+// Helper function to convert Product to ProductFormData
+const productToFormData = (product: Product): ProductFormData => ({
+  name: product.name,
+  descriptionFr: product.descriptionFr,
+  descriptionAr: product.descriptionAr,
+  price: product.price,
+  discountPrice: product.discountPrice ?? null,
+  category: product.category,
+  images: product.images,
+  sizes: product.sizes,
+});
+
+// Helper function to convert ProductFormData to database format
+const formDataToProductRecord = (
+  formData: ProductFormData,
+  id?: string
+): Database["public"]["Tables"]["products"]["Insert"] => ({
+  id: id,
+  name: formData.name,
+  description_fr: formData.descriptionFr,
+  description_ar: formData.descriptionAr,
+  price: formData.price,
+  discount_price: formData.discountPrice,
+  category: formData.category,
+  images: formData.images,
+  sizes: formData.sizes,
+  featured: false,
+  created_at: new Date().toISOString(),
+  updated_at: new Date().toISOString(),
+});
+
 const ProductFormPage: React.FC<ProductFormPageProps> = ({
   productId,
   onClose,
 }) => {
-  const { t } = useLanguage();
-  const { getClient } = useSupabase();
+  const { t, language } = useLanguage();
+  const {
+    getClient,
+    isLoading: isSupabaseLoading,
+    isInitialized,
+  } = useSupabase();
   const { isAdmin, isLoaded } = useAdmin();
   const isEditing = !!productId;
 
   const [loading, setLoading] = useState(true);
-  const [formData, setFormData] = useState<Partial<Product>>({
+  const [formData, setFormData] = useState<ProductFormData>({
     name: "",
-    description: "",
+    descriptionFr: "",
+    descriptionAr: "",
     price: 0,
-    discountPrice: 0,
+    discountPrice: null,
     category: "boots",
     images: [],
-    inStock: true,
-    featured: false,
     sizes: [],
   });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -69,7 +121,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
   useEffect(() => {
     const loadData = async () => {
-      if (!isAdmin) return;
+      if (!isAdmin || !isInitialized) return;
 
       try {
         setLoading(true);
@@ -86,7 +138,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         if (productId) {
           const product = await getProductById(client, productId);
           if (product) {
-            setFormData(product);
+            setFormData(productToFormData(product));
             setSelectedSizes(product.sizes);
           } else {
             toast.error(t("productNotFound"));
@@ -103,7 +155,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     };
 
     loadData();
-  }, [getClient, isAdmin, productId, onClose, t]);
+  }, [getClient, isAdmin, isInitialized, productId, onClose, t]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -151,37 +203,64 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     });
   };
 
-  const handleImageUpload = (imageData: string | string[]) => {
+  const handleImageChange = (newImages: Array<{ src: string }>) => {
     setFormData((prev) => ({
       ...prev,
-      images: Array.isArray(imageData)
-        ? [...prev.images, ...imageData]
-        : [imageData],
+      images: newImages.map((img) => img.src),
     }));
   };
 
-  const handleImageRemove = (index: number) => {
+  const handleImageReorder = (result: DropResult) => {
+    if (!result.destination) return;
+
+    const items = Array.from(formData.images || []);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
     setFormData((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: items,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields
+    if (
+      !formData.name ||
+      !formData.descriptionFr ||
+      !formData.descriptionAr ||
+      !formData.price ||
+      !formData.category ||
+      !formData.images ||
+      formData.images.length === 0
+    ) {
+      toast.error(t("pleaseFillAllRequiredFields"));
+      return;
+    }
+
     try {
       const client = await getClient();
-      const productData = {
-        ...formData,
-        sizes: selectedSizes,
-      } as Product;
+
+      // Convert form data to product format
+      const productData: Omit<Product, "id" | "createdAt" | "updatedAt"> = {
+        name: formData.name,
+        descriptionFr: formData.descriptionFr,
+        descriptionAr: formData.descriptionAr,
+        price: formData.price,
+        discountPrice: formData.discountPrice,
+        category: formData.category,
+        images: formData.images,
+        sizes: formData.sizes,
+      };
 
       let updatedProduct: Product | null;
       if (isEditing && productId) {
         updatedProduct = await updateProduct(client, {
           ...productData,
           id: productId,
-        });
+        } as Product);
       } else {
         updatedProduct = await addProduct(client, productData);
       }
@@ -189,6 +268,8 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
       if (updatedProduct) {
         toast.success(isEditing ? t("productUpdated") : t("productAdded"));
         onClose();
+      } else {
+        throw new Error("Failed to save product");
       }
     } catch (error) {
       console.error("Error saving product:", error);
@@ -196,7 +277,12 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     }
   };
 
-  if (!isLoaded || loading) {
+  // Helper function to get category display name
+  const getCategoryDisplayName = (category: Category) => {
+    return language === "ar" ? category.nameAr : category.nameFr;
+  };
+
+  if (!isLoaded || loading || isSupabaseLoading || !isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -262,11 +348,37 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                 <SelectContent>
                   {categories.map((category) => (
                     <SelectItem key={category.nameFr} value={category.nameFr}>
-                      {t(category.nameFr)}
+                      {getCategoryDisplayName(category)}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="descriptionFr">{t("descriptionFr")}</Label>
+              <Textarea
+                id="descriptionFr"
+                name="descriptionFr"
+                value={formData.descriptionFr}
+                onChange={handleInputChange}
+                required
+                className="min-h-[100px]"
+                dir="ltr"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="descriptionAr">{t("descriptionAr")}</Label>
+              <Textarea
+                id="descriptionAr"
+                name="descriptionAr"
+                value={formData.descriptionAr}
+                onChange={handleInputChange}
+                required
+                className="min-h-[100px]"
+                dir="rtl"
+              />
             </div>
 
             <div className="space-y-2">
@@ -300,26 +412,78 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">{t("description")}</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleInputChange}
-              required
-              className="min-h-[100px]"
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label>{t("images")}</Label>
             <div className="card-section p-4">
               <ImageDropzone
-                onImageUpload={handleImageUpload}
-                currentImages={formData.images || []}
-                onImageRemove={handleImageRemove}
-                multiple={true}
+                onImagesChange={handleImageChange}
+                initialImages={formData.images.map((src, index) => ({
+                  id: `existing-${index}`,
+                  src,
+                  name: `Image ${index + 1}`,
+                  size: 0,
+                }))}
+                maxImages={5}
+                maxSizeMB={5}
               />
+              {formData.images && formData.images.length > 0 && (
+                <DragDropContext onDragEnd={handleImageReorder}>
+                  <Droppable droppableId="images" direction="horizontal">
+                    {(provided) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className="flex flex-wrap gap-4 mt-4"
+                      >
+                        {formData.images.map((image, index) => (
+                          <Draggable
+                            key={index}
+                            draggableId={`image-${index}`}
+                            index={index}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className="relative"
+                              >
+                                <div
+                                  {...provided.dragHandleProps}
+                                  className="absolute -top-2 -left-2 bg-primary text-primary-foreground rounded-full p-1 cursor-move"
+                                >
+                                  <GripVertical className="h-4 w-4" />
+                                </div>
+                                <img
+                                  src={image}
+                                  alt={`Product image ${index + 1}`}
+                                  className="w-24 h-24 object-cover rounded-md"
+                                />
+                                <Button
+                                  variant="destructive"
+                                  size="icon"
+                                  className="absolute -top-2 -right-2 h-5 w-5"
+                                  onClick={() => {
+                                    const newImages = formData.images.filter(
+                                      (_, i) => i !== index
+                                    );
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      images: newImages,
+                                    }));
+                                  }}
+                                  type="button"
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              )}
             </div>
           </div>
 
@@ -340,30 +504,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                   </div>
                 ))}
               </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-6 card-section p-4">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="inStock"
-                checked={formData.inStock}
-                onCheckedChange={(checked) =>
-                  handleCheckboxChange("inStock", checked as boolean)
-                }
-              />
-              <Label htmlFor="inStock">{t("inStock")}</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="featured"
-                checked={formData.featured}
-                onCheckedChange={(checked) =>
-                  handleCheckboxChange("featured", checked as boolean)
-                }
-              />
-              <Label htmlFor="featured">{t("featured")}</Label>
             </div>
           </div>
 

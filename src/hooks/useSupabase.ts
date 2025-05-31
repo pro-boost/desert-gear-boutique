@@ -1,99 +1,99 @@
-import { useCallback, useState, useRef } from 'react';
-import { useAuth } from '@clerk/clerk-react';
-import { toast } from '@/components/ui/sonner';
-import { defaultClient, createAuthenticatedClient } from '@/lib/supabaseClient';
-import type { SupabaseClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Database } from '@/integrations/supabase/types';
+import { useAuth } from '@clerk/clerk-react';
 
-// Helper function to validate token format
-const validateToken = (token: string) => {
-  try {
-    // Check if token has three parts (header.payload.signature)
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new Error('Invalid token format: should have three parts');
+// Create a default client for non-authenticated requests
+const defaultClient = createClient<Database>(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: true
     }
-
-    // Try to decode the payload
-    const payload = JSON.parse(atob(parts[1]));
-    
-    // Check required claims
-    if (payload.aud !== 'authenticated') {
-      throw new Error('Invalid token: missing or incorrect "aud" claim');
-    }
-
-    return {
-      isValid: true,
-      payload,
-      header: JSON.parse(atob(parts[0]))
-    };
-  } catch (error) {
-    return {
-      isValid: false,
-      error: error instanceof Error ? error.message : 'Unknown token validation error'
-    };
   }
-};
+);
 
 export const useSupabase = () => {
-  const { getToken, isSignedIn, userId } = useAuth();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const clientRef = useRef<SupabaseClient<Database> | null>(null);
-  const tokenRef = useRef<string | null>(null);
-  const lastTokenRefreshRef = useRef<number>(0);
-  const TOKEN_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+  const { getToken, isSignedIn } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isInitialized, setIsInitialized] = useState(false);
+  const authenticatedClientRef = useRef<SupabaseClient<Database> | null>(null);
 
-  const getClient = useCallback(async (): Promise<SupabaseClient<Database>> => {
+  // Initialize the client
+  useEffect(() => {
+    const initializeClient = async () => {
+      try {
+        // Start with the default client
+        setIsInitialized(true);
+      } catch (error) {
+        console.error('Error initializing Supabase client:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeClient();
+  }, []);
+
+  const getClient = useCallback(async () => {
+    if (!isInitialized) {
+      throw new Error('Supabase client not initialized');
+    }
+
+    // For non-authenticated requests, return the default client
+    if (!isSignedIn) {
+      return defaultClient;
+    }
+
     try {
-      // If user is not signed in, return the default client
-      if (!isSignedIn) {
-        clientRef.current = defaultClient;
+      // If we already have an authenticated client, return it
+      if (authenticatedClientRef.current) {
+        return authenticatedClientRef.current;
+      }
+
+      // Get the Supabase token from Clerk
+      const token = await getToken({ template: 'supabase' });
+      
+      if (!token) {
+        console.warn('No Supabase token available, using default client');
         return defaultClient;
       }
 
-      const now = Date.now();
-      const shouldRefreshToken = !tokenRef.current || 
-        !lastTokenRefreshRef.current || 
-        (now - lastTokenRefreshRef.current) > TOKEN_REFRESH_INTERVAL;
-
-      // Get a new token if needed
-      if (shouldRefreshToken) {
-        console.log('Refreshing Supabase token...');
-        const token = await getToken({ template: 'supabase' });
-        
-        if (!token) {
-          console.error('No Supabase token received from Clerk');
-          toast.error('Authentication failed: No token received');
-          return defaultClient;
+      // Create a new client with the token only if we don't have one
+      authenticatedClientRef.current = createClient<Database>(
+        import.meta.env.VITE_SUPABASE_URL,
+        import.meta.env.VITE_SUPABASE_ANON_KEY,
+        {
+          auth: {
+            autoRefreshToken: true,
+            persistSession: true,
+            detectSessionInUrl: true
+          },
+          global: {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
         }
+      );
 
-        // Validate token
-        const validation = validateToken(token);
-        if (!validation.isValid) {
-          console.error('Token validation failed:', validation.error);
-          toast.error(`Authentication failed: ${validation.error}`);
-          return defaultClient;
-        }
-
-        tokenRef.current = token;
-        lastTokenRefreshRef.current = now;
-        clientRef.current = createAuthenticatedClient(token);
-      }
-
-      // If we have a cached client, return it
-      if (clientRef.current) {
-        return clientRef.current;
-      }
-
-      // This should not happen, but just in case
-      console.error('No client available');
-      return defaultClient;
+      return authenticatedClientRef.current;
     } catch (error) {
-      console.error('Error in getClient:', error);
-      toast.error('Failed to authenticate with Supabase');
+      console.error('Error getting authenticated client:', error);
+      // Return the default client if authentication fails
       return defaultClient;
     }
-  }, [getToken, isSignedIn]);
+  }, [isInitialized, isSignedIn, getToken]);
 
-  return { getClient, isAuthenticated };
+  // Clear the authenticated client when signing out
+  useEffect(() => {
+    if (!isSignedIn) {
+      authenticatedClientRef.current = null;
+    }
+  }, [isSignedIn]);
+
+  return { getClient, isLoading, isInitialized };
 }; 

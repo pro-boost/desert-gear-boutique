@@ -21,16 +21,15 @@ const convertToCamelCase = <T>(obj: Record<string, unknown>): T => {
 };
 
 // Helper function to convert camelCase to snake_case
-const convertToSnakeCase = (product: Omit<Product, 'id' | 'createdAt'>): ProductRecord => {
+const convertToSnakeCase = (product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): ProductRecord => {
   return {
     name: product.name,
-    description: product.description,
+    description_fr: product.descriptionFr,
+    description_ar: product.descriptionAr,
     price: product.price,
     discount_price: product.discountPrice ?? null,
     category: product.category,
     images: product.images,
-    in_stock: product.inStock,
-    featured: product.featured,
     sizes: product.sizes,
   };
 };
@@ -275,7 +274,7 @@ export const getProductById = async (client: SupabaseClient<Database>, id: strin
 // Add a new product
 export const addProduct = async (
   client: SupabaseClient<Database>,
-  product: Omit<Product, 'id' | 'createdAt'>
+  product: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Product | null> => {
   try {
     const productData: ProductRecord = {
@@ -290,7 +289,14 @@ export const addProduct = async (
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error details:', error);
+      throw error;
+    }
+
+    if (!data) {
+      throw new Error('No data returned after insert');
+    }
 
     return convertToCamelCase<Product>(data);
   } catch (error) {
@@ -350,7 +356,7 @@ export const deleteProduct = async (
 };
 
 // Define essential fields for product listings
-const ESSENTIAL_FIELDS = 'id, name, price, discount_price, images, category, in_stock, featured, created_at';
+const ESSENTIAL_FIELDS = 'id, name, description_fr, description_ar, price, discount_price, images, category, sizes, created_at, updated_at';
 
 // Get featured products with essential fields
 export const getFeaturedProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
@@ -358,7 +364,6 @@ export const getFeaturedProducts = async (client: SupabaseClient<Database>): Pro
     const { data, error } = await client
       .from('products')
       .select(ESSENTIAL_FIELDS)
-      .eq('featured', true)
       .order('created_at', { ascending: false })
       .limit(6);
 
@@ -455,7 +460,7 @@ export const filterProducts = async (
 
     // Apply search filter
     if (filters.search) {
-      query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+      query = query.or(`name.ilike.%${filters.search}%,description_fr.ilike.%${filters.search}%,description_ar.ilike.%${filters.search}%`);
     }
 
     const { data, error, count } = await query
