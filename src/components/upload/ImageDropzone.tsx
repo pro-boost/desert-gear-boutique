@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useMemo } from "react";
 import { Upload, X, GripVertical } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "@/components/ui/sonner";
@@ -30,23 +30,27 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = (file: File): boolean => {
-    const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    const isValidType = validTypes.includes(file.type);
-    const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
+  // Memoize validateFile to prevent unnecessary recreations
+  const validateFile = useCallback(
+    (file: File): boolean => {
+      const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+      const isValidType = validTypes.includes(file.type);
+      const isValidSize = file.size <= maxSizeMB * 1024 * 1024;
 
-    if (!isValidType) {
-      toast.error(`${file.name}: ${t("invalidImageFormat")}`);
-      return false;
-    }
-    if (!isValidSize) {
-      toast.error(`${file.name}: ${t("imageTooLarge")}`);
-      return false;
-    }
-    return true;
-  };
+      if (!isValidType) {
+        toast.error(`${file.name}: ${t("invalidImageFormat")}`);
+        return false;
+      }
+      if (!isValidSize) {
+        toast.error(`${file.name}: ${t("imageTooLarge")}`);
+        return false;
+      }
+      return true;
+    },
+    [maxSizeMB, t]
+  );
 
-  // Handle file selection and conversion to base64
+  // Process files with validateFile in dependencies
   const processFiles = useCallback(
     async (files: FileList) => {
       const fileArray = Array.from(files);
@@ -91,7 +95,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
         toast.error(t("errorUploadingImage"));
       }
     },
-    [images, onImagesChange, maxImages, t]
+    [images, onImagesChange, maxImages, t, validateFile]
   );
 
   // Handle drag and drop for file upload

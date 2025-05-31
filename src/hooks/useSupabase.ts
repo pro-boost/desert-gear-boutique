@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 import { useAuth } from '@clerk/clerk-react';
 
-// Create a default client for non-authenticated requests
+// Create a singleton default client for non-authenticated requests
 const defaultClient = createClient<Database>(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -11,22 +11,25 @@ const defaultClient = createClient<Database>(
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: true
+      detectSessionInUrl: true,
+      storageKey: 'supabase.auth.default'
     }
   }
 );
+
+// Create a singleton authenticated client
+let authenticatedClient: SupabaseClient<Database> | null = null;
 
 export const useSupabase = () => {
   const { getToken, isSignedIn } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
-  const authenticatedClientRef = useRef<SupabaseClient<Database> | null>(null);
+  const tokenRef = useRef<string | null>(null);
 
   // Initialize the client
   useEffect(() => {
     const initializeClient = async () => {
       try {
-        // Start with the default client
         setIsInitialized(true);
       } catch (error) {
         console.error('Error initializing Supabase client:', error);
@@ -49,11 +52,6 @@ export const useSupabase = () => {
     }
 
     try {
-      // If we already have an authenticated client, return it
-      if (authenticatedClientRef.current) {
-        return authenticatedClientRef.current;
-      }
-
       // Get the Supabase token from Clerk
       const token = await getToken({ template: 'supabase' });
       
@@ -62,28 +60,33 @@ export const useSupabase = () => {
         return defaultClient;
       }
 
-      // Create a new client with the token only if we don't have one
-      authenticatedClientRef.current = createClient<Database>(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_ANON_KEY,
-        {
-          auth: {
-            autoRefreshToken: true,
-            persistSession: true,
-            detectSessionInUrl: true
-          },
-          global: {
-            headers: {
-              Authorization: `Bearer ${token}`
+      // If we have a token and it's different from our current token, update the client
+      if (token !== tokenRef.current) {
+        tokenRef.current = token;
+        
+        // Create a new authenticated client with the new token
+        authenticatedClient = createClient<Database>(
+          import.meta.env.VITE_SUPABASE_URL,
+          import.meta.env.VITE_SUPABASE_ANON_KEY,
+          {
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+              storageKey: 'supabase.auth.authenticated'
+            },
+            global: {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
             }
           }
-        }
-      );
+        );
+      }
 
-      return authenticatedClientRef.current;
+      return authenticatedClient || defaultClient;
     } catch (error) {
       console.error('Error getting authenticated client:', error);
-      // Return the default client if authentication fails
       return defaultClient;
     }
   }, [isInitialized, isSignedIn, getToken]);
@@ -91,7 +94,8 @@ export const useSupabase = () => {
   // Clear the authenticated client when signing out
   useEffect(() => {
     if (!isSignedIn) {
-      authenticatedClientRef.current = null;
+      authenticatedClient = null;
+      tokenRef.current = null;
     }
   }, [isSignedIn]);
 

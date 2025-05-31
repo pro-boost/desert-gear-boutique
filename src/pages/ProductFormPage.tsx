@@ -196,10 +196,17 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
   const handleSizeChange = (size: string, checked: boolean) => {
     setSelectedSizes((prev) => {
-      if (checked) {
-        return [...prev, size];
-      }
-      return prev.filter((s) => s !== size);
+      const newSizes = checked
+        ? [...prev, size]
+        : prev.filter((s) => s !== size);
+
+      // Update formData.sizes to match selectedSizes
+      setFormData((prevForm) => ({
+        ...prevForm,
+        sizes: newSizes,
+      }));
+
+      return newSizes;
     });
   };
 

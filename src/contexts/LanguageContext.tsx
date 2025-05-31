@@ -1130,6 +1130,19 @@ const translations: Translations = {
     fr: "Description (Arabe)",
     ar: "الوصف (بالعربية)",
   },
+  // Product reordering translations
+  orderUpdated: {
+    fr: "Ordre des produits mis à jour",
+    ar: "تم تحديث ترتيب المنتجات",
+  },
+  failedToUpdateOrder: {
+    fr: "Échec de la mise à jour de l'ordre des produits",
+    ar: "فشل تحديث ترتيب المنتجات",
+  },
+  dragToReorder: {
+    fr: "Glissez pour réorganiser",
+    ar: "اسحب لإعادة الترتيب",
+  },
 };
 
 interface LanguageContextType {

@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Product, ProductFilters, PRODUCT_CATEGORIES } from '@/types/product';
+import { Product, ProductFilters, PRODUCT_CATEGORIES, isProductInStock } from '@/types/product';
 import { toast } from '@/components/ui/sonner';
 import type { Database } from '@/integrations/supabase/types';
 
@@ -11,11 +11,19 @@ const convertToCamelCase = <T>(obj: Record<string, unknown>): T => {
     return obj.map(convertToCamelCase) as T;
   }
   if (obj !== null && typeof obj === 'object') {
-    return Object.keys(obj).reduce((acc, key) => {
+    const result = Object.keys(obj).reduce((acc, key) => {
       const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
       acc[camelKey] = convertToCamelCase(obj[key] as Record<string, unknown>);
       return acc;
-    }, {} as Record<string, unknown>) as T;
+    }, {} as Record<string, unknown>);
+
+    // If this is a Product object, compute the inStock property
+    if ('sizes' in result && 'id' in result && 'name' in result) {
+      const product = result as unknown as Product;
+      product.inStock = isProductInStock(product);
+    }
+
+    return result as T;
   }
   return obj as T;
 };
@@ -234,12 +242,38 @@ export const deleteCategory = async (
   }
 };
 
+// Update product positions in batch
+export const updateProductPositions = async (
+  client: SupabaseClient<Database>,
+  updates: { id: string; position: number }[]
+): Promise<boolean> => {
+  try {
+    // Sort updates by position and extract just the IDs
+    const productIds = updates
+      .sort((a, b) => a.position - b.position)
+      .map(update => update.id);
+
+    // Call the function with just the array of IDs
+    const { error } = await client.rpc('update_product_positions', {
+      product_ids: productIds
+    });
+
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating product positions:', error);
+    toast.error('Failed to update product order');
+    return false;
+  }
+};
+
 // Get all products
 export const getProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
   try {
     const { data, error } = await client
       .from('products')
       .select('*')
+      .order('position', { ascending: true })
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -364,6 +398,7 @@ export const getFeaturedProducts = async (client: SupabaseClient<Database>): Pro
     const { data, error } = await client
       .from('products')
       .select(ESSENTIAL_FIELDS)
+      .order('position', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(6);
 
@@ -386,6 +421,7 @@ export const getNewArrivals = async (
     const { data, error } = await client
       .from('products')
       .select(ESSENTIAL_FIELDS)
+      .order('position', { ascending: true })
       .order('created_at', { ascending: false })
       .limit(count);
 
@@ -464,6 +500,7 @@ export const filterProducts = async (
     }
 
     const { data, error, count } = await query
+      .order('position', { ascending: true })
       .order('created_at', { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
 
