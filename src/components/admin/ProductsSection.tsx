@@ -32,12 +32,12 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   return (
     <Card className="card-section">
       <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div className="space-y-4 text-center md:text-start w-full">
             <CardTitle>{t("products")}</CardTitle>
             <CardDescription>{t("manageProductsDescription")}</CardDescription>
           </div>
-          <Button onClick={onAddProduct} className="gap-2">
+          <Button onClick={onAddProduct} className="w-full md:w-auto gap-2">
             <Plus size={16} />
             {t("addProduct")}
           </Button>

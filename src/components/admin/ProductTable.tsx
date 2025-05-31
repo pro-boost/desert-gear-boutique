@@ -49,14 +49,14 @@ const ProductTable: React.FC<ProductTableProps> = ({
 
   const ProductCard = ({ product }: { product: Product }) => (
     <Card className="w-full">
-      <CardHeader className="p-4">
+      <CardHeader className="">
         <div className="flex flex-col md:flex-row gap-4">
           <img
             src={product.images[0]}
             alt={product.name}
-            className="w-3/4 h-auto md:w-20 md:h-20 md:self-start object-cover rounded self-center"
+            className="w-3/4 h-auto md:w-20 rounded-lg md:h-20 md:self-start object-cover  self-center"
           />
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 p-4">
             <CardTitle className="text-lg break-words">
               {product.name}
             </CardTitle>

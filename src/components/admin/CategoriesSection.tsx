@@ -44,14 +44,14 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               {t("manageCategoriesDescription")}
             </CardDescription>
           </div>
-          <Button onClick={onAddCategory} className="gap-2">
+          <Button onClick={onAddCategory} className=" w-full md:w-auto gap-2">
             <Plus className="h-4 w-4" />
             {t("addCategory")}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="px-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((category) => (
             <CategoryCard
               key={category.nameFr}
