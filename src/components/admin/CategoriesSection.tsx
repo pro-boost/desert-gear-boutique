@@ -12,6 +12,7 @@ import { Plus } from "lucide-react";
 import CategoryCard from "./CategoryCard";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -19,8 +20,8 @@ interface Category {
 
 interface CategoriesSectionProps {
   categories: Category[];
-  onDeleteCategory: (categoryNameFr: string) => void;
-  onEditCategory: (categoryName: string) => void;
+  onDeleteCategory: (categoryId: string) => void;
+  onEditCategory: (categoryId: string) => void;
   onRefresh: () => Promise<void>;
   onAddCategory: () => void;
 }
@@ -44,7 +45,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
               {t("manageCategoriesDescription")}
             </CardDescription>
           </div>
-          <Button onClick={onAddCategory} className=" w-full md:w-auto gap-2">
+          <Button onClick={onAddCategory} className="w-full md:w-auto gap-2">
             <Plus className="h-4 w-4" />
             {t("addCategory")}
           </Button>
@@ -54,7 +55,7 @@ const CategoriesSection: React.FC<CategoriesSectionProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((category) => (
             <CategoryCard
-              key={category.nameFr}
+              key={category.id}
               category={category}
               onDelete={onDeleteCategory}
               onEdit={onEditCategory}

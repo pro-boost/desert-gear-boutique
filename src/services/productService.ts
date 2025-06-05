@@ -2,30 +2,24 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { Product, ProductFilters, PRODUCT_CATEGORIES, isProductInStock } from '@/types/product';
 import { toast } from '@/components/ui/sonner';
 import type { Database } from '@/integrations/supabase/types';
+import { migrateCategoryId } from '@/integrations/supabase/migrations';
 
 type ProductRecord = Database['public']['Tables']['products']['Insert'];
 
 // Helper function to convert snake_case to camelCase
-const convertToCamelCase = <T>(obj: Record<string, unknown>): T => {
-  if (Array.isArray(obj)) {
-    return obj.map(convertToCamelCase) as T;
+const convertToCamelCase = <T>(data: Record<string, unknown>): T => {
+  const result: Record<string, unknown> = {};
+  for (const key in data) {
+    const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+    result[camelKey] = data[key];
   }
-  if (obj !== null && typeof obj === 'object') {
-    const result = Object.keys(obj).reduce((acc, key) => {
-      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-      acc[camelKey] = convertToCamelCase(obj[key] as Record<string, unknown>);
-      return acc;
-    }, {} as Record<string, unknown>);
-
-    // If this is a Product object, compute the inStock property
-    if ('sizes' in result && 'id' in result && 'name' in result) {
-      const product = result as unknown as Product;
-      product.inStock = isProductInStock(product);
-    }
-
-    return result as T;
+  
+  // Add computed properties for Product type
+  if ('sizes' in result) {
+    result.inStock = Array.isArray(result.sizes) && result.sizes.length > 0;
   }
-  return obj as T;
+  
+  return result as unknown as T;
 };
 
 // Helper function to convert camelCase to snake_case
@@ -36,7 +30,7 @@ const convertToSnakeCase = (product: Omit<Product, 'id' | 'createdAt' | 'updated
     description_ar: product.descriptionAr,
     price: product.price,
     discount_price: product.discountPrice ?? null,
-    category: product.category,
+    category_id: product.categoryId,
     images: product.images,
     sizes: product.sizes,
   };
@@ -54,6 +48,7 @@ export const saveCategories = (categories: string[]): void => {
 
 // Add interfaces for category management
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -91,7 +86,7 @@ export const ensureCategoriesTable = async (
   }
 };
 
-// Get categories from localStorage or use default ones
+// Get categories from database
 export const getCategories = async (
   client: SupabaseClient<Database>
 ): Promise<Category[]> => {
@@ -106,6 +101,7 @@ export const getCategories = async (
     if (error) throw error;
 
     return data.map(category => ({
+      id: category.id,
       nameFr: category.name_fr,
       nameAr: category.name_ar,
       sizes: category.sizes,
@@ -122,7 +118,7 @@ export const getCategories = async (
 // Add a new category
 export const addCategory = async (
   client: SupabaseClient<Database>,
-  category: Omit<Category, 'createdAt' | 'updatedAt'>
+  category: Omit<Category, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Category | null> => {
   try {
     const now = new Date().toISOString();
@@ -163,6 +159,7 @@ export const addCategory = async (
 
       if (retryError) throw retryError;
       return {
+        id: retryData.id,
         nameFr: retryData.name_fr,
         nameAr: retryData.name_ar,
         sizes: retryData.sizes,
@@ -174,6 +171,7 @@ export const addCategory = async (
     if (error) throw error;
 
     return {
+      id: data.id,
       nameFr: data.name_fr,
       nameAr: data.name_ar,
       sizes: data.sizes,
@@ -197,17 +195,19 @@ export const updateCategory = async (
     const { data, error } = await client
       .from('categories')
       .update({
+        name_fr: category.nameFr,
         name_ar: category.nameAr,
         sizes: category.sizes,
         updated_at: now
       })
-      .eq('name_fr', category.nameFr)
+      .eq('id', category.id)
       .select()
       .single();
 
     if (error) throw error;
 
     return {
+      id: data.id,
       nameFr: data.name_fr,
       nameAr: data.name_ar,
       sizes: data.sizes,
@@ -224,13 +224,13 @@ export const updateCategory = async (
 // Delete a category
 export const deleteCategory = async (
   client: SupabaseClient<Database>,
-  categoryNameFr: string
+  categoryId: string
 ): Promise<boolean> => {
   try {
     const { error } = await client
       .from('categories')
       .delete()
-      .eq('name_fr', categoryNameFr);
+      .eq('id', categoryId);
 
     if (error) throw error;
 
@@ -390,7 +390,7 @@ export const deleteProduct = async (
 };
 
 // Define essential fields for product listings
-const ESSENTIAL_FIELDS = 'id, name, description_fr, description_ar, price, discount_price, images, category, sizes, created_at, updated_at';
+const ESSENTIAL_FIELDS = 'id, name, description_fr, description_ar, price, discount_price, images, category_id, sizes, created_at, updated_at';
 
 // Get featured products with essential fields
 export const getFeaturedProducts = async (client: SupabaseClient<Database>): Promise<Product[]> => {
@@ -447,7 +447,7 @@ export const getProductsByCategory = async (
     const { count, error: countError } = await client
       .from('products')
       .select('*', { count: 'exact', head: true })
-      .eq('category', category);
+      .eq('category_id', category);
 
     if (countError) throw countError;
 
@@ -455,7 +455,7 @@ export const getProductsByCategory = async (
     const { data, error } = await client
       .from('products')
       .select(ESSENTIAL_FIELDS)
-      .eq('category', category)
+      .eq('category_id', category)
       .order('created_at', { ascending: false })
       .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -486,7 +486,7 @@ export const filterProducts = async (
 
     // Apply category filter
     if (filters.category && filters.category !== 'all') {
-      query = query.eq('category', filters.category);
+      query = query.eq('category_id', filters.category);
     }
 
     // Apply size filter
@@ -514,5 +514,17 @@ export const filterProducts = async (
     console.error('Error filtering products:', error);
     toast.error('Failed to filter products');
     return { products: [], total: 0 };
+  }
+};
+
+// Run category_id migration
+export const runCategoryIdMigration = async (client: SupabaseClient<Database>): Promise<void> => {
+  try {
+    await migrateCategoryId(client);
+    toast.success('Category ID migration completed successfully');
+  } catch (error) {
+    console.error('Error running category ID migration:', error);
+    toast.error('Failed to run category ID migration');
+    throw error;
   }
 };

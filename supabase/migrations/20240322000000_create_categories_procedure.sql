@@ -7,7 +7,9 @@ AS $$
 BEGIN
   -- Create the table if it doesn't exist
   CREATE TABLE IF NOT EXISTS categories (
-    name TEXT PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name_fr TEXT NOT NULL,
+    name_ar TEXT NOT NULL,
     sizes TEXT[] NOT NULL DEFAULT '{}',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -41,14 +43,15 @@ BEGIN
   );
 
   -- Create indexes for better performance
-  CREATE INDEX IF NOT EXISTS categories_name_idx ON categories (name);
+  CREATE INDEX IF NOT EXISTS categories_name_fr_idx ON categories (name_fr);
+  CREATE INDEX IF NOT EXISTS categories_name_ar_idx ON categories (name_ar);
   CREATE INDEX IF NOT EXISTS categories_created_at_idx ON categories (created_at DESC);
 
   -- Insert default categories if they don't exist
-  INSERT INTO categories (name, sizes) VALUES
-    ('boots', ARRAY['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']),
-    ('jackets', ARRAY['S', 'M', 'L', 'XL', 'XXL']),
-    ('accessories', ARRAY['One Size'])
-  ON CONFLICT (name) DO NOTHING;
+  INSERT INTO categories (name_fr, name_ar, sizes) VALUES
+    ('boots', 'boots', ARRAY['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']),
+    ('jackets', 'jackets', ARRAY['S', 'M', 'L', 'XL', 'XXL']),
+    ('accessories', 'accessories', ARRAY['One Size'])
+  ON CONFLICT (name_fr) DO NOTHING;
 END;
 $$; 

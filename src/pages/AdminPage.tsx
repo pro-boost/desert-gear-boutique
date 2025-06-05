@@ -18,8 +18,10 @@ import ProductsSection from "@/components/admin/ProductsSection";
 import CategoriesSection from "@/components/admin/CategoriesSection";
 import CategoryFormPage from "@/pages/CategoryFormPage";
 import ProductFormPage from "@/pages/ProductFormPage";
+import { MigrationButton } from "@/components/admin/MigrationButton";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -102,19 +104,17 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  const handleDeleteCategory = async (categoryNameFr: string) => {
+  const handleDeleteCategory = async (categoryId: string) => {
     try {
       const client = await getClient();
-      const success = await deleteCategory(client, categoryNameFr);
+      const success = await deleteCategory(client, categoryId);
       if (success) {
-        setCategories((prev) =>
-          prev.filter((cat) => cat.nameFr !== categoryNameFr)
-        );
-        toast.success(`Category "${categoryNameFr}" deleted successfully`);
+        toast.success(t("categoryDeleted"));
+        loadData();
       }
     } catch (error) {
       console.error("Error deleting category:", error);
-      toast.error("Failed to delete category");
+      toast.error(t("errorDeletingCategory"));
     }
   };
 
@@ -123,8 +123,8 @@ const AdminPage: React.FC = () => {
     setShowCategoryForm(true);
   };
 
-  const handleEditCategory = (categoryName: string) => {
-    setEditingCategory(categoryName);
+  const handleEditCategory = (categoryId: string) => {
+    setEditingCategory(categoryId);
     setShowCategoryForm(true);
   };
 
@@ -170,6 +170,7 @@ const AdminPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-center">
               {t("adminDashboard")}
             </h1>
+            <MigrationButton />
           </div>
 
           {loading ? (
@@ -218,7 +219,7 @@ const AdminPage: React.FC = () => {
               <TabsContent value="categories" className="space-y-8">
                 {showCategoryForm ? (
                   <CategoryFormPage
-                    categoryName={editingCategory}
+                    categoryId={editingCategory}
                     onClose={handleCategoryFormClose}
                   />
                 ) : (

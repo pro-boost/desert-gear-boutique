@@ -5,7 +5,7 @@ export interface Product {
   descriptionAr: string;
   price: number;
   discountPrice?: number;
-  category: string;
+  categoryId: string;
   images: string[];
   sizes: string[];
   createdAt: string;

@@ -10,6 +10,7 @@ import {
 import { ProductFilters as Filters } from "@/types/product";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -50,7 +51,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <SelectContent>
           <SelectItem value="all">{t("allCategories")}</SelectItem>
           {categories.map((category) => (
-            <SelectItem key={category.nameFr} value={category.nameFr}>
+            <SelectItem key={category.id} value={category.id}>
               {getCategoryName(category)}
             </SelectItem>
           ))}
@@ -64,7 +65,7 @@ export const ProductFilters: React.FC<ProductFiltersProps> = ({
         <SelectContent>
           <SelectItem value="all">{t("allSizes")}</SelectItem>
           {categories
-            .find((cat) => cat.nameFr === filters.category)
+            .find((cat) => cat.id === filters.category)
             ?.sizes.map((size) => (
               <SelectItem key={size} value={size}>
                 {size}

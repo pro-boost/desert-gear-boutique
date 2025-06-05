@@ -17,6 +17,7 @@ import { ProductFilters } from "@/components/products/ProductFilters";
 import { ProductGrid } from "@/components/products/ProductGrid";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];

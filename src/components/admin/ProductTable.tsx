@@ -54,9 +54,10 @@ import { toast } from "@/components/ui/sonner";
 
 interface ProductTableProps {
   products: Product[];
-  onEdit: (productId: string) => void;
-  onDelete: (productId: string) => void;
-  onRefresh: () => Promise<void>;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
+  onReorder: (productIds: string[]) => void;
+  isLoading?: boolean;
 }
 
 // Sortable table row component
@@ -109,7 +110,7 @@ const SortableTableRow = ({
         {product.name}
       </TableCell>
       <TableCell className="max-w-[150px] truncate">
-        {product.category}
+        {product.categoryId}
       </TableCell>
       <TableCell>
         {product.discountPrice ? (
@@ -218,7 +219,7 @@ const SortableProductCard = ({
               {product.name}
             </CardTitle>
             <CardDescription className="mt-1 break-words">
-              {t("category")}: {product.category}
+              {t("category")}: {product.categoryId}
             </CardDescription>
           </div>
         </div>
@@ -296,7 +297,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
   products,
   onEdit,
   onDelete,
-  onRefresh,
+  onReorder,
+  isLoading,
 }) => {
   const { t } = useLanguage();
   const { getClient } = useSupabase();
@@ -339,7 +341,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             toast.error(t("failedToUpdateOrder"));
           } else {
             toast.success(t("orderUpdated"));
-            onRefresh();
+            onReorder(newItems.map((item) => item.id));
           }
           setIsUpdating(false);
         });

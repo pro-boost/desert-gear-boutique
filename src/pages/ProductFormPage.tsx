@@ -51,7 +51,7 @@ interface ProductFormData {
   descriptionAr: string;
   price: number;
   discountPrice: number | null;
-  category: string;
+  categoryId: string;
   images: string[];
   sizes: string[];
 }
@@ -68,7 +68,7 @@ const productToFormData = (product: Product): ProductFormData => ({
   descriptionAr: product.descriptionAr,
   price: product.price,
   discountPrice: product.discountPrice ?? null,
-  category: product.category,
+  categoryId: product.categoryId,
   images: product.images,
   sizes: product.sizes,
 });
@@ -84,7 +84,7 @@ const formDataToProductRecord = (
   description_ar: formData.descriptionAr,
   price: formData.price,
   discount_price: formData.discountPrice,
-  category: formData.category,
+  category_id: formData.categoryId,
   images: formData.images,
   sizes: formData.sizes,
   featured: false,
@@ -112,7 +112,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     descriptionAr: "",
     price: 0,
     discountPrice: null,
-    category: "boots",
+    categoryId: "boots",
     images: [],
     sizes: [],
   });
@@ -178,7 +178,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    if (name === "category") {
+    if (name === "categoryId") {
       const category = categories.find((c) => c.nameFr === value);
       setFormData((prev) => ({
         ...prev,
@@ -239,7 +239,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
       !formData.descriptionFr ||
       !formData.descriptionAr ||
       !formData.price ||
-      !formData.category ||
+      !formData.categoryId ||
       !formData.images ||
       formData.images.length === 0
     ) {
@@ -257,7 +257,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
         descriptionAr: formData.descriptionAr,
         price: formData.price,
         discountPrice: formData.discountPrice,
-        category: formData.category,
+        categoryId: formData.categoryId,
         images: formData.images,
         sizes: formData.sizes,
       };
@@ -302,7 +302,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
   }
 
   const currentCategory = categories.find(
-    (c) => c.nameFr === formData.category
+    (c) => c.nameFr === formData.categoryId
   );
   const availableSizes = currentCategory?.sizes || [];
 
@@ -344,10 +344,12 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="category">{t("category")}</Label>
+              <Label htmlFor="categoryId">{t("category")}</Label>
               <Select
-                value={formData.category}
-                onValueChange={(value) => handleSelectChange("category", value)}
+                value={formData.categoryId}
+                onValueChange={(value) =>
+                  handleSelectChange("categoryId", value)
+                }
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("selectCategory")} />

@@ -11,28 +11,30 @@ import {
 } from "@/services/productService";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
 }
 
 interface CategoryFormPageProps {
-  categoryName?: string;
+  categoryId?: string;
   onClose: () => void;
 }
 
 const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
-  categoryName,
+  categoryId,
   onClose,
 }) => {
   const { t } = useLanguage();
   const { getClient } = useSupabase();
   const { isAdmin, isLoaded } = useAdmin();
-  const isEditing = !!categoryName;
+  const isEditing = !!categoryId;
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState<Category>({
+    id: "",
     nameFr: "",
     nameAr: "",
     sizes: [],
@@ -47,11 +49,11 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
         const client = await getClient();
 
         // If editing, load category data
-        if (isEditing && categoryName) {
+        if (isEditing && categoryId) {
           const { data, error } = await client
             .from("categories")
             .select("*")
-            .eq("name_fr", decodeURIComponent(categoryName))
+            .eq("id", categoryId)
             .single();
 
           if (error) {
@@ -60,6 +62,7 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
 
           if (data) {
             setFormData({
+              id: data.id,
               nameFr: data.name_fr,
               nameAr: data.name_ar,
               sizes: data.sizes || [],
@@ -79,10 +82,10 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
     };
 
     loadData();
-  }, [getClient, isAdmin, isEditing, categoryName, onClose, t]);
+  }, [getClient, isAdmin, isEditing, categoryId, onClose, t]);
 
   const handleSubmit = async (
-    categoryData: Omit<Category, "createdAt" | "updatedAt">
+    categoryData: Omit<Category, "id" | "createdAt" | "updatedAt">
   ) => {
     try {
       setSaving(true);
@@ -99,7 +102,10 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
 
       if (isEditing) {
         // Update existing category
-        savedCategory = await updateCategory(client, categoryData);
+        savedCategory = await updateCategory(client, {
+          id: categoryId!,
+          ...categoryData,
+        });
         if (savedCategory) {
           toast.success(t("categoryUpdated"));
         }

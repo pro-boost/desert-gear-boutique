@@ -14,6 +14,7 @@ import {
 import { Save, X, ArrowLeft } from "lucide-react";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -22,63 +23,65 @@ interface Category {
 interface CategoryFormProps {
   editingCategory: Category | null;
   onSubmit: (
-    category: Omit<Category, "createdAt" | "updatedAt">
+    category: Omit<Category, "id" | "createdAt" | "updatedAt">
   ) => Promise<void>;
   onCancel: () => void;
-  isSubmitting?: boolean;
+  isSubmitting: boolean;
 }
 
 const CategoryForm: React.FC<CategoryFormProps> = ({
   editingCategory,
   onSubmit,
   onCancel,
-  isSubmitting = false,
+  isSubmitting,
 }) => {
   const { t } = useLanguage();
-  const [newCategoryNameFr, setNewCategoryNameFr] = useState("");
-  const [newCategoryNameAr, setNewCategoryNameAr] = useState("");
-  const [newCategorySizes, setNewCategorySizes] = useState<string[]>([]);
+  const [nameFr, setNameFr] = useState("");
+  const [nameAr, setNameAr] = useState("");
+  const [sizes, setSizes] = useState<string[]>([]);
   const [newSize, setNewSize] = useState("");
 
   useEffect(() => {
     if (editingCategory) {
-      setNewCategoryNameFr(editingCategory.nameFr);
-      setNewCategoryNameAr(editingCategory.nameAr);
-      setNewCategorySizes(editingCategory.sizes);
-    } else {
-      setNewCategoryNameFr("");
-      setNewCategoryNameAr("");
-      setNewCategorySizes([]);
+      setNameFr(editingCategory.nameFr);
+      setNameAr(editingCategory.nameAr);
+      setSizes(editingCategory.sizes);
     }
   }, [editingCategory]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit({
+      nameFr,
+      nameAr,
+      sizes,
+    });
+  };
+
   const handleAddSize = () => {
-    if (newSize.trim() && !newCategorySizes.includes(newSize.trim())) {
-      setNewCategorySizes([...newCategorySizes, newSize.trim()]);
+    if (newSize && !sizes.includes(newSize)) {
+      setSizes([...sizes, newSize]);
       setNewSize("");
     }
   };
 
   const handleRemoveSize = (size: string) => {
-    setNewCategorySizes(newCategorySizes.filter((s) => s !== size));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newCategoryNameFr.trim()) return;
-
-    await onSubmit({
-      nameFr: newCategoryNameFr.trim(),
-      nameAr: newCategoryNameAr.trim(),
-      sizes: newCategorySizes,
-    });
+    setSizes(sizes.filter((s) => s !== size));
   };
 
   return (
     <Card className="card-section">
       <CardHeader>
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div className="space-y-4 text-center md:text-start w-full">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onCancel}
+            className="shrink-0"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
             <CardTitle>
               {editingCategory ? t("editCategory") : t("addCategory")}
             </CardTitle>
@@ -88,75 +91,55 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                 : t("addCategoryDescription")}
             </CardDescription>
           </div>
-          <div className="p-6 pb-0">
-            <Button variant="ghost" onClick={onCancel} className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              {t("backToCategories")}
-            </Button>
-          </div>
         </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="categoryNameFr">
-                {t("categoryName")} (Français)
-              </Label>
+          <div className="grid gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="nameFr">{t("nameFr")}</Label>
               <Input
-                id="categoryNameFr"
-                value={newCategoryNameFr}
-                onChange={(e) => setNewCategoryNameFr(e.target.value)}
-                placeholder={t("enterCategoryName")}
-                className="w-full"
-                disabled={isSubmitting}
+                id="nameFr"
+                value={nameFr}
+                onChange={(e) => setNameFr(e.target.value)}
+                required
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="categoryNameAr">
-                {t("categoryName")} (العربية)
-              </Label>
+            <div className="grid gap-2">
+              <Label htmlFor="nameAr">{t("nameAr")}</Label>
               <Input
-                id="categoryNameAr"
-                value={newCategoryNameAr}
-                onChange={(e) => setNewCategoryNameAr(e.target.value)}
-                placeholder={t("enterCategoryName")}
-                className="w-full"
+                id="nameAr"
+                value={nameAr}
+                onChange={(e) => setNameAr(e.target.value)}
+                required
                 dir="rtl"
-                disabled={isSubmitting}
               />
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>{t("sizes")}</Label>
-              <div className="flex flex-col sm:flex-row gap-2">
+          <div className="space-y-4">
+            <div className="flex items-end gap-2">
+              <div className="grid flex-1 gap-2">
+                <Label htmlFor="newSize">{t("addSize")}</Label>
                 <Input
+                  id="newSize"
                   value={newSize}
                   onChange={(e) => setNewSize(e.target.value)}
                   placeholder={t("enterSize")}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddSize();
-                    }
-                  }}
-                  className="flex-1"
-                  disabled={isSubmitting}
                 />
-                <Button
-                  onClick={handleAddSize}
-                  type="button"
-                  className="w-full sm:w-auto"
-                  disabled={isSubmitting}
-                >
-                  {t("addSize")}
-                </Button>
               </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleAddSize}
+                disabled={!newSize || sizes.includes(newSize)}
+              >
+                <X className="h-4 w-4 rotate-45" />
+              </Button>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {newCategorySizes.map((size) => (
+              {sizes.map((size) => (
                 <Badge
                   key={size}
                   variant="secondary"
@@ -164,38 +147,41 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
                 >
                   {size}
                   <Button
+                    type="button"
                     variant="ghost"
                     size="icon"
                     className="h-4 w-4 p-0 hover:bg-transparent"
                     onClick={() => handleRemoveSize(size)}
-                    disabled={isSubmitting}
                   >
                     <X className="h-3 w-3" />
                   </Button>
                 </Badge>
               ))}
             </div>
+          </div>
 
-            <div className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onCancel}
-                disabled={isSubmitting}
-              >
-                {t("cancel")}
-              </Button>
-              <Button type="submit" className="gap-2" disabled={isSubmitting}>
-                <Save className="h-4 w-4" />
-                {isSubmitting ? (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current" />
-                ) : editingCategory ? (
-                  t("saveChanges")
-                ) : (
-                  t("addCategory")
-                )}
-              </Button>
-            </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
+              {t("cancel")}
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  {t("saving")}
+                </div>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {editingCategory ? t("saveChanges") : t("addCategory")}
+                </>
+              )}
+            </Button>
           </div>
         </form>
       </CardContent>

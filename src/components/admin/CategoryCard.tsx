@@ -24,6 +24,7 @@ import {
 import { Edit, Trash } from "lucide-react";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -31,8 +32,8 @@ interface Category {
 
 interface CategoryCardProps {
   category: Category;
-  onDelete: (categoryNameFr: string) => void;
-  onEdit: (categoryName: string) => void;
+  onDelete: (categoryId: string) => void;
+  onEdit: (categoryId: string) => void;
 }
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
@@ -78,27 +79,18 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
             </Badge>
           ))}
         </div>
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
+        <div className="flex justify-end gap-2 mt-4">
           <Button
             variant="outline"
-            size="sm"
-            onClick={() => onEdit(category.nameFr)}
-            className="flex-1 p-1 min-w-[120px]"
+            size="icon"
+            onClick={() => onEdit(category.id)}
           >
-            <Edit className="h-4 w-4 mr-2 shrink-0" />
-            <span className="truncate">{t("edit")}</span>
+            <Edit className="h-4 w-4" />
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 p-1 min-w-[120px]"
-              >
-                <Trash className="h-4 w-4 mr-2 shrink-0" />
-                <span className="truncate">{t("delete")}</span>
+              <Button variant="outline" size="icon">
+                <Trash className="h-4 w-4" />
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
@@ -110,14 +102,14 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               </AlertDialogHeader>
               <AlertDialogFooter>
                 <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-                <AlertDialogAction onClick={() => onDelete(category.nameFr)}>
+                <AlertDialogAction onClick={() => onDelete(category.id)}>
                   {t("delete")}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
         </div>
-      </CardFooter>
+      </CardContent>
     </Card>
   );
 };

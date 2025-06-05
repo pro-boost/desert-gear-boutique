@@ -25,7 +25,11 @@ const ProductDetail = () => {
   const { t } = useLanguage();
   const { addToCart } = useCart();
   const { addToFavorites, removeFromFavorites, isFavorite } = useFavorites();
-  const { getClient } = useSupabase();
+  const {
+    getClient,
+    isInitialized,
+    isLoading: isSupabaseLoading,
+  } = useSupabase();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -37,7 +41,7 @@ const ProductDetail = () => {
     let mounted = true;
 
     const loadProductAndRelated = async () => {
-      if (!id) {
+      if (!id || !isInitialized) {
         if (mounted) setLoading(false);
         return;
       }
@@ -56,24 +60,38 @@ const ProductDetail = () => {
           return;
         }
 
+        console.log("Found product:", foundProduct); // Debug log
+
         if (mounted) {
           setProduct(foundProduct);
           setSelectedSizes([]);
         }
 
-        // Get related products
-        const related = await getProductsByCategory(
-          client,
-          foundProduct.category
+        // Fetch related products
+        console.log(
+          "Category ID for related products:",
+          foundProduct.categoryId
         );
-        if (mounted) {
-          if (Array.isArray(related)) {
-            setRelatedProducts(related.filter((p) => p.id !== id).slice(0, 4));
-          } else {
-            console.error("Related products is not an array:", related);
-            setRelatedProducts([]);
-          }
+        const relatedProductsResponse = await getProductsByCategory(
+          client,
+          foundProduct.categoryId
+        );
+        console.log("Related products response:", relatedProductsResponse);
+
+        if (!Array.isArray(relatedProductsResponse.products)) {
+          console.error(
+            "Related products is not an array:",
+            relatedProductsResponse
+          );
+          setRelatedProducts([]);
+          return;
         }
+
+        // Filter out the current product from related products and limit to 4 items
+        const filteredRelated = relatedProductsResponse.products
+          .filter((p) => p.id !== foundProduct.id)
+          .slice(0, 4);
+        setRelatedProducts(filteredRelated);
       } catch (error) {
         console.error("Error loading product:", error);
         if (mounted) {
@@ -91,7 +109,7 @@ const ProductDetail = () => {
     return () => {
       mounted = false;
     };
-  }, [id, getClient]);
+  }, [id, getClient, isInitialized]);
 
   const handleFavoriteToggle = () => {
     if (!product) return;
@@ -133,7 +151,7 @@ const ProductDetail = () => {
     navigate("/cart");
   };
 
-  if (loading) {
+  if (isSupabaseLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin" />
