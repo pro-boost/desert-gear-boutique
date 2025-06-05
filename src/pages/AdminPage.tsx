@@ -18,7 +18,6 @@ import ProductsSection from "@/components/admin/ProductsSection";
 import CategoriesSection from "@/components/admin/CategoriesSection";
 import CategoryFormPage from "@/pages/CategoryFormPage";
 import ProductFormPage from "@/pages/ProductFormPage";
-import { MigrationButton } from "@/components/admin/MigrationButton";
 
 interface Category {
   id: string;
@@ -170,7 +169,6 @@ const AdminPage: React.FC = () => {
             <h1 className="text-3xl font-bold text-center">
               {t("adminDashboard")}
             </h1>
-            <MigrationButton />
           </div>
 
           {loading ? (

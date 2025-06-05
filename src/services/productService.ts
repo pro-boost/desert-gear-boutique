@@ -516,15 +516,3 @@ export const filterProducts = async (
     return { products: [], total: 0 };
   }
 };
-
-// Run category_id migration
-export const runCategoryIdMigration = async (client: SupabaseClient<Database>): Promise<void> => {
-  try {
-    await migrateCategoryId(client);
-    toast.success('Category ID migration completed successfully');
-  } catch (error) {
-    console.error('Error running category ID migration:', error);
-    toast.error('Failed to run category ID migration');
-    throw error;
-  }
-};
