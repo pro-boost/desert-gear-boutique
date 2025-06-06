@@ -813,8 +813,8 @@ const translations: Translations = {
     ar: "المتابعة إلى الدفع",
   },
   newOrder: {
-    fr: "Nouvelle commande de Desert Gear Boutique",
-    ar: "طلب جديد من ديزرت جير بوتيك",
+    fr: "Nouvelle commande de Produit",
+    ar: "طلب جديد",
   },
   orderItems: {
     fr: "Articles commandés",
@@ -1154,6 +1154,26 @@ const translations: Translations = {
   dragToReorder: {
     fr: "Glissez pour réorganiser",
     ar: "اسحب لإعادة الترتيب",
+  },
+  quantityLabel: {
+    fr: "Quantité",
+    ar: "الكمية",
+  },
+  sizesLabel: {
+    fr: "Tailles",
+    ar: "المقاسات",
+  },
+  pricePerItemLabel: {
+    fr: "Prix par article",
+    ar: "السعر لكل منتج",
+  },
+  subtotalLabel: {
+    fr: "Sous-total",
+    ar: "المجموع الفرعي",
+  },
+  currencyLabel: {
+    fr: "Dh",
+    ar: "درهم",
   },
 };
 
