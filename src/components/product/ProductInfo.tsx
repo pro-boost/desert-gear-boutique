@@ -7,10 +7,14 @@ interface ProductInfoProps {
   product: Product;
 }
 
-const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
-  const { t } = useLanguage();
+export const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
+  const { t, language } = useLanguage();
   const hasDiscount =
     product.discountPrice && product.discountPrice < product.price;
+
+  // Get the appropriate description based on the current language
+  const description =
+    language === "ar" ? product.descriptionAr : product.descriptionFr;
 
   return (
     <div className="space-y-8">
@@ -56,7 +60,12 @@ const ProductInfo: React.FC<ProductInfoProps> = ({ product }) => {
       {/* Description */}
       <div className="space-y-2">
         <h3 className="text-lg font-medium">{t("description")}</h3>
-        <p className="text-muted-foreground">{product.description}</p>
+        <p
+          className="text-muted-foreground"
+          dir={language === "ar" ? "rtl" : "ltr"}
+        >
+          {description}
+        </p>
       </div>
     </div>
   );

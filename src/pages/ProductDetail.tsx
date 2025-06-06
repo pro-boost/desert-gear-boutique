@@ -15,7 +15,7 @@ import { toast } from "@/components/ui/sonner";
 
 // Import new components
 import ProductGallery from "@/components/product/ProductGallery";
-import ProductInfo from "@/components/product/ProductInfo";
+import { ProductInfo } from "@/components/product/ProductInfo";
 import SizeSelection from "@/components/product/SizeSelection";
 import ProductActions from "@/components/product/ProductActions";
 import RelatedProducts from "@/components/product/RelatedProducts";
