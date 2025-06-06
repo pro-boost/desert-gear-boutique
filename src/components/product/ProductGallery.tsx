@@ -20,11 +20,11 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
       <div className="relative">
         {/* Main Image Slider */}
         <div
-          className="aspect-square w-full overflow-hidden relative cursor-zoom-in"
+          className="aspect-square w-full overflow-hidden relative cursor-zoom-in bg-muted/10 flex items-center justify-center"
           onClick={() => setIsImageViewerOpen(true)}
         >
           <div
-            className="flex transition-transform duration-500 ease-in-out"
+            className="flex transition-transform duration-500 ease-in-out h-full w-full"
             style={{ transform: `translateX(-${activeImage * 100}%)` }}
           >
             {images.map((imgSrc, index) => (
@@ -32,7 +32,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                 key={index}
                 src={imgSrc}
                 alt={`${productName} image ${index + 1}`}
-                className="w-full h-full object-cover flex-shrink-0"
+                className="w-full h-full object-contain flex-shrink-0"
                 loading={index === 0 ? "eager" : "lazy"}
               />
             ))}
@@ -69,8 +69,8 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
 
         {/* Thumbnail Gallery */}
         {images.length > 1 && (
-          <div className="mt-4 overflow-x-auto">
-            <div className="flex space-x-3 pb-2">
+          <div className="mt-4">
+            <div className="flex flex-wrap justify-center gap-4">
               {images.map((img, index) => (
                 <button
                   key={index}
@@ -79,7 +79,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                     setActiveImage(index);
                   }}
                   className={`
-                    w-16 h-16 border rounded-lg overflow-hidden transition-all flex-shrink-0 cursor-pointer
+                    w-16 h-16 border rounded-lg overflow-hidden transition-all flex-shrink-0 cursor-pointer flex items-center justify-center bg-muted/10
                     ${
                       activeImage === index
                         ? "border-primary ring-2 ring-primary/20"
@@ -90,7 +90,7 @@ const ProductGallery: React.FC<ProductGalleryProps> = ({
                   <Image
                     src={img}
                     alt={`${productName} thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain"
                     loading="lazy"
                   />
                 </button>

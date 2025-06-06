@@ -10,14 +10,6 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingBag, Heart, Target } from "lucide-react";
 import { toast } from "@/components/ui/sonner";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/utils";
 
 interface ProductCardProps {
@@ -57,23 +49,23 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
   return (
     <Card
       className={cn(
-        "card-product group relative transition-all duration-300",
+        "card-product group min-h-full relative transition-all duration-300 flex flex-col",
         delay ? `animate-fade-in [animation-delay:${delay}ms]` : ""
       )}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col flex-1">
         <div className="relative aspect-square">
           <Link to={`/products/${product.id}`} className="block h-full">
             {isImageLoading && (
-              <div className="absolute inset-0 bg-muted animate-pulse" />
+              <div className="absolute  inset-0 bg-muted animate-pulse" />
             )}
             <img
               src={product.images[0]}
               alt={product.name}
               className={cn(
-                "w-full h-full object-cover transition-transform duration-300 group-hover:scale-105",
+                "w-full h-full object-contain transition-transform duration-300 group-hover:scale-105",
                 isImageLoading ? "opacity-0" : "opacity-100"
               )}
               loading="lazy"
@@ -95,7 +87,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
             {hasDiscount && (
               <Badge
                 variant="secondary"
-                className="bg-tactical text-tactical-foreground dark:shadow-[0_2px_10px_rgba(255,138,76,0.15)]"
+                className="bg-tactical max-w-max text-tactical-foreground dark:shadow-[0_2px_10px_rgba(255,138,76,0.15)]"
               >
                 -{Math.round((1 - product.discountPrice / product.price) * 100)}
                 %
@@ -182,7 +174,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
           )}
         </CardContent>
 
-        <CardFooter className="p-4 pt-0">
+        <CardFooter className="p-4 pt-0 mt-auto">
           <Button
             className="w-full"
             onClick={() => navigate(`/products/${product.id}`)}
