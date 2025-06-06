@@ -70,7 +70,23 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
 
   return (
     <div className="relative">
-      <div className="overflow-hidden" ref={emblaRef}>
+      {/* Mobile Grid View */}
+      <div className="grid grid-cols-1 gap-6 sm:hidden">
+        {products.map((product, index) => (
+          <motion.div
+            key={product.id}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <ProductCard product={product} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Desktop Carousel View */}
+      <div className="hidden sm:block overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {products.map((product, index) => (
             <motion.div
@@ -79,7 +95,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="min-w-0 flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] xl:flex-[0_0_25%] px-3"
+              className="min-w-0 flex-[0_0_50%] lg:flex-[0_0_33.333%] xl:flex-[0_0_25%] px-3"
             >
               <ProductCard product={product} />
             </motion.div>
@@ -87,12 +103,14 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </div>
       </div>
 
+      {/* Navigation arrows only for desktop carousel */}
       {showNavigation && (
-        <div className="flex justify-center gap-4 mt-6">
+        <>
           <Button
             variant="outline"
             size="icon"
-            className="bg-background/90 backdrop-blur-sm hover:bg-background 
+            className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-10
+                     bg-background/90 backdrop-blur-sm hover:bg-background 
                      hover:scale-105 transition-all w-10 h-10
                      shadow-lg border-primary/20 dark:border-primary/30"
             onClick={scrollPrev}
@@ -102,14 +120,15 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           <Button
             variant="outline"
             size="icon"
-            className="bg-background/90 backdrop-blur-sm hover:bg-background 
+            className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-10
+                     bg-background/90 backdrop-blur-sm hover:bg-background 
                      hover:scale-105 transition-all w-10 h-10
                      shadow-lg border-primary/20 dark:border-primary/30"
             onClick={scrollNext}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
-        </div>
+        </>
       )}
     </div>
   );
