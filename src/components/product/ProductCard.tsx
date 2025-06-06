@@ -59,20 +59,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
 
   const handleWhatsAppInquiry = () => {
     const message = [
-      `*NOUVELLE DEMANDE DE PRODUIT* 🛍️`,
+      `*${t("productInquiryHeader")}* 🛍️`,
       "━━━━━━━━━━━━━━━━━━━━━━━━",
       "",
-      `*Produit:* ${product.name}`,
-      `*Prix:* ${(product.discountPrice || product.price).toFixed(2)} Dh`,
+      `*${t("productLabel")}:* ${product.name}`,
+      `*${t("priceLabel")}:* ${(product.discountPrice || product.price).toFixed(
+        2
+      )} ${t("currencyLabel")}`,
       product.sizes && product.sizes.length > 0
-        ? `*Tailles disponibles:* ${product.sizes.join(" | ")}`
+        ? `*${t("availableSizesLabel")}:* ${product.sizes.join(" | ")}`
         : "",
       "",
-      "Bonjour,",
+      t("inquiryGreeting"),
       "",
-      "Je suis intéressé(e) par ce produit et j'aimerais avoir plus d'informations.",
+      t("inquiryMessage"),
       "",
-      "Merci d'avance pour votre retour.",
+      t("inquiryThankYou"),
       "",
       "━━━━━━━━━━━━━━━━━━━━━━━━",
     ]

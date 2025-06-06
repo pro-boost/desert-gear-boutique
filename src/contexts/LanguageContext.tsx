@@ -1175,6 +1175,38 @@ const translations: Translations = {
     fr: "Dh",
     ar: "درهم",
   },
+  productInquiryHeader: {
+    fr: "NOUVELLE DEMANDE DE PRODUIT",
+    ar: "طلب معلومات عن منتج جديد",
+  },
+  productLabel: {
+    fr: "Produit",
+    ar: "المنتج",
+  },
+  priceLabel: {
+    fr: "Prix",
+    ar: "السعر",
+  },
+  availableSizesLabel: {
+    fr: "Tailles disponibles",
+    ar: "المقاسات المتوفرة",
+  },
+  inquiryGreeting: {
+    fr: "Bonjour,",
+    ar: "مرحباً،",
+  },
+  inquiryMessage: {
+    fr: "Je suis intéressé(e) par ce produit et j'aimerais avoir plus d'informations.",
+    ar: "أنا مهتم بهذا المنتج وأود الحصول على مزيد من المعلومات.",
+  },
+  inquiryThankYou: {
+    fr: "Merci d'avance pour votre retour.",
+    ar: "شكراً مسبقاً على ردكم.",
+  },
+  inquireOnWhatsApp: {
+    fr: "Demander sur WhatsApp",
+    ar: "استفسر عبر واتساب",
+  },
 };
 
 interface LanguageContextType {
