@@ -27,8 +27,12 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
   onClose,
 }) => {
   const { t } = useLanguage();
-  const { getClient } = useSupabase();
-  const { isAdmin, isLoaded } = useAdmin();
+  const {
+    getClient,
+    isInitialized,
+    isLoading: isSupabaseLoading,
+  } = useSupabase();
+  const { isAdmin, isLoaded: isAdminLoaded } = useAdmin();
   const isEditing = !!categoryId;
 
   const [loading, setLoading] = useState(true);
@@ -42,7 +46,7 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
 
   useEffect(() => {
     const loadData = async () => {
-      if (!isAdmin) return;
+      if (!isAdmin || !isInitialized) return;
 
       try {
         setLoading(true);
@@ -82,7 +86,7 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
     };
 
     loadData();
-  }, [getClient, isAdmin, isEditing, categoryId, onClose, t]);
+  }, [getClient, isAdmin, isInitialized, isEditing, categoryId, onClose, t]);
 
   const handleSubmit = async (
     categoryData: Omit<Category, "id" | "createdAt" | "updatedAt">
@@ -130,7 +134,7 @@ const CategoryFormPage: React.FC<CategoryFormPageProps> = ({
     }
   };
 
-  if (!isLoaded || loading) {
+  if (!isAdminLoaded || !isInitialized || isSupabaseLoading || loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

@@ -29,6 +29,8 @@ interface CategoryFormProps {
   isSubmitting: boolean;
 }
 
+const STORAGE_KEY = "category_form_draft";
+
 const CategoryForm: React.FC<CategoryFormProps> = ({
   editingCategory,
   onSubmit,
@@ -41,13 +43,42 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   const [sizes, setSizes] = useState<string[]>([]);
   const [newSize, setNewSize] = useState("");
 
+  // Load initial data
   useEffect(() => {
     if (editingCategory) {
       setNameFr(editingCategory.nameFr);
       setNameAr(editingCategory.nameAr);
       setSizes(editingCategory.sizes);
+      // Clear any draft when editing
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      // Try to load draft for new category
+      const savedDraft = localStorage.getItem(STORAGE_KEY);
+      if (savedDraft) {
+        try {
+          const draft = JSON.parse(savedDraft);
+          setNameFr(draft.nameFr || "");
+          setNameAr(draft.nameAr || "");
+          setSizes(draft.sizes || []);
+        } catch (e) {
+          console.error("Error loading draft:", e);
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
     }
   }, [editingCategory]);
+
+  // Save draft when form changes
+  useEffect(() => {
+    if (!editingCategory) {
+      const draft = {
+        nameFr,
+        nameAr,
+        sizes,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
+    }
+  }, [nameFr, nameAr, sizes, editingCategory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,6 +87,15 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
       nameAr,
       sizes,
     });
+    // Clear draft after successful submission
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
+  const handleCancel = () => {
+    if (!editingCategory) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+    onCancel();
   };
 
   const handleAddSize = () => {
@@ -76,7 +116,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            onClick={onCancel}
+            onClick={handleCancel}
             className="shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -164,7 +204,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
             <Button
               type="button"
               variant="outline"
-              onClick={onCancel}
+              onClick={handleCancel}
               disabled={isSubmitting}
             >
               {t("cancel")}

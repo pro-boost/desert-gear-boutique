@@ -29,7 +29,11 @@ interface Category {
 const AdminPage: React.FC = () => {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { getClient, isLoading: isSupabaseLoading } = useSupabase();
+  const {
+    getClient,
+    isInitialized,
+    isLoading: isSupabaseLoading,
+  } = useSupabase();
   const { isAdmin, isLoaded: isAdminLoaded } = useAdmin();
 
   const [products, setProducts] = useState<Product[]>([]);
@@ -42,7 +46,7 @@ const AdminPage: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
-    if (!isAdmin) return;
+    if (!isAdmin || !isInitialized) return;
 
     try {
       setLoading(true);
@@ -72,7 +76,7 @@ const AdminPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [getClient, isAdmin, navigate, t]);
+  }, [getClient, isAdmin, isInitialized, navigate, t]);
 
   useEffect(() => {
     if (isAdminLoaded && !isAdmin) {
@@ -82,10 +86,10 @@ const AdminPage: React.FC = () => {
   }, [isAdminLoaded, isAdmin, navigate, t]);
 
   useEffect(() => {
-    if (!isSupabaseLoading && isAdminLoaded) {
+    if (!isSupabaseLoading && isAdminLoaded && isInitialized) {
       loadData();
     }
-  }, [isSupabaseLoading, isAdminLoaded, loadData]);
+  }, [isSupabaseLoading, isAdminLoaded, isInitialized, loadData]);
 
   const handleDeleteProduct = async (productId: string) => {
     try {
@@ -149,7 +153,7 @@ const AdminPage: React.FC = () => {
     loadData();
   };
 
-  if (isSupabaseLoading || !isAdminLoaded) {
+  if (isSupabaseLoading || !isAdminLoaded || !isInitialized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>

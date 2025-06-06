@@ -29,6 +29,11 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 }) => {
   const { t } = useLanguage();
 
+  const handleReorder = async (productIds: string[]) => {
+    // After reordering is complete, refresh the products list
+    await onRefresh();
+  };
+
   return (
     <Card className="card-section">
       <CardHeader>
@@ -48,7 +53,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           products={products}
           onEdit={onEditProduct}
           onDelete={onDeleteProduct}
-          onRefresh={onRefresh}
+          onReorder={handleReorder}
         />
       </CardContent>
     </Card>

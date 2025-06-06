@@ -40,6 +40,7 @@ import {
 } from "@hello-pangea/dnd";
 
 interface Category {
+  id: string;
   nameFr: string;
   nameAr: string;
   sizes: string[];
@@ -112,7 +113,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     descriptionAr: "",
     price: 0,
     discountPrice: null,
-    categoryId: "boots",
+    categoryId: "",
     images: [],
     sizes: [],
   });
@@ -179,7 +180,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
 
   const handleSelectChange = (name: string, value: string) => {
     if (name === "categoryId") {
-      const category = categories.find((c) => c.nameFr === value);
+      const category = categories.find((c) => c.id === value);
       setFormData((prev) => ({
         ...prev,
         [name]: value,
@@ -301,9 +302,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
     return null;
   }
 
-  const currentCategory = categories.find(
-    (c) => c.nameFr === formData.categoryId
-  );
+  const currentCategory = categories.find((c) => c.id === formData.categoryId);
   const availableSizes = currentCategory?.sizes || [];
 
   return (
@@ -356,7 +355,7 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((category) => (
-                    <SelectItem key={category.nameFr} value={category.nameFr}>
+                    <SelectItem key={category.id} value={category.id}>
                       {getCategoryDisplayName(category)}
                     </SelectItem>
                   ))}

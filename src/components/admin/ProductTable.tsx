@@ -56,7 +56,7 @@ interface ProductTableProps {
   products: Product[];
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
-  onReorder: (productIds: string[]) => void;
+  onReorder?: (productIds: string[]) => void;
   isLoading?: boolean;
 }
 
@@ -297,7 +297,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   products,
   onEdit,
   onDelete,
-  onReorder,
+  onReorder = () => {},
   isLoading,
 }) => {
   const { t } = useLanguage();

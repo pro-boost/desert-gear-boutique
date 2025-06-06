@@ -3,22 +3,9 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 import { useAuth } from '@clerk/clerk-react';
 
-// Create a singleton default client for non-authenticated requests
-const defaultClient = createClient<Database>(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: true,
-      storageKey: 'supabase.auth.default'
-    }
-  }
-);
-
-// Create a singleton authenticated client
-let authenticatedClient: SupabaseClient<Database> | null = null;
+// Create a singleton instance
+let supabaseInstance: SupabaseClient<Database> | null = null;
+let isInitializing = false;
 
 export const useSupabase = () => {
   const { getToken, isSignedIn } = useAuth();
@@ -29,12 +16,46 @@ export const useSupabase = () => {
   // Initialize the client
   useEffect(() => {
     const initializeClient = async () => {
+      if (isInitializing || supabaseInstance) {
+        setIsInitialized(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
+        isInitializing = true;
+        // Check if environment variables are available
+        if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+          throw new Error('Missing Supabase environment variables');
+        }
+
+        // Create the singleton instance
+        supabaseInstance = createClient<Database>(
+          import.meta.env.VITE_SUPABASE_URL,
+          import.meta.env.VITE_SUPABASE_ANON_KEY,
+          {
+            auth: {
+              autoRefreshToken: true,
+              persistSession: true,
+              detectSessionInUrl: true,
+              storageKey: 'supabase.auth.default'
+            }
+          }
+        );
+
+        // Test the connection
+        const { error } = await supabaseInstance.from('categories').select('count').limit(1);
+        if (error) {
+          throw error;
+        }
+
         setIsInitialized(true);
       } catch (error) {
         console.error('Error initializing Supabase client:', error);
+        throw error;
       } finally {
         setIsLoading(false);
+        isInitializing = false;
       }
     };
 
@@ -42,13 +63,13 @@ export const useSupabase = () => {
   }, []);
 
   const getClient = useCallback(async () => {
-    if (!isInitialized) {
+    if (!isInitialized || !supabaseInstance) {
       throw new Error('Supabase client not initialized');
     }
 
-    // For non-authenticated requests, return the default client
+    // For non-authenticated requests, return the singleton instance
     if (!isSignedIn) {
-      return defaultClient;
+      return supabaseInstance;
     }
 
     try {
@@ -57,15 +78,15 @@ export const useSupabase = () => {
       
       if (!token) {
         console.warn('No Supabase token available, using default client');
-        return defaultClient;
+        return supabaseInstance;
       }
 
       // If we have a token and it's different from our current token, update the client
       if (token !== tokenRef.current) {
         tokenRef.current = token;
         
-        // Create a new authenticated client with the new token
-        authenticatedClient = createClient<Database>(
+        // Update the singleton instance with the new token
+        supabaseInstance = createClient<Database>(
           import.meta.env.VITE_SUPABASE_URL,
           import.meta.env.VITE_SUPABASE_ANON_KEY,
           {
@@ -84,17 +105,16 @@ export const useSupabase = () => {
         );
       }
 
-      return authenticatedClient || defaultClient;
+      return supabaseInstance;
     } catch (error) {
       console.error('Error getting authenticated client:', error);
-      return defaultClient;
+      return supabaseInstance;
     }
   }, [isInitialized, isSignedIn, getToken]);
 
-  // Clear the authenticated client when signing out
+  // Clear the token when signing out
   useEffect(() => {
     if (!isSignedIn) {
-      authenticatedClient = null;
       tokenRef.current = null;
     }
   }, [isSignedIn]);

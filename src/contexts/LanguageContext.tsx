@@ -873,6 +873,14 @@ const translations: Translations = {
     fr: "Nom de la catégorie",
     ar: "اسم الفئة",
   },
+  nameFr: {
+    fr: "Nom (Français)",
+    ar: "الاسم (بالفرنسية)",
+  },
+  nameAr: {
+    fr: "Nom (Arabe)",
+    ar: "الاسم (بالعربية)",
+  },
   enterCategoryName: {
     fr: "Entrez le nom de la catégorie",
     ar: "أدخل اسم الفئة",
@@ -892,6 +900,10 @@ const translations: Translations = {
   deleteCategory: {
     fr: "Supprimer la catégorie",
     ar: "حذف الفئة",
+  },
+  categoryDeleted: {
+    fr: "Catégorie supprimée avec succès",
+    ar: "تم حذف الفئة بنجاح",
   },
   deleteCategoryConfirmation: {
     fr: "Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible.",
