@@ -319,7 +319,7 @@ const translations: Translations = {
     ar: "الرسالة",
   },
   equipmentDescription: {
-    fr: "Équipements de haute qualité",
+    fr: "équipements tactiques de haute qualité",
     ar: "معدات عالية الجودة",
   },
   passwordRequirements: {
@@ -427,11 +427,11 @@ const translations: Translations = {
     ar: "الرؤية",
   },
   missionDescription: {
-    fr: "Nous nous engageons à fournir des équipements de sécurité de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.",
+    fr: "Nous nous engageons à fournir des équipements tactiques de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.",
     ar: "نلتزم بتقديم معدات الأمان من أعلى جودة، مع التركيز على المتانة والأداء.",
   },
   visionDescription: {
-    fr: "Devenir le leader de référence dans le domaine des équipements de sécurité au Maroc et en Afrique.",
+    fr: "Devenir le leader de référence dans le domaine des équipements tactiques au Maroc et en Afrique.",
     ar: "أن نصبح الرائد المرجعي في مجال معدات الأمان في المغرب وأفريقيا.",
   },
   standardDelivery: {
@@ -559,11 +559,11 @@ const translations: Translations = {
     ar: "لا توجد مفضلات",
   },
   bestEquipment: {
-    fr: "Les meilleurs équipements de sécurité pour les professionnels et les passionnés.",
+    fr: "Les meilleurs équipements tactiques pour les professionnels et les passionnés.",
     ar: "أفضل معدات الأمان للمحترفين والهواة.",
   },
   aboutUsDescription: {
-    fr: "Strike Gear est votre destination de confiance pour les équipements de sécurité de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.",
+    fr: "Strike Gear est votre destination de confiance pour les équipements tactiques de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.",
     ar: "سترايك جير هي وجهتك الموثوقة لمعدات الأمان عالية الجودة. منذ تأسيسنا، التزمنا بتقديم أفضل المنتجات للمحترفين والهواة.",
   },
   productSelection: {
@@ -619,7 +619,7 @@ const translations: Translations = {
     ar: "مرحباً بكم في سترايك جير بوتيك",
   },
   heroSubtitle: {
-    fr: "Votre destination de confiance pour des équipements de haute qualité",
+    fr: "Votre destination de confiance pour des équipements tactiques de haute qualité",
     ar: "وجهتك الموثوقة لمعدات عالية الجودة",
   },
   viewAll: {
