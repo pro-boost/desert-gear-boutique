@@ -2,9 +2,10 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Database } from '@/integrations/supabase/types';
 import { useAuth } from '@clerk/clerk-react';
+import { defaultClient } from '@/lib/supabaseClient';
 
 // Create a singleton instance
-let supabaseInstance: SupabaseClient<Database> | null = null;
+const supabaseInstance: SupabaseClient<Database> = defaultClient;
 let isInitializing = false;
 
 export const useSupabase = () => {
@@ -16,38 +17,30 @@ export const useSupabase = () => {
   // Initialize the client
   useEffect(() => {
     const initializeClient = async () => {
-      if (isInitializing || supabaseInstance) {
-        setIsInitialized(true);
-        setIsLoading(false);
+      console.log('Initializing Supabase client...', { isInitializing, hasInstance: !!supabaseInstance });
+      if (isInitializing) {
+        console.log('Already initializing, skipping...');
         return;
       }
 
       try {
         isInitializing = true;
+        setIsLoading(true);
+        
         // Check if environment variables are available
         if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+          console.error('Missing Supabase environment variables');
           throw new Error('Missing Supabase environment variables');
         }
 
-        // Create the singleton instance
-        supabaseInstance = createClient<Database>(
-          import.meta.env.VITE_SUPABASE_URL,
-          import.meta.env.VITE_SUPABASE_ANON_KEY,
-          {
-            auth: {
-              autoRefreshToken: true,
-              persistSession: true,
-              detectSessionInUrl: true,
-              storageKey: 'supabase.auth.default'
-            }
-          }
-        );
-
-        // Test the connection
-        const { error } = await supabaseInstance.from('categories').select('count').limit(1);
+        console.log('Testing connection with default client...');
+        // Test the connection with the default client first
+        const { error } = await defaultClient.from('categories').select('count').limit(1);
         if (error) {
+          console.error('Error testing connection:', error);
           throw error;
         }
+        console.log('Connection test successful');
 
         setIsInitialized(true);
       } catch (error) {
@@ -63,30 +56,35 @@ export const useSupabase = () => {
   }, []);
 
   const getClient = useCallback(async () => {
-    if (!isInitialized || !supabaseInstance) {
-      throw new Error('Supabase client not initialized');
+    console.log('Getting Supabase client...', { isInitialized, isSignedIn });
+    if (!isInitialized) {
+      console.log('Not initialized, returning default client');
+      return defaultClient;
     }
 
-    // For non-authenticated requests, return the singleton instance
+    // For non-authenticated requests, return the default client
     if (!isSignedIn) {
-      return supabaseInstance;
+      console.log('User not signed in, returning default client');
+      return defaultClient;
     }
 
     try {
       // Get the Supabase token from Clerk
+      console.log('Getting Clerk token...');
       const token = await getToken({ template: 'supabase' });
       
       if (!token) {
         console.warn('No Supabase token available, using default client');
-        return supabaseInstance;
+        return defaultClient;
       }
 
-      // If we have a token and it's different from our current token, update the client
+      // If we have a token and it's different from our current token, create a new client
       if (token !== tokenRef.current) {
+        console.log('Creating new authenticated client with token');
         tokenRef.current = token;
         
-        // Update the singleton instance with the new token
-        supabaseInstance = createClient<Database>(
+        // Create a new authenticated client
+        return createClient<Database>(
           import.meta.env.VITE_SUPABASE_URL,
           import.meta.env.VITE_SUPABASE_ANON_KEY,
           {
@@ -105,10 +103,11 @@ export const useSupabase = () => {
         );
       }
 
+      console.log('Using existing authenticated client');
       return supabaseInstance;
     } catch (error) {
       console.error('Error getting authenticated client:', error);
-      return supabaseInstance;
+      return defaultClient;
     }
   }, [isInitialized, isSignedIn, getToken]);
 

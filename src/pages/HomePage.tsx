@@ -21,15 +21,21 @@ import { cn } from "@/lib/utils";
 import MapComponent from "@/components/map/MapComponent";
 import { motion } from "framer-motion";
 import { ProductSkeletonGrid } from "@/components/ui/product-skeleton";
+import { convertToCamelCase } from "@/services/productService";
 
 // Lazy load the hero image
 const HeroImage = React.lazy(() => import("../components/ui/HeroImage"));
 
 const HomePage = () => {
   const { t } = useLanguage();
-  const { getClient } = useSupabase();
+  const {
+    getClient,
+    isLoading: isSupabaseLoading,
+    isInitialized,
+  } = useSupabase();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [emblaRef, emblaApi] = useEmblaCarousel({
     loop: true,
     align: "start",
@@ -72,29 +78,87 @@ const HomePage = () => {
 
   useEffect(() => {
     const loadProducts = async () => {
+      console.log("Starting to load products...");
+      setError(null);
+
+      if (!isInitialized) {
+        console.log("Waiting for Supabase to initialize...");
+        return;
+      }
+
       try {
         setLoading(true);
+        console.log("Getting Supabase client...");
         const client = await getClient();
-        // Fetch featured and new products in parallel
-        const [featured, newProducts] = await Promise.all([
-          getFeaturedProducts(client),
-          getNewArrivals(client),
-        ]);
-        // Combine and deduplicate products
-        const allProducts = [...featured, ...newProducts];
-        const uniqueProducts = Array.from(
-          new Map(allProducts.map((item) => [item.id, item])).values()
+
+        // Try a simple query first
+        console.log("Testing simple query...");
+        const { data: testData, error: testError } = await client
+          .from("products")
+          .select("id")
+          .limit(1);
+
+        if (testError) {
+          console.error("Test query failed:", testError);
+          throw testError;
+        }
+        console.log("Test query successful:", testData);
+
+        // Now try to get the actual products
+        console.log("Fetching products...");
+        const { data, error } = await client
+          .from("products")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(12);
+
+        if (error) {
+          console.error("Error fetching products:", error);
+          throw error;
+        }
+
+        console.log("Products fetched successfully:", data);
+
+        if (!data || data.length === 0) {
+          console.log("No products found in the database");
+          setProducts([]);
+          return;
+        }
+
+        const convertedProducts = data.map((item) =>
+          convertToCamelCase<Product>(item)
         );
-        setProducts(uniqueProducts);
-      } catch (error) {
-        console.error("Error loading products:", error);
+        console.log("Converted products:", convertedProducts);
+        setProducts(convertedProducts);
+      } catch (err) {
+        console.error("Error in loadProducts:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to load products"
+        );
       } finally {
         setLoading(false);
       }
     };
 
     loadProducts();
-  }, [getClient]);
+  }, [getClient, isInitialized]);
+
+  if (isSupabaseLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-red-500 mb-4">{error}</div>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -153,6 +217,15 @@ const HomePage = () => {
           <div className="relative w-full max-w-7xl mx-auto">
             {loading ? (
               <ProductSkeletonGrid count={4} />
+            ) : products.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground mb-4">
+                  {t("noProductsAvailable")}
+                </p>
+                <Button asChild>
+                  <Link to="/products">{t("viewAllProducts")}</Link>
+                </Button>
+              </div>
             ) : (
               <div className="relative">
                 <div className="overflow-hidden" ref={emblaRef}>

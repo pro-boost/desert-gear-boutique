@@ -6,12 +6,12 @@ import { migrateCategoryId } from '@/integrations/supabase/migrations';
 
 type ProductRecord = Database['public']['Tables']['products']['Insert'];
 
-// Helper function to convert snake_case to camelCase
-const convertToCamelCase = <T>(data: Record<string, unknown>): T => {
+// Convert snake_case to camelCase
+export const convertToCamelCase = <T>(data: Record<string, unknown>): T => {
   const result: Record<string, unknown> = {};
-  for (const key in data) {
+  for (const [key, value] of Object.entries(data)) {
     const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-    result[camelKey] = data[key];
+    result[camelKey] = value;
   }
   
   // Add computed properties for Product type
@@ -19,7 +19,7 @@ const convertToCamelCase = <T>(data: Record<string, unknown>): T => {
     result.inStock = Array.isArray(result.sizes) && result.sizes.length > 0;
   }
   
-  return result as unknown as T;
+  return result as T;
 };
 
 // Helper function to convert camelCase to snake_case
