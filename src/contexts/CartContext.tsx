@@ -6,9 +6,17 @@ import React, {
   ReactNode,
 } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { Product, PRODUCT_SIZES } from "@/types/product";
+import { Product } from "@/types/product";
 import { toast } from "@/components/ui/sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSupabase } from "@/hooks/useSupabase";
+import {
+  getUserCartItems,
+  addToCart as addToCartDB,
+  updateCartItemQuantity as updateCartItemQuantityDB,
+  removeFromCart as removeFromCartDB,
+  clearCart as clearCartDB,
+} from "@/services/userDataService";
 
 // Export the CartItem type so it can be imported in other files
 export interface CartItem {
@@ -19,11 +27,20 @@ export interface CartItem {
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product, quantity: number, size: string) => void;
-  updateQuantity: (productId: string, quantity: number, size: string) => void;
-  removeItem: (productId: string, size: string) => void;
-  clearCart: () => void;
+  addToCart: (
+    product: Product,
+    quantity: number,
+    size: string
+  ) => Promise<void>;
+  updateQuantity: (
+    productId: string,
+    quantity: number,
+    size: string
+  ) => Promise<void>;
+  removeItem: (productId: string, size: string) => Promise<void>;
+  clearCart: () => Promise<void>;
   totalPrice: number;
+  isLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -33,108 +50,152 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { user } = useUser();
   const { t } = useLanguage();
+  const { getClient, isInitialized } = useSupabase();
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load cart from localStorage when user changes
+  // Load cart from database when user changes
   useEffect(() => {
-    if (user) {
-      // For signed-in users, load their synced cart
-      const storedCart = localStorage.getItem(`cart_${user.id}`);
-      if (storedCart) {
-        setItems(JSON.parse(storedCart));
-      } else {
-        // If no synced cart exists, try to load the local cart
-        const localCart = localStorage.getItem("local_cart");
-        if (localCart) {
-          setItems(JSON.parse(localCart));
-          // Save the local cart to the user's synced cart
-          localStorage.setItem(`cart_${user.id}`, localCart);
-          // Clear the local cart
-          localStorage.removeItem("local_cart");
-        } else {
-          setItems([]);
-        }
-      }
-    } else {
-      // For non-signed-in users, load the local cart
-      const localCart = localStorage.getItem("local_cart");
-      if (localCart) {
-        setItems(JSON.parse(localCart));
-      } else {
+    const loadCart = async () => {
+      if (!user || !isInitialized) {
         setItems([]);
+        setIsLoading(false);
+        return;
       }
+
+      try {
+        setIsLoading(true);
+        const client = await getClient();
+        const cartItems = await getUserCartItems(client, user.id);
+        setItems(cartItems);
+      } catch (error) {
+        console.error("Error loading cart:", error);
+        toast.error(t("errorLoadingCart"));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadCart();
+  }, [user, isInitialized, getClient, t]);
+
+  const addToCart = async (
+    product: Product,
+    quantity: number,
+    size: string
+  ) => {
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
+      return;
     }
-  }, [user]);
 
-  // Save cart to localStorage when it changes
-  useEffect(() => {
-    if (user) {
-      // For signed-in users, save to their synced cart
-      localStorage.setItem(`cart_${user.id}`, JSON.stringify(items));
-    } else {
-      // For non-signed-in users, save to local cart
-      localStorage.setItem("local_cart", JSON.stringify(items));
-    }
-  }, [items, user]);
-
-  const addToCart = (product: Product, quantity: number, size: string) => {
-    setItems((prev) => {
-      const existingItem = prev.find(
-        (item) => item.product.id === product.id && item.selectedSize === size
-      );
-
-      if (existingItem) {
-        const newQuantity = existingItem.quantity + quantity;
-        const updatedItems = prev.map((item) =>
-          item.product.id === product.id && item.selectedSize === size
-            ? { ...item, quantity: newQuantity }
-            : item
+    try {
+      const client = await getClient();
+      await addToCartDB(client, user.id, product.id, quantity, size);
+      setItems((prev) => {
+        const existingItem = prev.find(
+          (item) => item.product.id === product.id && item.selectedSize === size
         );
-        toast.success(t("updatedCart"));
-        return updatedItems;
-      }
 
-      toast.success(t("addedToCart"));
-      return [...prev, { product, quantity, selectedSize: size }];
-    });
+        if (existingItem) {
+          const newQuantity = existingItem.quantity + quantity;
+          const updatedItems = prev.map((item) =>
+            item.product.id === product.id && item.selectedSize === size
+              ? { ...item, quantity: newQuantity }
+              : item
+          );
+          toast.success(t("updatedCart"));
+          return updatedItems;
+        }
+
+        toast.success(t("addedToCart"));
+        return [...prev, { product, quantity, selectedSize: size }];
+      });
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error(t("errorAddingToCart"));
+    }
   };
 
-  const updateQuantity = (
+  const updateQuantity = async (
     productId: string,
     quantity: number,
     size: string
   ) => {
-    if (quantity < 1) {
-      removeItem(productId, size);
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
       return;
     }
 
-    setItems((prev) =>
-      prev.map((item) =>
-        item.product.id === productId && item.selectedSize === size
-          ? { ...item, quantity }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (productId: string, size: string) => {
-    setItems((prev) => {
-      const item = prev.find(
-        (item) => item.product.id === productId && item.selectedSize === size
+    try {
+      const client = await getClient();
+      await updateCartItemQuantityDB(
+        client,
+        user.id,
+        productId,
+        quantity,
+        size
       );
-      if (item) {
-        toast.success(t("removedFromCart"));
+      if (quantity < 1) {
+        await removeItem(productId, size);
+        return;
       }
-      return prev.filter(
-        (item) => !(item.product.id === productId && item.selectedSize === size)
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.product.id === productId && item.selectedSize === size
+            ? { ...item, quantity }
+            : item
+        )
       );
-    });
+    } catch (error) {
+      console.error("Error updating cart quantity:", error);
+      toast.error(t("errorUpdatingCart"));
+    }
   };
 
-  const clearCart = () => {
-    setItems([]);
-    toast.success(t("cartCleared"));
+  const removeItem = async (productId: string, size: string) => {
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
+      return;
+    }
+
+    try {
+      const client = await getClient();
+      await removeFromCartDB(client, user.id, productId, size);
+      setItems((prev) => {
+        const item = prev.find(
+          (item) => item.product.id === productId && item.selectedSize === size
+        );
+        if (item) {
+          toast.success(t("removedFromCart"));
+        }
+        return prev.filter(
+          (item) =>
+            !(item.product.id === productId && item.selectedSize === size)
+        );
+      });
+    } catch (error) {
+      console.error("Error removing from cart:", error);
+      toast.error(t("errorRemovingFromCart"));
+    }
+  };
+
+  const clearCart = async () => {
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
+      return;
+    }
+
+    try {
+      const client = await getClient();
+      await clearCartDB(client, user.id);
+      setItems([]);
+      toast.success(t("cartCleared"));
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      toast.error(t("errorClearingCart"));
+    }
   };
 
   const totalPrice = items.reduce(
@@ -152,6 +213,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
         removeItem,
         clearCart,
         totalPrice,
+        isLoading,
       }}
     >
       {children}

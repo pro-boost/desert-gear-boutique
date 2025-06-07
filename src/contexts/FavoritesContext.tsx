@@ -3,12 +3,19 @@ import { useUser } from "@clerk/clerk-react";
 import { Product } from "@/types/product";
 import { toast } from "@/components/ui/sonner";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useSupabase } from "@/hooks/useSupabase";
+import {
+  getUserFavorites,
+  addToFavorites as addToFavoritesDB,
+  removeFromFavorites as removeFromFavoritesDB,
+} from "@/services/userDataService";
 
 interface FavoritesContextType {
   items: Product[];
-  addToFavorites: (product: Product) => void;
-  removeFromFavorites: (productId: string) => void;
+  addToFavorites: (product: Product) => Promise<void>;
+  removeFromFavorites: (productId: string) => Promise<void>;
   isFavorite: (productId: string) => boolean;
+  isLoading: boolean;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | undefined>(
@@ -20,68 +27,77 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { user } = useUser();
   const { t } = useLanguage();
+  const { getClient, isInitialized } = useSupabase();
   const [items, setItems] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load favorites from localStorage when user changes
+  // Load favorites from database when user changes
   useEffect(() => {
-    if (user) {
-      // For signed-in users, load their synced favorites
-      const storedFavorites = localStorage.getItem(`favorites_${user.id}`);
-      if (storedFavorites) {
-        setItems(JSON.parse(storedFavorites));
-      } else {
-        // If no synced favorites exist, try to load the local favorites
-        const localFavorites = localStorage.getItem("local_favorites");
-        if (localFavorites) {
-          setItems(JSON.parse(localFavorites));
-          // Save the local favorites to the user's synced favorites
-          localStorage.setItem(`favorites_${user.id}`, localFavorites);
-          // Clear the local favorites
-          localStorage.removeItem("local_favorites");
-        } else {
-          setItems([]);
-        }
-      }
-    } else {
-      // For non-signed-in users, load the local favorites
-      const localFavorites = localStorage.getItem("local_favorites");
-      if (localFavorites) {
-        setItems(JSON.parse(localFavorites));
-      } else {
+    const loadFavorites = async () => {
+      if (!user || !isInitialized) {
         setItems([]);
+        setIsLoading(false);
+        return;
       }
-    }
-  }, [user]);
 
-  // Save favorites to localStorage when they change
-  useEffect(() => {
-    if (user) {
-      // For signed-in users, save to their synced favorites
-      localStorage.setItem(`favorites_${user.id}`, JSON.stringify(items));
-    } else {
-      // For non-signed-in users, save to local favorites
-      localStorage.setItem("local_favorites", JSON.stringify(items));
-    }
-  }, [items, user]);
-
-  const addToFavorites = (product: Product) => {
-    setItems((prev) => {
-      if (!prev.find((item) => item.id === product.id)) {
-        toast.success(t("addedToFavorites"));
-        return [...prev, product];
+      try {
+        setIsLoading(true);
+        const client = await getClient();
+        const favorites = await getUserFavorites(client, user.id);
+        setItems(favorites);
+      } catch (error) {
+        console.error("Error loading favorites:", error);
+        toast.error(t("errorLoadingFavorites"));
+      } finally {
+        setIsLoading(false);
       }
-      return prev;
-    });
+    };
+
+    loadFavorites();
+  }, [user, isInitialized, getClient, t]);
+
+  const addToFavorites = async (product: Product) => {
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
+      return;
+    }
+
+    try {
+      const client = await getClient();
+      await addToFavoritesDB(client, product.id);
+      setItems((prev) => {
+        if (!prev.find((item) => item.id === product.id)) {
+          toast.success(t("addedToFavorites"));
+          return [...prev, product];
+        }
+        return prev;
+      });
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      toast.error(t("errorAddingToFavorites"));
+    }
   };
 
-  const removeFromFavorites = (productId: string) => {
-    setItems((prev) => {
-      const product = prev.find((item) => item.id === productId);
-      if (product) {
-        toast.success(t("removedFromFavorites"));
-      }
-      return prev.filter((item) => item.id !== productId);
-    });
+  const removeFromFavorites = async (productId: string) => {
+    if (!user) {
+      toast.error(t("pleaseSignIn"));
+      return;
+    }
+
+    try {
+      const client = await getClient();
+      await removeFromFavoritesDB(client, productId);
+      setItems((prev) => {
+        const product = prev.find((item) => item.id === productId);
+        if (product) {
+          toast.success(t("removedFromFavorites"));
+        }
+        return prev.filter((item) => item.id !== productId);
+      });
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      toast.error(t("errorRemovingFromFavorites"));
+    }
   };
 
   const isFavorite = (productId: string) => {
@@ -95,6 +111,7 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({
         addToFavorites,
         removeFromFavorites,
         isFavorite,
+        isLoading,
       }}
     >
       {children}
