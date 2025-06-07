@@ -52,13 +52,6 @@ const AdminPage: React.FC = () => {
       setLoading(true);
       const client = await getClient();
 
-      // Only proceed if we have an authenticated client
-      if (!client.auth.getSession()) {
-        toast.error(t("authenticationRequired"));
-        navigate("/");
-        return;
-      }
-
       const [productsData, categoriesData] = await Promise.all([
         getProducts(client),
         getCategories(client),
@@ -67,12 +60,7 @@ const AdminPage: React.FC = () => {
       setCategories(categoriesData);
     } catch (error) {
       console.error("Error loading data:", error);
-      if (error instanceof Error && error.message === "No active session") {
-        toast.error(t("sessionExpired"));
-        navigate("/");
-      } else {
-        toast.error(t("errorLoadingData"));
-      }
+      toast.error(t("errorLoadingData"));
     } finally {
       setLoading(false);
     }
