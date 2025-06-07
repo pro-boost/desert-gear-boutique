@@ -66,7 +66,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       try {
         setIsLoading(true);
         const client = await getClient();
-        const cartItems = await getUserCartItems(client, user.id);
+        const cartItems = await getUserCartItems(client);
         setItems(cartItems);
       } catch (error) {
         console.error("Error loading cart:", error);
@@ -91,7 +91,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const client = await getClient();
-      await addToCartDB(client, user.id, product.id, quantity, size);
+      await addToCartDB(client, product.id, quantity, size);
       setItems((prev) => {
         const existingItem = prev.find(
           (item) => item.product.id === product.id && item.selectedSize === size
@@ -129,18 +129,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const client = await getClient();
-      await updateCartItemQuantityDB(
-        client,
-        user.id,
-        productId,
-        quantity,
-        size
-      );
-      if (quantity < 1) {
+      if (quantity <= 0) {
         await removeItem(productId, size);
         return;
       }
-
+      await updateCartItemQuantityDB(client, productId, quantity, size);
       setItems((prev) =>
         prev.map((item) =>
           item.product.id === productId && item.selectedSize === size
@@ -162,19 +155,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const client = await getClient();
-      await removeFromCartDB(client, user.id, productId, size);
-      setItems((prev) => {
-        const item = prev.find(
-          (item) => item.product.id === productId && item.selectedSize === size
-        );
-        if (item) {
-          toast.success(t("removedFromCart"));
-        }
-        return prev.filter(
+      await removeFromCartDB(client, productId, size);
+      setItems((prev) =>
+        prev.filter(
           (item) =>
             !(item.product.id === productId && item.selectedSize === size)
-        );
-      });
+        )
+      );
+      toast.success(t("removedFromCart"));
     } catch (error) {
       console.error("Error removing from cart:", error);
       toast.error(t("errorRemovingFromCart"));
@@ -189,7 +177,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
     try {
       const client = await getClient();
-      await clearCartDB(client, user.id);
+      await clearCartDB(client);
       setItems([]);
       toast.success(t("cartCleared"));
     } catch (error) {

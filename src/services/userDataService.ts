@@ -187,13 +187,17 @@ export const addToCart = async (
   try {
     console.log('Adding to cart:', { productId, quantity, selectedSize });
     const { error } = await client.rpc('upsert_cart_item', {
-      p_product_id: productId,
+      p_product_id: productId.toString(),
       p_quantity: quantity,
       p_selected_size: selectedSize
     });
 
     if (error) {
       console.error('Error adding to cart:', error);
+      if (error.code === '400') {
+        console.error('Bad request - invalid parameters:', error.message);
+        throw new Error('Invalid parameters format');
+      }
       throw error;
     }
 
@@ -212,21 +216,18 @@ export const updateCartItemQuantity = async (
 ): Promise<void> => {
   try {
     console.log('Updating cart item quantity:', { productId, quantity, selectedSize });
-    
-    if (quantity <= 0) {
-      // If quantity is 0 or negative, remove the item
-      await removeFromCart(client, productId, selectedSize);
-      return;
-    }
-
     const { error } = await client.rpc('upsert_cart_item', {
-      p_product_id: productId,
+      p_product_id: productId.toString(),
       p_quantity: quantity,
       p_selected_size: selectedSize
     });
 
     if (error) {
       console.error('Error updating cart item quantity:', error);
+      if (error.code === '400') {
+        console.error('Bad request - invalid parameters:', error.message);
+        throw new Error('Invalid parameters format');
+      }
       throw error;
     }
 
@@ -245,12 +246,16 @@ export const removeFromCart = async (
   try {
     console.log('Removing from cart:', { productId, selectedSize });
     const { error } = await client.rpc('delete_cart_item', {
-      p_product_id: productId,
+      p_product_id: productId.toString(),
       p_selected_size: selectedSize
     });
 
     if (error) {
       console.error('Error removing from cart:', error);
+      if (error.code === '400') {
+        console.error('Bad request - invalid parameters:', error.message);
+        throw new Error('Invalid parameters format');
+      }
       throw error;
     }
 
