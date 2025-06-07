@@ -16,6 +16,7 @@ type Translations = {
 };
 
 // All translatable text goes here
+
 const translations: Translations = {
   siteTitle: {
     fr: "Strike Gear",
@@ -66,7 +67,7 @@ const translations: Translations = {
     ar: "من نحن",
   },
   admin: {
-    fr: "Admin",
+    fr: "Administrateur",
     ar: "المشرف",
   },
   addToCart: {
@@ -75,19 +76,19 @@ const translations: Translations = {
   },
   outOfStock: {
     fr: "En rupture de stock",
-    ar: "نفذ من المخزون",
+    ar: "نفد من المخزون",
   },
   stock: {
     fr: "Stock",
     ar: "المخزون",
   },
   adress: {
-    fr: "Institut Imam Ouarch, Filles Pour L'éducation Musulmane, Meknes",
+    fr: "Institut Imam Ouarch, Filles pour l'éducation musulmane, Meknès",
     ar: "مكناس  مؤسسة الإمام ورش بنات للتعليم العتيق",
   },
   allStock: {
-    fr: " Tous les stocks",
-    ar: "  كل المخازن",
+    fr: "Tous les stocks",
+    ar: "كل المخازن",
   },
   inStock: {
     fr: "En stock",
@@ -98,7 +99,7 @@ const translations: Translations = {
     ar: "البحث عن منتج",
   },
   email: {
-    fr: "Email",
+    fr: "E-mail",
     ar: "البريد الإلكتروني",
   },
   phone: {
@@ -118,7 +119,7 @@ const translations: Translations = {
     ar: "الوصف",
   },
   ourProducts: {
-    fr: "Nos Produits",
+    fr: "Nos produits",
     ar: "منتجاتنا",
   },
   featured: {
@@ -254,15 +255,15 @@ const translations: Translations = {
     ar: "تذكرني",
   },
   forgotPassword: {
-    fr: "Mot de passe oublié?",
+    fr: "Mot de passe oublié ?",
     ar: "نسيت كلمة المرور؟",
   },
   noAccount: {
-    fr: "Pas de compte?",
+    fr: "Pas de compte ?",
     ar: "ليس لديك حساب؟",
   },
   hasAccount: {
-    fr: "Vous avez déjà un compte?",
+    fr: "Vous avez déjà un compte ?",
     ar: "لديك حساب بالفعل؟",
   },
   createAccount: {
@@ -318,8 +319,8 @@ const translations: Translations = {
     ar: "الرسالة",
   },
   equipmentDescription: {
-    fr: "Équipement militaire et tactique de haute qualité",
-    ar: "معدات عسكرية وتكتيكية عالية الجودة",
+    fr: "Équipements de haute qualité",
+    ar: "معدات عالية الجودة",
   },
   passwordRequirements: {
     fr: "Le mot de passe doit contenir au moins 6 caractères",
@@ -393,7 +394,6 @@ const translations: Translations = {
     fr: "Choisir une taille d'abord",
     ar: "اختر المقاس أولاً",
   },
-  // Adding missing translations that are visible in English in various pages
   loading: {
     fr: "Chargement...",
     ar: "جاري التحميل...",
@@ -427,23 +427,23 @@ const translations: Translations = {
     ar: "الرؤية",
   },
   missionDescription: {
-    fr: "Nous nous engageons à fournir des équipements militaires et tactiques de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.",
-    ar: "نلتزم بتقديم معدات عسكرية وتكتيكية من أعلى جودة، مع التركيز على المتانة والأداء.",
+    fr: "Nous nous engageons à fournir des équipements de sécurité de la plus haute qualité, en mettant l'accent sur la durabilité et la performance.",
+    ar: "نلتزم بتقديم معدات الأمان من أعلى جودة، مع التركيز على المتانة والأداء.",
   },
   visionDescription: {
-    fr: "Devenir le leader de référence dans le domaine des équipements militaires et tactiques au Maroc et en Afrique.",
-    ar: "أن نصبح الرائد المرجعي في مجال المعدات العسكرية والتكتيكية في المغرب وأفريقيا.",
+    fr: "Devenir le leader de référence dans le domaine des équipements de sécurité au Maroc et en Afrique.",
+    ar: "أن نصبح الرائد المرجعي في مجال معدات الأمان في المغرب وأفريقيا.",
   },
   standardDelivery: {
-    fr: "Livraison Standard",
+    fr: "Livraison standard",
     ar: "التوصيل العادي",
   },
   expressDelivery: {
-    fr: "Express",
-    ar: "السريع",
+    fr: "Livraison express",
+    ar: "التوصيل السريع",
   },
   orderTracking: {
-    fr: "Suivi de Commande",
+    fr: "Suivi de commande",
     ar: "تتبع الطلب",
   },
   realTimeTracking: {
@@ -452,7 +452,7 @@ const translations: Translations = {
   },
   emailNotifications: {
     fr: "Sur site de livraison",
-    ar: " في موقع التوصيل",
+    ar: "في موقع التوصيل",
   },
   businessDays: {
     fr: "jours ouvrables",
@@ -467,7 +467,7 @@ const translations: Translations = {
     ar: "رسوم إضافية قدرها",
   },
   deliveryZones: {
-    fr: "Zones de Livraison",
+    fr: "Zones de livraison",
     ar: "مناطق التوصيل",
   },
   deliveryZonesDescription: {
@@ -475,20 +475,19 @@ const translations: Translations = {
     ar: "نقوم بالتوصيل إلى جميع مدن المغرب. قد تختلف مدة التوصيل حسب موقعك.",
   },
   importantToKnow: {
-    fr: "Important à Savoir",
+    fr: "Important à savoir",
     ar: "مهم أن تعرف",
   },
   returnPolicy: {
-    fr: "Politique de Retour",
+    fr: "Politique de retour",
     ar: "سياسة الإرجاع",
   },
   returnPolicyDescription: {
     fr: "Nous acceptons les retours dans un délai de 2 jours après la réception de votre commande ou directement avec le même livreur, si la pointure ne correspond pas.\nLes articles doivent être dans leur état d'origine, non utilisés et dans leur emballage d'origine.",
-    ar: "نقبل إرجاع المنتج خلال مدة لا تتجاوز يومين بعد استلام الطلب، أو يمكن إرجاعه مباشرة مع نفس عامل التوصيل إذا كانت المقاس غير مناسب.\nيجب أن يكون المنتج في حالته الأصلية، غير مستعمل، وفي عبوته الأصلية.",
+    ar: "نقبل إرجاع المنتج خلال مدة لا تتجاوز يومين بعد استلام الطلب، أو يمكن إرجاعه مباشرة مع نفس عامل التوصيل إذا كان المقاس غير مناسب.\nيجب أن يكون المنتج في حالته الأصلية، غير مستعمل، وفي عبوته الأصلية.",
   },
-
   howToReturn: {
-    fr: "Comment Retourner un Article",
+    fr: "Comment retourner un article",
     ar: "كيفية إرجاع منتج",
   },
   refunds: {
@@ -516,7 +515,7 @@ const translations: Translations = {
     ar: "قم بإيداع الطرد في نقطة التجميع المحددة",
   },
   daysGuarantee: {
-    fr: "2 Jours",
+    fr: "2 jours",
     ar: "2 يوما",
   },
   forReturning: {
@@ -544,7 +543,7 @@ const translations: Translations = {
     ar: "اسمك",
   },
   yourEmail: {
-    fr: "Votre email",
+    fr: "Votre e-mail",
     ar: "بريدك الإلكتروني",
   },
   messageSubject: {
@@ -560,16 +559,16 @@ const translations: Translations = {
     ar: "لا توجد مفضلات",
   },
   bestEquipment: {
-    fr: "Le meilleur équipement militaire et tactique pour les professionnels et les passionnés.",
-    ar: "أفضل المعدات العسكرية والتكتيكية للمحترفين والهواة.",
+    fr: "Les meilleurs équipements de sécurité pour les professionnels et les passionnés.",
+    ar: "أفضل معدات الأمان للمحترفين والهواة.",
   },
   aboutUsDescription: {
-    fr: "Nidal Boots est votre destination de confiance pour l'équipement militaire et tactique de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.",
-    ar: "نضال بوتس هي وجهتك الموثوقة للمعدات العسكرية والتكتيكية عالية الجودة. منذ تأسيسنا، التزمنا بتقديم أفضل المنتجات للمحترفين والهواة.",
+    fr: "Strike Gear est votre destination de confiance pour les équipements de sécurité de haute qualité. Depuis notre fondation, nous nous sommes engagés à fournir les meilleurs produits aux professionnels et aux passionnés.",
+    ar: "سترايك جير هي وجهتك الموثوقة لمعدات الأمان عالية الجودة. منذ تأسيسنا، التزمنا بتقديم أفضل المنتجات للمحترفين والهواة.",
   },
   productSelection: {
-    fr: "Notre sélection comprend des bottes militaires robustes, des vestes tactiques et des accessoires essentiels, tous soigneusement choisis pour leur qualité et leur durabilité.",
-    ar: "تشمل مجموعتنا أحذية عسكرية متينة وسترات تكتيكية وإكسسوارات أساسية، تم اختيارها جميعًا بعناية لجودتها ومتانتها.",
+    fr: "Notre sélection comprend des bottes robustes, des vestes tactiques et des accessoires essentiels, tous soigneusement choisis pour leur qualité et leur durabilité.",
+    ar: "تشمل مجموعتنا أحذية متينة وسترات تكتيكية وإكسسوارات أساسية، تم اختيارها جميعًا بعناية لجودتها ومتانتها.",
   },
   ordersProcessed: {
     fr: "Les commandes sont traitées du lundi au vendredi",
@@ -577,7 +576,7 @@ const translations: Translations = {
   },
   confirmationEmail: {
     fr: "Un message de confirmation vous sera envoyé après l'expédition",
-    ar: "سيتم إرسال رسالة للتأكيد بعد الشحن",
+    ar: "سيتم إرسال رسالة تأكيد بعد الشحن",
   },
   differentAddress: {
     fr: "Possibilité de livraison à une adresse différente",
@@ -587,13 +586,12 @@ const translations: Translations = {
     fr: "Service client disponible pour toute question",
     ar: "خدمة العملاء متاحة لأي استفسار",
   },
-  // Add translations for components with hardcoded text
   sendMessageCta: {
     fr: "Envoyez-nous un message",
     ar: "أرسل لنا رسالة",
   },
   messageSentSuccess: {
-    fr: "Message envoyé avec succès!",
+    fr: "Message envoyé avec succès !",
     ar: "تم إرسال الرسالة بنجاح!",
   },
   loginRequired: {
@@ -618,11 +616,11 @@ const translations: Translations = {
   },
   welcomeToDesertGear: {
     fr: "Bienvenue chez Strike Gear Boutique",
-    ar: "مرحباً بكم في ديزرت جير بوتيك",
+    ar: "مرحباً بكم في سترايك جير بوتيك",
   },
   heroSubtitle: {
-    fr: "Votre destination de confiance pour l'équipement militaire et tactique de haute qualité",
-    ar: "وجهتك الموثوقة للمعدات العسكرية والتكتيكية عالية الجودة",
+    fr: "Votre destination de confiance pour des équipements de haute qualité",
+    ar: "وجهتك الموثوقة لمعدات عالية الجودة",
   },
   viewAll: {
     fr: "Voir tout",
@@ -749,8 +747,8 @@ const translations: Translations = {
     ar: "الدفع عند الاستلام",
   },
   deliveryConfirmation: {
-    fr: "Nous vous contacterons pour confirmer votre commande et livrer à votre adresse.",
-    ar: "سنتواصل معك لتأكيد طلبك والتوصيل إلى عنوانك.",
+    fr: "Nous vous contacterons pour confirmer votre commande et organiser la livraison à votre adresse.",
+    ar: "سنتواصل معك لتأكيد طلبك وترتيب التوصيل إلى عنوانك.",
   },
   fullName: {
     fr: "Nom complet",
@@ -781,12 +779,12 @@ const translations: Translations = {
     ar: "عنوان التوصيل",
   },
   enterDeliveryAddress: {
-    fr: "Entrez votre adresse de livraison complète",
+    fr: "Entrez votre adresse complète de livraison",
     ar: "أدخل عنوان التوصيل الكامل",
   },
   agreeToPolicies: {
     fr: "En passant votre commande, vous acceptez nos :",
-    ar: "بإتمام طلبك، فإنك توافق على :",
+    ar: "بإتمامك للطلب، فإنك توافق على:",
   },
   shippingPolicy: {
     fr: "Politique de livraison",
@@ -813,20 +811,20 @@ const translations: Translations = {
     ar: "المتابعة إلى الدفع",
   },
   newOrder: {
-    fr: "Nouvelle commande de Produit",
-    ar: "طلب جديد",
+    fr: "Nouvelle commande de produit",
+    ar: "طلب منتج جديد",
   },
   orderItems: {
     fr: "Articles commandés",
     ar: "المنتجات المطلوبة",
   },
   provideDeliveryDetails: {
-    fr: "Veuillez fournir vos coordonnées de livraison dans le chat",
+    fr: "Veuillez fournir vos informations de livraison dans le chat",
     ar: "يرجى تقديم تفاصيل التوصيل في المحادثة",
   },
   payAfterReceiving: {
-    fr: "Paiement à la réception de votre commande",
-    ar: "الدفع عند استلام طلبك",
+    fr: "Paiement à la réception de la commande",
+    ar: "الدفع عند استلام الطلب",
   },
   // Admin page translations
   adminDashboard: {
@@ -835,23 +833,23 @@ const translations: Translations = {
   },
   backToHome: {
     fr: "Retour à l'accueil",
-    ar: "العودة إلى الرئيسية",
+    ar: "العودة إلى الصفحة الرئيسية",
   },
   categories: {
     fr: "Catégories",
     ar: "الفئات",
   },
   manageProductsDescription: {
-    fr: "Gérez vos produits, ajoutez-en de nouveaux ou modifiez les existants",
-    ar: "إدارة منتجاتك، إضافة منتجات جديدة أو تعديل المنتجات الموجودة",
+    fr: "Gérez vos produits : ajoutez-en de nouveaux ou modifiez les existants.",
+    ar: "قم بإدارة منتجاتك، أضف منتجات جديدة أو عدّل المنتجات الموجودة.",
   },
   manageCategories: {
     fr: "Gérer les catégories",
     ar: "إدارة الفئات",
   },
   manageCategoriesDescription: {
-    fr: "Gérez les catégories de produits et leurs tailles disponibles",
-    ar: "إدارة فئات المنتجات والمقاسات المتاحة",
+    fr: "Gérez les catégories de produits et leurs tailles disponibles.",
+    ar: "قم بإدارة فئات المنتجات والمقاسات المتاحة.",
   },
   addCategory: {
     fr: "Ajouter une catégorie",
@@ -862,23 +860,23 @@ const translations: Translations = {
     ar: "تعديل الفئة",
   },
   editCategoryDescription: {
-    fr: "Modifiez les détails de la catégorie et ses tailles disponibles",
-    ar: "تعديل تفاصيل الفئة والمقاسات المتاحة",
+    fr: "Modifiez les détails de la catégorie et ses tailles disponibles.",
+    ar: "قم بتعديل تفاصيل الفئة والمقاسات المتاحة.",
   },
   addCategoryDescription: {
-    fr: "Créez une nouvelle catégorie avec ses tailles disponibles",
-    ar: "إنشاء فئة جديدة مع المقاسات المتاحة",
+    fr: "Créez une nouvelle catégorie avec ses tailles disponibles.",
+    ar: "أنشئ فئة جديدة مع المقاسات المتاحة.",
   },
   categoryName: {
     fr: "Nom de la catégorie",
     ar: "اسم الفئة",
   },
   nameFr: {
-    fr: "Nom (Français)",
+    fr: "Nom (français)",
     ar: "الاسم (بالفرنسية)",
   },
   nameAr: {
-    fr: "Nom (Arabe)",
+    fr: "Nom (arabe)",
     ar: "الاسم (بالعربية)",
   },
   enterCategoryName: {
@@ -891,7 +889,7 @@ const translations: Translations = {
   },
   enterSize: {
     fr: "Entrez une taille",
-    ar: "أدخل مقاساً",
+    ar: "أدخل مقاسًا",
   },
   addSize: {
     fr: "Ajouter une taille",
@@ -907,7 +905,7 @@ const translations: Translations = {
   },
   deleteCategoryConfirmation: {
     fr: "Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette action est irréversible.",
-    ar: "هل أنت متأكد من رغبتك في حذف هذه الفئة؟ لا يمكن التراجع عن هذا الإجراء.",
+    ar: "هل أنت متأكد أنك تريد حذف هذه الفئة؟ هذا الإجراء لا يمكن التراجع عنه.",
   },
   image: {
     fr: "Image",
@@ -919,7 +917,7 @@ const translations: Translations = {
   },
   deleteProductConfirmation: {
     fr: "Êtes-vous sûr de vouloir supprimer ce produit ? Cette action est irréversible.",
-    ar: "هل أنت متأكد من رغبتك في حذف هذا المنتج؟ لا يمكن التراجع عن هذا الإجراء.",
+    ar: "هل أنت متأكد أنك تريد حذف هذا المنتج؟ هذا الإجراء لا يمكن التراجع عنه.",
   },
   unauthorizedAccess: {
     fr: "Accès non autorisé",
@@ -939,12 +937,12 @@ const translations: Translations = {
     ar: "إضافة منتج جديد",
   },
   editProductDescription: {
-    fr: "Modifiez les informations du produit ci-dessous",
-    ar: "قم بتعديل معلومات المنتج أدناه",
+    fr: "Modifiez les informations du produit ci-dessous.",
+    ar: "قم بتعديل معلومات المنتج أدناه.",
   },
   addProductDescription: {
-    fr: "Remplissez les informations du produit ci-dessous",
-    ar: "املأ معلومات المنتج أدناه",
+    fr: "Remplissez les informations du produit ci-dessous.",
+    ar: "املأ معلومات المنتج أدناه.",
   },
   productName: {
     fr: "Nom du produit",
@@ -968,11 +966,11 @@ const translations: Translations = {
   },
   errorSavingProduct: {
     fr: "Erreur lors de l'enregistrement du produit",
-    ar: "خطأ في حفظ المنتج",
+    ar: "حدث خطأ أثناء حفظ المنتج",
   },
   errorLoadingData: {
     fr: "Erreur lors du chargement des données",
-    ar: "خطأ في تحميل البيانات",
+    ar: "حدث خطأ أثناء تحميل البيانات",
   },
   // ImageDropzone translations
   dropImagesHere: {
@@ -984,12 +982,12 @@ const translations: Translations = {
     ar: "أسقط الصور هنا",
   },
   dragDropImage: {
-    fr: "Glissez et déposez votre image de produit ici ou cliquez pour sélectionner",
-    ar: "اسحب وأفلت صورة المنتج هنا أو انقر للاختيار",
+    fr: "Glissez-déposez l'image du produit ici ou cliquez pour sélectionner",
+    ar: "اسحب وأفلت صورة المنتج هنا أو انقر لاختيارها",
   },
   dragDropImages: {
-    fr: "Glissez et déposez vos images de produit ici ou cliquez pour sélectionner (max 5)",
-    ar: "اسحب وأفلت صور المنتج هنا أو انقر للاختيار (الحد الأقصى 5)",
+    fr: "Glissez-déposez les images du produit ici ou cliquez pour sélectionner (max 5)",
+    ar: "اسحب وأفلت صور المنتج هنا أو انقر لاختيارها (الحد الأقصى 5)",
   },
   productPreview: {
     fr: "Aperçu du produit",
@@ -999,6 +997,7 @@ const translations: Translations = {
     fr: "Aperçu du produit {index}",
     ar: "معاينة المنتج {index}",
   },
+
   // Homepage feature translations
   fastShipping: {
     fr: "Livraison rapide",
@@ -1008,6 +1007,7 @@ const translations: Translations = {
     fr: "Garantie qualité",
     ar: "ضمان الجودة",
   },
+
   // Contact form placeholders
   yourPhone: {
     fr: "Votre numéro de téléphone",
@@ -1023,7 +1023,7 @@ const translations: Translations = {
   },
   phoneNumberFormat: {
     fr: "Veuillez entrer un numéro de téléphone valide (minimum 10 chiffres)",
-    ar: "الرجاء إدخال رقم هاتف صالح (10 أرقام على الأقل)",
+    ar: "يرجى إدخال رقم هاتف صالح (10 أرقام على الأقل)",
   },
   enterSubject: {
     fr: "Comment pouvons-nous vous aider ?",
@@ -1033,6 +1033,8 @@ const translations: Translations = {
     fr: "Écrivez votre message ici...",
     ar: "اكتب رسالتك هنا...",
   },
+
+  // UI and product options
   direction: {
     fr: "ltr",
     ar: "rtl",
@@ -1070,10 +1072,11 @@ const translations: Translations = {
     ar: "إعادة تعيين الفلاتر",
   },
   tryDifferentFilters: {
-    fr: "Essayez des filtres différents",
+    fr: "Essayez d'autres filtres",
     ar: "جرب فلاتر مختلفة",
   },
-  // Add missing translations for admin actions
+
+  // Admin actions
   delete: {
     fr: "Supprimer",
     ar: "حذف",
@@ -1087,59 +1090,63 @@ const translations: Translations = {
     ar: "تصفح الملفات",
   },
   addMoreImages: {
-    fr: "Ajouter plus d'images",
+    fr: "Ajouter d'autres images",
     ar: "إضافة المزيد من الصور",
   },
   pleaseFillAllRequiredFields: {
     fr: "Veuillez remplir tous les champs obligatoires",
     ar: "يرجى ملء جميع الحقول المطلوبة",
   },
+
+  // Error messages
   errorAddingProduct: {
-    fr: "Une erreur s'est produite lors de l'ajout du produit",
+    fr: "Une erreur est survenue lors de l'ajout du produit",
     ar: "حدث خطأ أثناء إضافة المنتج",
   },
   errorUpdatingProduct: {
-    fr: "Une erreur s'est produite lors de la mise à jour du produit",
+    fr: "Une erreur est survenue lors de la mise à jour du produit",
     ar: "حدث خطأ أثناء تحديث المنتج",
   },
   errorLoadingCategories: {
-    fr: "Une erreur s'est produite lors du chargement des catégories",
+    fr: "Une erreur est survenue lors du chargement des catégories",
     ar: "حدث خطأ أثناء تحميل الفئات",
   },
   errorLoadingProduct: {
-    fr: "Une erreur s'est produite lors du chargement du produit",
+    fr: "Une erreur est survenue lors du chargement du produit",
     ar: "حدث خطأ أثناء تحميل المنتج",
   },
   errorUploadingImage: {
-    fr: "Une erreur s'est produite lors du téléchargement de l'image",
+    fr: "Une erreur est survenue lors du téléversement de l'image",
     ar: "حدث خطأ أثناء تحميل الصورة",
   },
   errorRemovingImage: {
-    fr: "Une erreur s'est produite lors de la suppression de l'image",
+    fr: "Une erreur est survenue lors de la suppression de l'image",
     ar: "حدث خطأ أثناء حذف الصورة",
   },
   errorReorderingImages: {
-    fr: "Une erreur s'est produite lors du réarrangement des images",
+    fr: "Une erreur est survenue lors du réagencement des images",
     ar: "حدث خطأ أثناء إعادة ترتيب الصور",
   },
   maxImagesReached: {
-    fr: "Vous avez atteint la limite maximale d'images (5)",
+    fr: "Vous avez atteint le nombre maximal d'images (5)",
     ar: "لقد وصلت إلى الحد الأقصى للصور (5)",
   },
   invalidImageFormat: {
-    fr: "Format d'image non valide. Formats acceptés : JPEG, JPG, PNG, WEBP",
+    fr: "Format d'image invalide. Formats acceptés : JPEG, JPG, PNG, WEBP",
     ar: "تنسيق صورة غير صالح. التنسيقات المقبولة: JPEG، JPG، PNG، WEBP",
   },
   imageTooLarge: {
-    fr: "L'image est trop volumineuse. Taille maximale : 5MB",
+    fr: "L'image est trop volumineuse. Taille maximale : 5 Mo",
     ar: "الصورة كبيرة جدًا. الحجم الأقصى: 5 ميجابايت",
   },
+
+  // Descriptions
   descriptionFr: {
-    fr: "Description (Français)",
+    fr: "Description (français)",
     ar: "الوصف (بالفرنسية)",
   },
   descriptionAr: {
-    fr: "Description (Arabe)",
+    fr: "Description (arabe)",
     ar: "الوصف (بالعربية)",
   },
   // Product reordering translations
@@ -1149,12 +1156,14 @@ const translations: Translations = {
   },
   failedToUpdateOrder: {
     fr: "Échec de la mise à jour de l'ordre des produits",
-    ar: "فشل تحديث ترتيب المنتجات",
+    ar: "فشل في تحديث ترتيب المنتجات",
   },
   dragToReorder: {
-    fr: "Glissez pour réorganiser",
+    fr: "Faites glisser pour réorganiser",
     ar: "اسحب لإعادة الترتيب",
   },
+
+  // Product details
   quantityLabel: {
     fr: "Quantité",
     ar: "الكمية",
@@ -1165,7 +1174,7 @@ const translations: Translations = {
   },
   pricePerItemLabel: {
     fr: "Prix par article",
-    ar: "السعر لكل منتج",
+    ar: "السعر لكل وحدة",
   },
   subtotalLabel: {
     fr: "Sous-total",
@@ -1175,6 +1184,8 @@ const translations: Translations = {
     fr: "Dh",
     ar: "درهم",
   },
+
+  // Product inquiry
   productInquiryHeader: {
     fr: "NOUVELLE DEMANDE DE PRODUIT",
     ar: "طلب معلومات عن منتج جديد",
@@ -1196,16 +1207,16 @@ const translations: Translations = {
     ar: "مرحباً،",
   },
   inquiryMessage: {
-    fr: "Je suis intéressé(e) par ce produit et j'aimerais avoir plus d'informations.",
-    ar: "أنا مهتم بهذا المنتج وأود الحصول على مزيد من المعلومات.",
+    fr: "Je suis intéressé(e) par ce produit et souhaiterais avoir plus d'informations.",
+    ar: "أنا مهتم بهذا المنتج وأرغب في الحصول على مزيد من المعلومات.",
   },
   inquiryThankYou: {
     fr: "Merci d'avance pour votre retour.",
-    ar: "شكراً مسبقاً على ردكم.",
+    ar: "شكراً لكم مسبقاً على ردكم.",
   },
   inquireOnWhatsApp: {
-    fr: "Demander sur WhatsApp",
-    ar: "استفسر عبر واتساب",
+    fr: "Demander via WhatsApp",
+    ar: "الاستفسار عبر واتساب",
   },
 };
 

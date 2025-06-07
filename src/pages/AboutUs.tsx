@@ -5,14 +5,14 @@ const AboutUs = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="container mx-auto px-4 py-12">
+      <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-heading font-bold mb-8">{t("aboutUs")}</h1>
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
           <div className="mb-12">
             <img
-              src="https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
+              src="/images/main/thomas-de-luze-t9wX36U3BEs-unsplash.webp"
               alt={t("aboutUs")}
               className="w-full h-[400px] object-cover rounded-lg mb-8"
             />

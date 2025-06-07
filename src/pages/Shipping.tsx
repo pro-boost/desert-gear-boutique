@@ -6,7 +6,7 @@ const Shipping = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container min-h-screen mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-heading font-bold mb-8">
           {t("shipping")}

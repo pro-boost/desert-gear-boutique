@@ -85,11 +85,11 @@ ${t("subtotalLabel")}: ${item.subtotal.toFixed(2)} ${t("currencyLabel")}
   };
 
   return (
-    <main className="flex-grow py-3 px-2 sm:py-4 sm:px-3 md:py-6 md:px-4 lg:py-8 lg:px-6">
-      <div className="container mx-auto max-w-6xl">
+    <main className="container min-h-screen mx-auto px-4 py-12">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-3 sm:mb-4 md:mb-6">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-heading font-bold">
+          <h1 className="text-4xl font-heading font-bold mb-12 text-center">
             {t("cart")}
           </h1>
         </div>

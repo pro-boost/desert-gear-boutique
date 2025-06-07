@@ -10,7 +10,7 @@ const Footer = () => {
     <footer className="bg-accent/10 dark:bg-accent/5 py-10 px-4 border-t border-border">
       <div className="container mx-auto">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand Column */}
           <div>
             <h3 className="text-lg font-bold mb-4 text-primary">
@@ -39,47 +39,6 @@ const Footer = () => {
                 <Facebook size={20} />
               </a>
             </div>
-          </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-bold mb-4 text-primary">
-              {t("exploreProducts")}
-            </h3>
-            <ul className="space-y-2">
-              <li>
-                <Link
-                  to="/products?category=boots"
-                  className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block"
-                >
-                  {t("boots")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/products?category=jackets"
-                  className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block"
-                >
-                  {t("jackets")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/products?category=accessories"
-                  className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block"
-                >
-                  {t("accessories")}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/products"
-                  className="text-muted-foreground hover:text-primary transition-colors hover:translate-x-1 inline-block"
-                >
-                  {t("allProducts")}
-                </Link>
-              </li>
-            </ul>
           </div>
 
           {/* Support Column */}
@@ -169,7 +128,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-10 pt-6 border-t border-border/30 text-center text-sm text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} Nidal Boots. {t("allRights")}
+            © {new Date().getFullYear()} Strike Gear. {t("allRights")}
           </p>
         </div>
       </div>

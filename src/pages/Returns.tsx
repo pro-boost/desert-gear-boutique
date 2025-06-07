@@ -6,7 +6,7 @@ const Returns = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container min-h-screen mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-heading font-bold mb-8">{t("returns")}</h1>
 
@@ -41,7 +41,7 @@ const Returns = () => {
           <h2 className="text-2xl font-heading font-semibold mb-4">
             {t("howToReturn")}
           </h2>
-          <ol className="list-decimal pl-6 space-y-4 text-muted-foreground">
+          <ol className="list-decimal pl-6 space-y-4 text-muted-foreground mb-6">
             <li>{t("contactCustomerService")}</li>
             <li>{t("packageCarefully")}</li>
             <li>{t("useReturnLabel")}</li>
