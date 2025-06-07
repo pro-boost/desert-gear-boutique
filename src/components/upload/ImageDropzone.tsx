@@ -239,7 +239,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
 
       {/* Image Preview Grid */}
       {images.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 max-w-3xl ">
           {images.map((image, index) => (
             <div
               key={image.id}
@@ -250,6 +250,7 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
               onDragEnd={handleDragEnd}
               className={`
                 relative group bg-background rounded-lg border-2 transition-all duration-200 cursor-move
+                max-w-[200px] mx-auto w-full
                 ${draggedIndex === index ? "opacity-50 scale-95" : ""}
                 ${
                   dragOverIndex === index && draggedIndex !== index
@@ -260,9 +261,9 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
               `}
             >
               {/* Drag Handle */}
-              <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
-                <div className="bg-background/80 rounded p-1">
-                  <GripVertical className="h-4 w-4 text-foreground" />
+              <div className="absolute top-1 left-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10">
+                <div className="bg-background/80 rounded p-0.5">
+                  <GripVertical className="h-3 w-3 text-foreground" />
                 </div>
               </div>
 
@@ -272,32 +273,32 @@ const ImageDropzone: React.FC<ImageDropzoneProps> = ({
                   e.stopPropagation();
                   removeImage(image.id);
                 }}
-                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10"
+                className="absolute top-1 right-1 opacity-100 transition-opacity duration-200 z-10"
               >
-                <div className="bg-destructive hover:bg-destructive/90 rounded-full p-1 transition-colors duration-200">
-                  <X className="h-4 w-4 text-destructive-foreground" />
+                <div className="bg-destructive hover:bg-destructive/90 rounded-full p-0.5 transition-colors duration-200">
+                  <X className="h-3 w-3 text-destructive-foreground" />
                 </div>
               </button>
 
               {/* Image */}
-              <div className="aspect-square p-2">
+              <div className="aspect-square p-1">
                 <img
                   src={image.src}
                   alt={image.name}
-                  className="w-full h-full object-cover rounded-md"
+                  className="w-full h-full object-contain rounded-md"
                   draggable={false}
                 />
               </div>
 
               {/* Image Info */}
-              <div className="p-2 border-t border-muted">
+              <div className="p-1 border-t border-muted flex flex-col items-center justify-center">
                 <p
-                  className="text-xs text-muted-foreground truncate"
+                  className="text-[10px] text-muted-foreground truncate"
                   title={image.name}
                 >
                   {image.name}
                 </p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-[10px] text-muted-foreground">
                   {(image.size / 1024 / 1024).toFixed(2)} MB
                 </p>
               </div>

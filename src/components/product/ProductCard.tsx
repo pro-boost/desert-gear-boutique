@@ -195,26 +195,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, delay = 0 }) => {
               <span className="text-lg font-bold">${product.price}</span>
             )}
           </div>
-
-          {product.sizes && product.sizes.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {product.sizes.map((size) => (
-                <Button
-                  key={size}
-                  variant={selectedSize === size ? "default" : "outline"}
-                  size="sm"
-                  className={cn(
-                    "min-w-[2.5rem] h-8 px-2",
-                    selectedSize === size &&
-                      "bg-primary text-primary-foreground"
-                  )}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </Button>
-              ))}
-            </div>
-          )}
         </CardContent>
 
         <CardFooter className="p-4 pt-0 mt-auto flex gap-2">

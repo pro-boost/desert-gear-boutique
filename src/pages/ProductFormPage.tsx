@@ -433,65 +433,6 @@ const ProductFormPage: React.FC<ProductFormPageProps> = ({
                 maxImages={5}
                 maxSizeMB={5}
               />
-              {formData.images && formData.images.length > 0 && (
-                <DragDropContext onDragEnd={handleImageReorder}>
-                  <Droppable droppableId="images" direction="horizontal">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="flex flex-wrap gap-4 mt-4"
-                      >
-                        {formData.images.map((image, index) => (
-                          <Draggable
-                            key={index}
-                            draggableId={`image-${index}`}
-                            index={index}
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className="relative"
-                              >
-                                <div
-                                  {...provided.dragHandleProps}
-                                  className="absolute -top-2 -left-2 bg-primary text-primary-foreground rounded-full p-1 cursor-move"
-                                >
-                                  <GripVertical className="h-4 w-4" />
-                                </div>
-                                <img
-                                  src={image}
-                                  alt={`Product image ${index + 1}`}
-                                  className="w-24 h-24 object-cover rounded-md"
-                                />
-                                <Button
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute -top-2 -right-2 h-5 w-5"
-                                  onClick={() => {
-                                    const newImages = formData.images.filter(
-                                      (_, i) => i !== index
-                                    );
-                                    setFormData((prev) => ({
-                                      ...prev,
-                                      images: newImages,
-                                    }));
-                                  }}
-                                  type="button"
-                                >
-                                  <X className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              )}
             </div>
           </div>
 

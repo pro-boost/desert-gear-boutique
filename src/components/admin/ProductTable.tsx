@@ -103,7 +103,7 @@ const SortableTableRow = ({
         <img
           src={product.images[0]}
           alt={product.name}
-          className="w-12 h-12 object-cover rounded"
+          className="w-12 h-12 object-contain rounded"
         />
       </TableCell>
       <TableCell className="font-medium max-w-[200px] truncate">
@@ -211,7 +211,7 @@ const SortableProductCard = ({
             <img
               src={product.images[0]}
               alt={product.name}
-              className="w-3/4 h-auto md:w-20 rounded-lg md:h-20 md:self-start object-cover self-center"
+              className="w-3/4 h-auto md:w-20 rounded-lg md:h-20 md:self-start object-contain self-center"
             />
           </div>
           <div className="flex-1 min-w-0 p-4">
