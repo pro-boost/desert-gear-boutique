@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { RouteObject, Navigate, Outlet } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import {
   SignedIn,
@@ -55,69 +55,88 @@ const ProtectedRoute = ({
   return <>{children}</>;
 };
 
+// Define routes configuration
+export const routes: RouteObject[] = [
+  {
+    path: "/",
+    element: <HomePage />,
+  },
+  {
+    path: "/products",
+    element: <ProductsPage />,
+  },
+  {
+    path: "/products/:id",
+    element: <ProductDetail />,
+  },
+  {
+    path: "/about",
+    element: <AboutUs />,
+  },
+  {
+    path: "/contact",
+    element: <ContactPage />,
+  },
+  {
+    path: "/shipping",
+    element: <Shipping />,
+  },
+  {
+    path: "/returns",
+    element: <Returns />,
+  },
+  {
+    path: "/sign-in/*",
+    element: (
+      <SignedOut>
+        <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" />
+      </SignedOut>
+    ),
+  },
+  {
+    path: "/sign-up/*",
+    element: (
+      <SignedOut>
+        <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
+      </SignedOut>
+    ),
+  },
+  {
+    path: "/cart",
+    element: (
+      <SignedIn>
+        <CartPage />
+      </SignedIn>
+    ),
+  },
+  {
+    path: "/favorites",
+    element: (
+      <SignedIn>
+        <FavoritesPage />
+      </SignedIn>
+    ),
+  },
+  {
+    path: "/admin",
+    element: (
+      <ProtectedRoute adminOnly>
+        <AdminPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+];
+
+// Export a component that renders the routes with Suspense
 const AppRoutes = () => {
   return (
     <>
       <Suspense fallback={<RouteLoadingFallback />}>
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/shipping" element={<Shipping />} />
-          <Route path="/returns" element={<Returns />} />
-
-          {/* Auth Routes */}
-          <Route
-            path="/sign-in/*"
-            element={
-              <SignedOut>
-                <SignIn routing="path" path="/sign-in" signUpUrl="/sign-up" />
-              </SignedOut>
-            }
-          />
-          <Route
-            path="/sign-up/*"
-            element={
-              <SignedOut>
-                <SignUp routing="path" path="/sign-up" signInUrl="/sign-in" />
-              </SignedOut>
-            }
-          />
-
-          {/* Protected Routes */}
-          <Route
-            path="/cart"
-            element={
-              <SignedIn>
-                <CartPage />
-              </SignedIn>
-            }
-          />
-          <Route
-            path="/favorites"
-            element={
-              <SignedIn>
-                <FavoritesPage />
-              </SignedIn>
-            }
-          />
-
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute adminOnly>
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* 404 Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Outlet />
       </Suspense>
       <BackToTopButton />
     </>

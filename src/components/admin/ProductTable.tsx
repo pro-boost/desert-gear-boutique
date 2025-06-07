@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
@@ -49,8 +49,18 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useSupabase } from "@/hooks/useSupabase";
-import { updateProductPositions } from "@/services/productService";
+import {
+  updateProductPositions,
+  getCategories,
+} from "@/services/productService";
 import { toast } from "@/components/ui/sonner";
+
+interface Category {
+  id: string;
+  nameFr: string;
+  nameAr: string;
+  sizes: string[];
+}
 
 interface ProductTableProps {
   products: Product[];
@@ -65,10 +75,12 @@ const SortableTableRow = ({
   product,
   onEdit,
   onDelete,
+  categoryName,
 }: {
   product: Product;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  categoryName: string;
 }) => {
   const { t } = useLanguage();
   const {
@@ -109,9 +121,7 @@ const SortableTableRow = ({
       <TableCell className="font-medium max-w-[200px] truncate">
         {product.name}
       </TableCell>
-      <TableCell className="max-w-[150px] truncate">
-        {product.categoryId}
-      </TableCell>
+      <TableCell className="max-w-[150px] truncate">{categoryName}</TableCell>
       <TableCell>
         {product.discountPrice ? (
           <div className="flex flex-col">
@@ -173,10 +183,12 @@ const SortableProductCard = ({
   product,
   onEdit,
   onDelete,
+  categoryName,
 }: {
   product: Product;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  categoryName: string;
 }) => {
   const { t } = useLanguage();
   const {
@@ -219,7 +231,7 @@ const SortableProductCard = ({
               {product.name}
             </CardTitle>
             <CardDescription className="mt-1 break-words">
-              {t("category")}: {product.categoryId}
+              {t("category")}: {categoryName}
             </CardDescription>
           </div>
         </div>
@@ -300,10 +312,26 @@ const ProductTable: React.FC<ProductTableProps> = ({
   onReorder = () => {},
   isLoading,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { getClient } = useSupabase();
   const [items, setItems] = useState(products);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      const client = await getClient();
+      const categories = await getCategories(client);
+      setCategories(categories);
+    };
+    loadCategories();
+  }, [getClient]);
+
+  const getCategoryName = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId);
+    if (!category) return categoryId;
+    return language === "ar" ? category.nameAr : category.nameFr;
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -370,6 +398,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 product={product}
                 onEdit={onEdit}
                 onDelete={onDelete}
+                categoryName={getCategoryName(product.categoryId)}
               />
             ))}
           </SortableContext>
@@ -406,6 +435,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                     product={product}
                     onEdit={onEdit}
                     onDelete={onDelete}
+                    categoryName={getCategoryName(product.categoryId)}
                   />
                 ))}
               </SortableContext>

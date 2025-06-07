@@ -1,4 +1,9 @@
-import { BrowserRouter } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  type FutureConfig,
+  Outlet,
+} from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { LanguageProvider } from "@/contexts/LanguageContext";
@@ -8,6 +13,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/layouts/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import { routes } from "@/routes";
 
 // Lazy load Clerk components
 const ClerkLoaded = lazy(() =>
@@ -17,14 +23,42 @@ const ClerkLoading = lazy(() =>
   import("@clerk/clerk-react").then((mod) => ({ default: mod.ClerkLoading }))
 );
 
-// Lazy load routes
-const AppRoutes = lazy(() => import("@/routes"));
-
 // Loading component for Clerk
 const ClerkLoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
   </div>
+);
+
+// Create router with future flags
+const router = createBrowserRouter(
+  [
+    {
+      element: (
+        <CartProvider>
+          <FavoritesProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navbar />
+              <main className="flex-grow">
+                <Suspense fallback={<ClerkLoadingFallback />}>
+                  <Outlet />
+                </Suspense>
+              </main>
+              <Footer />
+              <Toaster />
+            </div>
+          </FavoritesProvider>
+        </CartProvider>
+      ),
+      children: routes,
+    },
+  ],
+  {
+    future: {
+      v7_startTransition: true,
+      v7_relativeSplatPath: true,
+    } as Partial<FutureConfig>,
+  }
 );
 
 const App = () => {
@@ -43,22 +77,7 @@ const App = () => {
               <ClerkLoadingFallback />
             </ClerkLoading>
             <ClerkLoaded>
-              <BrowserRouter>
-                <CartProvider>
-                  <FavoritesProvider>
-                    <div className="min-h-screen flex flex-col">
-                      <Navbar />
-                      <main className="flex-grow">
-                        <Suspense fallback={<ClerkLoadingFallback />}>
-                          <AppRoutes />
-                        </Suspense>
-                      </main>
-                      <Footer />
-                      <Toaster />
-                    </div>
-                  </FavoritesProvider>
-                </CartProvider>
-              </BrowserRouter>
+              <RouterProvider router={router} />
             </ClerkLoaded>
           </Suspense>
         </ClerkProvider>
