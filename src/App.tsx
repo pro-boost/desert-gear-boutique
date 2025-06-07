@@ -13,6 +13,7 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/layouts/Footer";
 import { Toaster } from "@/components/ui/sonner";
+import ScrollToTop from "@/components/ScrollToTop";
 import { routes } from "@/routes";
 
 // Lazy load Clerk components
@@ -38,6 +39,7 @@ const router = createBrowserRouter(
         <CartProvider>
           <FavoritesProvider>
             <div className="min-h-screen flex flex-col">
+              <ScrollToTop />
               <Navbar />
               <main className="flex-grow">
                 <Suspense fallback={<ClerkLoadingFallback />}>
